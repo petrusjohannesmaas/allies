@@ -10,6 +10,7 @@ An example **Ally** object:
 ```json
 {
 	"ally": {
+		"id": "",
         "category": "",
 		"basic_info": {
 			"fname": "",
@@ -18,7 +19,12 @@ An example **Ally** object:
 			"birthday": "",
 			"pfp": ""
 		},
-		"missions": [{}, {}],
+		"missions": [{
+			"uuid": "",
+			"description": "",
+			"due_date": ""
+		}, {}],
+
 		"note": ""
 	}
 }
@@ -27,7 +33,7 @@ An example **Ally** object:
 Each ally contains:
 - **Category**: A string representing the category of ally (e.g., family member, friend, etc.).
 - **Basic Info**: First name, last name, email, birthday, profile picture.
-- **Missions**: A list of commitments or obligations with a description and due date.
+- **Missions**: A list of commitments or obligations with a unique identifier, description, and due date.
 - **Note**: General notes related to the ally.
 
 ## Development Phases

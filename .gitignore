@@ -2,3 +2,5 @@ node_modules
 contacts.db
 .vscode
 .env
+archive
+deno.lock
