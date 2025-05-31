@@ -1,2 +1,4 @@
 node_modules
-allies.db
+contacts.db
+.vscode
+.env
