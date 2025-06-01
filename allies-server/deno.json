@@ -4,7 +4,7 @@
     "strict": true
   },
   "tasks": {
-    "start": "deno run --allow-read --allow-write --allow-net --allow-env main.ts",
+    "start": "deno run --allow-read --allow-write --allow-net --allow-env server.ts",
     "migrate": "deno run --allow-read --allow-write --allow-net --allow-env database/migrations.ts",
     "test": "deno run --allow-read --allow-write --allow-net --allow-env tests/test.ts"
   },

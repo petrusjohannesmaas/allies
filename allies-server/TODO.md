@@ -10,17 +10,22 @@ Here’s the **Phase 1 To-Do List** for getting the backend up and running.
 ✅ Import **Deno modules** for **dotenv** and **std/dotenv**.
 ✅ Create a **.gitignore** file to exclude unnecessary files.
 
+
 #### **2️⃣ Database Configuration**
 
 ✅ Install and configure **PostgreSQL** Docker container and local client.
 ✅ Create migration script.
 ✅ Test **models** for **Allies** and **Missions**.
-✅ Ensure support for **JSONB storage** in missions.
+✅ Clean up the database schema to not use any JSON fields.
+✅ Redo the migration script to use the new schema.
+✅ Create new models for **Allies** and **Missions**.
+
 
 #### **3️⃣ API Routes Definition**
 
-🚧 Implement **CRUD endpoints**:
-  - `POST /allies` → Add a new ally.
+✅ Create a basic server with a test route to insert.
+- Implement **CRUD endpoints**:
+  ✅ `POST /allies` → Add a new ally.
   - `GET /allies` → Retrieve all allies.
   - `GET /allies/:id` → Get details of a specific ally.
   - `PUT /allies/:id` → Update ally information.
