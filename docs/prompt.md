@@ -1,12 +1,37 @@
-### **3️⃣ Verify JSONB Storage in PostgreSQL**
-To check that **basic_info** is correctly stored as JSONB:
-```sql
-SELECT basic_info->>'fname' FROM allies WHERE id = 1;
+I don't want to use data:any because the whole reason of creating models and helper functions is to have type safety.
+
+I think we need to change our schema to be purely relational and not have any JSON fields.
+
+How can we change this into a relational schema?
+
+```json
+{
+	"ally": {
+		"id": "",
+        "category": "",
+        "fname": "",
+        "lname": "",
+        "email": "",
+        "birthday": "",
+        "pfp": "",
+        "note": "",
+		"missions": [{
+			"uuid": "",
+			"description": "",
+			"due_date": ""
+		}, {}],
+
+	}
+}
 ```
-✅ **PostgreSQL natively queries JSON data**  
 
----
+Here's out progress so far. Let's work on this.
 
-### **Next Steps**
-Would you like to **test inserting some sample data** or **expand API endpoints** for managing allies and missions? 🚀  
-Let me know where you want to go next!
+#### **2️⃣ Database Configuration**
+
+✅ Install and configure **PostgreSQL** Docker container and local client.
+✅ Create migration script.
+✅ Test **models** for **Allies** and **Missions** with JSONB fields.
+🏗️ Refactor the database schema to not use any JSON fields.
+🏗️ Redo our migration script to use the new schema.
+🏗️ Create new models for **Allies** and **Missions**.
