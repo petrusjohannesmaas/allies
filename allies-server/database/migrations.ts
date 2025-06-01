@@ -1,6 +1,6 @@
-import { db } from "../database.ts";
+import { client } from "./database.ts";
 
-await db.query(`
+await client.queryArray(`
   CREATE TABLE IF NOT EXISTS allies (
     id SERIAL PRIMARY KEY,
     category TEXT NOT NULL,
@@ -9,7 +9,7 @@ await db.query(`
   )
 `);
 
-await db.query(`
+await client.queryArray(`
   CREATE TABLE IF NOT EXISTS missions (
     id SERIAL PRIMARY KEY,
     ally_id INTEGER REFERENCES allies(id) ON DELETE CASCADE,
@@ -19,4 +19,5 @@ await db.query(`
   )
 `);
 
-console.log("Migration completed successfully.");
+console.log("Migration completed!");
+await client.end();

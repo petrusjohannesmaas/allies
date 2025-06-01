@@ -1,11 +1,53 @@
 {
   "version": "5",
   "specifiers": {
-    "jsr:@std/dotenv@~0.225.5": "0.225.5"
+    "jsr:@db/postgres@*": "0.19.5",
+    "jsr:@db/postgres@~0.19.5": "0.19.5",
+    "jsr:@std/bytes@^1.0.5": "1.0.6",
+    "jsr:@std/bytes@^1.0.6": "1.0.6",
+    "jsr:@std/crypto@^1.0.4": "1.0.5",
+    "jsr:@std/crypto@^1.0.5": "1.0.5",
+    "jsr:@std/dotenv@~0.225.5": "0.225.5",
+    "jsr:@std/encoding@^1.0.9": "1.0.10",
+    "jsr:@std/fmt@^1.0.6": "1.0.8",
+    "jsr:@std/path@^1.0.8": "1.1.0",
+    "jsr:@std/uuid@^1.0.8": "1.0.8"
   },
   "jsr": {
+    "@db/postgres@0.19.5": {
+      "integrity": "afdbe608bd066cda2ee5dba37c416d332098b9238c51aec223331108e281954c",
+      "dependencies": [
+        "jsr:@std/bytes@^1.0.5",
+        "jsr:@std/crypto@^1.0.4",
+        "jsr:@std/encoding",
+        "jsr:@std/fmt",
+        "jsr:@std/path"
+      ]
+    },
+    "@std/bytes@1.0.6": {
+      "integrity": "f6ac6adbd8ccd99314045f5703e23af0a68d7f7e58364b47d2c7f408aeb5820a"
+    },
+    "@std/crypto@1.0.5": {
+      "integrity": "0dcfbb319fe0bba1bd3af904ceb4f948cde1b92979ec1614528380ed308a3b40"
+    },
     "@std/dotenv@0.225.5": {
       "integrity": "9ce6f9d0ec3311f74a32535aa1b8c62ed88b1ab91b7f0815797d77a6f60c922f"
+    },
+    "@std/encoding@1.0.10": {
+      "integrity": "8783c6384a2d13abd5e9e87a7ae0520a30e9f56aeeaa3bdf910a3eaaf5c811a1"
+    },
+    "@std/fmt@1.0.8": {
+      "integrity": "71e1fc498787e4434d213647a6e43e794af4fd393ef8f52062246e06f7e372b7"
+    },
+    "@std/path@1.1.0": {
+      "integrity": "ddc94f8e3c275627281cbc23341df6b8bcc874d70374f75fec2533521e3d6886"
+    },
+    "@std/uuid@1.0.8": {
+      "integrity": "2c3aa3de49271c042b57f0362018c380103c11aafdf89227f5fa2662e6568623",
+      "dependencies": [
+        "jsr:@std/bytes@^1.0.6",
+        "jsr:@std/crypto@^1.0.5"
+      ]
     }
   },
   "redirects": {
@@ -463,7 +505,9 @@
   },
   "workspace": {
     "dependencies": [
-      "jsr:@std/dotenv@~0.225.5"
+      "jsr:@db/postgres@~0.19.5",
+      "jsr:@std/dotenv@~0.225.5",
+      "jsr:@std/uuid@^1.0.8"
     ]
   }
 }

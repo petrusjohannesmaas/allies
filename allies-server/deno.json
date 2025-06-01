@@ -4,9 +4,13 @@
     "strict": true
   },
   "tasks": {
-    "start": "deno run --allow-read --allow-write --allow-net --allow-env main.ts"
+    "start": "deno run --allow-read --allow-write --allow-net --allow-env main.ts",
+    "migrate": "deno run --allow-read --allow-write --allow-net --allow-env database/migrations.ts",
+    "test": "deno run --allow-read --allow-write --allow-net --allow-env tests/test.ts"
   },
   "imports": {
-    "@std/dotenv": "jsr:@std/dotenv@^0.225.5"
+    "@db/postgres": "jsr:@db/postgres@^0.19.5",
+    "@std/dotenv": "jsr:@std/dotenv@^0.225.5",
+    "@std/uuid": "jsr:@std/uuid@^1.0.8"
   }
 }

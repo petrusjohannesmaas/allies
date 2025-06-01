@@ -82,9 +82,10 @@ Each ally contains:
 - **Vite** – Fast and optimized development tooling for frontend projects.
 
 ### **Backend Stack**
-- **PostgreSQL** – Relational database with JSONB support for flexible data storage.
-- **DenoDB ORM** – Object-relational mapping for structured data management.
-- **Deno HTTP Module** – Native HTTP server for handling API requests efficiently.
+- **PostgreSQL** – Relational database with JSONB support for structured data storage.  
+- **@db/postgres Driver** – Native PostgreSQL client for direct SQL queries.  
+- **Custom ORM Layer** – TypeScript models and helper functions for structured data management.  
+- **Deno HTTP Module** – Built-in HTTP server for handling API requests efficiently.
 
 ### **Frontend Stack**
 - **React** – Component-based UI framework for interactive applications.

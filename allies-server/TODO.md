@@ -13,13 +13,13 @@ Here’s the **Phase 1 To-Do List** for getting the backend up and running.
 #### **2️⃣ Database Configuration**
 
 ✅ Install and configure **PostgreSQL** Docker container and local client.
-🚧 Init migration script.
-- Test **DenoDB models** for **Allies** and **Missions**.
-- Ensure support for **JSONB storage** in missions.
+✅ Create migration script.
+✅ Test **models** for **Allies** and **Missions**.
+✅ Ensure support for **JSONB storage** in missions.
 
 #### **3️⃣ API Routes Definition**
 
-- Implement **CRUD endpoints**:
+🚧 Implement **CRUD endpoints**:
   - `POST /allies` → Add a new ally.
   - `GET /allies` → Retrieve all allies.
   - `GET /allies/:id` → Get details of a specific ally.
