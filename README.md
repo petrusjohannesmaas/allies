@@ -2,100 +2,172 @@
 
 ## Overview
 
-**Allies** is an application designed to help users keep track of their obligations and maintain basic information about their friends and family. The app will provide a user interface for seamless interaction while ensuring security and usability across multiple phases of development.
+**Allies** is a personal portfolio application that helps you keep track of important people in your life—friends, family, and their associated responsibilities. The app is designed for simplicity, privacy, and usability, built with a minimal tech stack and deployed on a private VPS.
 
-## Data Structure
+Users can store contact details, birthdays, notes, and define "missions" (commitments or tasks) for each ally.
 
-An example **Ally** and a **Mission** object:
-```sql
-CREATE TABLE allies (
-  id SERIAL PRIMARY KEY,
-  category TEXT NOT NULL,
-  fname TEXT NOT NULL,
-  lname TEXT NOT NULL,
-  email TEXT UNIQUE NOT NULL,
-  birthday DATE NOT NULL,
-  pfp TEXT,
-  note TEXT
-);
+---
 
-CREATE TABLE missions (
-  uuid UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  ally_id INT REFERENCES allies(id) ON DELETE CASCADE,
-  description TEXT NOT NULL,
-  due_date DATE NOT NULL
-);
+## 🎯 Goals
+
+* Simplify the tech stack to pure frontend and a single backend binary (PocketBase)
+* Use the project as a self-hosted, real-world portfolio piece
+* Prioritize clarity, speed, and maintainability
+* Develop a mobile application to interact with the server
+
+---
+
+## 🧱 Data Model (PocketBase Collections)
+
+### Collection: `allies`
+
+| Field      | Type  | Description                              |
+| ---------- | ----- | ---------------------------------------- |
+| `category` | text  | Relationship type (friend, family, etc.) |
+| `fname`    | text  | First name                               |
+| `lname`    | text  | Last name                                |
+| `email`    | email | Unique contact email                     |
+| `birthday` | date  | Birthdate                                |
+| `pfp`      | file  | Profile picture                          |
+| `note`     | text  | Notes or personal details                |
+
+### Collection: `missions`
+
+| Field         | Type     | Description                      |
+| ------------- | -------- | -------------------------------- |
+| `description` | text     | Task description                 |
+| `due_date`    | date     | Deadline for the mission         |
+| `ally`        | relation | One-to-many relation to `allies` |
+
+---
+
+## 🛠 Tech Stack
+
+| Layer    | Tech                                                  |
+| -------- | ----------------------------------------------------- |
+| Frontend | HTML, CSS, Vanilla JavaScript                         |
+| Backend  | [PocketBase](https://pocketbase.io) (SQLite embedded) |
+| Hosting  | Private VPS (e.g. Hetzner, Linode, DigitalOcean)      |
+
+No framework, no transpilers, no build tools — just clean, accessible code backed by a fast Go-based backend.
+
+---
+
+## 🔁 Application Flow
+
+1. **User visits frontend** hosted on your VPS
+2. **Frontend interacts with PocketBase** through its REST or JavaScript API
+3. **Data** like allies and missions are created, read, updated, or deleted directly via API
+4. **Realtime updates** optionally subscribed via PocketBase’s websocket layer
+
+---
+
+## 🔧 Development Phases
+
+### ✅ Phase 1: Data Modeling
+
+* Define collections using PocketBase admin UI
+
+### ✅ Phase 2: Frontend MVP
+
+* Build HTML/CSS/JS interface to:
+
+  * View Allies
+  * Add new Allies
+  * Assign Missions
+  * View Obligations
+
+### ✅ Phase 3: Authentication
+
+* Enable PocketBase auth (admin or user-based)
+* Login screen for managing data securely
+
+### ⏳ Phase 4: VPS Deployment
+
+* Deploy PocketBase and static HTML files
+* Secure via HTTPS + firewall
+* Use systemd or PM2 to keep PocketBase running
+
+### ⏳ Phase 5: Realtime UX Improvements
+
+* Use WebSocket features to watch for changes
+
+### ⏳ Phase 6: Mobile Responsiveness
+
+* Polish design for mobile and tablet use
+
+---
+
+## 🗂 Folder Structure (Example)
+
+```
+/allies
+├── /public
+│   ├── index.html
+│   ├── styles.css
+│   └── app.js
+├── /assets
+│   └── icons, profile images
+├── /docs
+│   └── architecture.md
+└── pocketbase/
+    └── pb_data/ (your database)
 ```
 
-Each ally contains:
-- **Category**: A string representing the category of ally (e.g., family member, friend, etc.).
-- **Basic Info**: First name, last name, email, birthday, profile picture.
-- **Missions**: A list of commitments or obligations with a unique identifier, description, and due date.
-- **Note**: General notes related to the ally.
+---
 
-## Development Phases
+## 🚀 Deployment Notes
 
-### Phase 1: Server-side development
-- Implement API endpoints with a working local copy.
-- Interact with the API using an HTTP client.
+1. **Run PocketBase on VPS**
 
-### Phase 2: Client-side development
-- Build a front-end interface for seamless interaction.
-- Ensure usability and responsiveness.
+   ```bash
+   ./pocketbase serve --http="0.0.0.0:8090"
+   ```
 
-### Phase 3: Containerization
-- Deploy API and client in **Docker** containers.
-- Implement persistent storage solutions.
-- Add the project to the portfolio and make it public.
+2. **Serve static files** via:
 
-### Phase 4: Security
-- Integrate **JWT** for authentication.
-- Apply encryption for data security.
+   * Caddy
+   * nginx
+   * or even PocketBase’s static file support
 
-### Phase 5: Cloud Deployment
-- Deploy the application to a cloud provider.
-- Ensure availability and scalability.
-
-### Phase 6: OAuth Integration
-- Enable **OAuth** authentication for seamless logins.
-- Re-deploy with new authentication mechanisms.
-
-### Phase 7: Mobile Application
-- Develop a **cross-platform** mobile client.
-- Integrate with the cloud-hosted server.
-
-## Future Plans
-- Enhancing the user experience with AI-powered suggestions.
-- Expanding features for obligation tracking.
-- Potential support for notifications and reminders.
+3. **Protect admin dashboard** by firewalling port 8090 or using basic auth
 
 ---
 
-## **Technologies**
+## 📌 Example Code (JavaScript)
 
-### **Core Language & Tools**
-- **TypeScript** – Static typing ensures maintainability and scalability.
-- **Deno** – Secure-by-default runtime with ES module support and no npm requirement.
-- **Vite** – Fast and optimized development tooling for frontend projects.
+```js
+// Connect to PocketBase
+const pb = new PocketBase("https://your-vps-domain.com");
 
-### **Backend Stack**
-- **PostgreSQL** – Relational database with JSONB support for structured data storage.  
-- **@db/postgres Driver** – Native PostgreSQL client for direct SQL queries.  
-- **Custom ORM Layer** – TypeScript models and helper functions for structured data management.  
-- **Deno HTTP Module** – Built-in HTTP server for handling API requests efficiently.
-
-### **Frontend Stack**
-- **React** – Component-based UI framework for interactive applications.
-- **Bulma** – Modern CSS framework for responsive design.
+// Fetch allies
+pb.collection('allies').getFullList().then(data => {
+  data.forEach(ally => {
+    console.log(`${ally.fname} ${ally.lname} - ${ally.category}`);
+  });
+});
+```
 
 ---
 
-### Installation
+## 🔐 Security
 
-Not currently available.
+* PocketBase admin password stored securely on VPS
+* Authenticated API access with token support
+* Optional OAuth support (coming in future phases)
 
 ---
 
-### License
+## 📦 License
 
-This project is licensed under the GNU General Public License v3.0. See the [LICENSE](LICENSE) file for more information.
+This project is **not open to the public** at this time. It exists as a private, portfolio-facing application.
+
+---
+
+## 🚀 Future Enhancements
+
+* AI-powered ally reminders (birthdays, deadlines)
+* Notification/Email system (via cron + PocketBase)
+* Mobile PWA version
+* Export/import backup utility
+---
