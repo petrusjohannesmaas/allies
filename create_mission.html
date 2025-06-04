@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Create Mission</title>
+</head>
+
+<body>
+  <h1>Create Mission</h1>
+  <form id="mission-form">
+    <input name="description" placeholder="Mission Description" required><br>
+    <input name="due_date" type="date" required><br>
+    <select name="ally" id="ally-select" required>
+      <option value="">-- Select Ally --</option>
+    </select><br>
+    <button type="submit">Save Mission</button>
+  </form>
+
+  <script type="module">
+    import PocketBase from 'https://esm.sh/pocketbase';
+
+    const pb = new PocketBase('http://127.0.0.1:8090');
+
+    async function loadAllies() {
+      const res = await pb.collection('allies').getFullList({ sort: '-created' });
+      const select = document.getElementById('ally-select');
+      res.forEach(ally => {
+        const option = document.createElement('option');
+        option.value = ally.id;
+        option.textContent = `${ally.fname} ${ally.lname}`;
+        select.appendChild(option);
+      });
+    }
+
+    loadAllies();
+
+    document.getElementById('mission-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const form = e.target;
+
+      const data = {
+        description: form.description.value,
+        due_date: form.due_date.value,
+        ally: form.ally.value,
+      };
+
+      try {
+        const result = await pb.collection('missions').create(data);
+        alert('✅ Mission created!');
+        form.reset();
+      } catch (err) {
+        console.error('❌ Error:', err);
+
+        if (err?.data?.data) {
+          // Field-specific errors from PocketBase
+          const errors = Object.entries(err.data.data)
+            .map(([field, detail]) => `• ${field}: ${detail.message}`)
+            .join('\n');
+          alert(`Please correct the following:\n\n${errors}`);
+        } else {
+          alert('Something went wrong. Please try again.');
+        }
+      }
+    });
+  </script>
+</body>
+
+</html>

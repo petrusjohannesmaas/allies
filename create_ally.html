@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Create Ally</title>
+</head>
+
+<body>
+    <h1>Create Ally</h1>
+    <form id="ally-form">
+        <input name="fname" placeholder="First Name" required><br>
+        <input name="lname" placeholder="Last Name" required><br>
+        <input name="email" placeholder="Email" type="email" required><br>
+        <input name="category" placeholder="Category"><br>
+        <input name="birthday" type="date"><br>
+        <input name="note" placeholder="Note"><br>
+        <input name="pfp" type="file" accept="image/*"><br>
+        <button type="submit">Save Ally</button>
+    </form>
+
+    <script type="module">
+        import PocketBase from 'https://esm.sh/pocketbase';
+
+        const pb = new PocketBase('http://127.0.0.1:8090');
+
+        // Admin login
+        await pb.admins.authWithPassword('petrusjohannesmaas@outlook.com', 'testing123');
+
+        document.getElementById('ally-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const form = e.target;
+            const data = new FormData();
+
+            data.append('fname', form.fname.value);
+            data.append('lname', form.lname.value);
+            data.append('email', form.email.value);
+            data.append('category', form.category.value);
+            data.append('birthday', form.birthday.value);
+            data.append('note', form.note.value);
+            if (form.pfp.files[0]) {
+                data.append('pfp', form.pfp.files[0]);
+            }
+
+            try {
+                const result = await pb.collection('allies').create(data);
+                alert('✅ Ally created!');
+                form.reset();
+            } catch (err) {
+                console.error('❌ Error:', err);
+
+                if (err?.data?.data) {
+                    // Field-specific errors from PocketBase
+                    const errors = Object.entries(err.data.data)
+                        .map(([field, detail]) => `• ${field}: ${detail.message}`)
+                        .join('\n');
+                    alert(`Please correct the following:\n\n${errors}`);
+                } else {
+                    alert('Something went wrong. Please try again.');
+                }
+            }
+
+        });
+    </script>
+</body>
+
+</html>

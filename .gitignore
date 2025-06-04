@@ -1,6 +1,4 @@
 node_modules
-contacts.db
 .vscode
 .env
-docs
-deno.lock
+pocketbase
