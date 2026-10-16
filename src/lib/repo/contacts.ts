@@ -124,6 +124,36 @@ export async function deleteContact(db: Db, contact: Contact): Promise<void> {
   await deletePicture(pictureStore, contact.picture);
 }
 
+/**
+ * Contacts whose first name, last name or whole name holds `text`. The search
+ * runs on every keystroke against a local database, so there is no delay and
+ * no need for one.
+ *
+ * SQLite's LIKE ignores letter case for ASCII letters, which is enough for
+ * names here. The user's text is escaped, so a `%` in it matches a literal
+ * percent sign rather than everything.
+ */
+export async function searchContacts(db: Db, text: string): Promise<Contact[]> {
+  const trimmed = text.trim();
+  if (trimmed === '') return [];
+
+  const pattern = `%${escapeLike(trimmed)}%`;
+  return db.select<Contact>(
+    `SELECT ${COLUMNS} FROM contacts
+     WHERE first_name LIKE $1 ESCAPE '\\'
+        OR last_name LIKE $1 ESCAPE '\\'
+        OR (first_name || ' ' || COALESCE(last_name, '')) LIKE $1 ESCAPE '\\'
+     ${ORDER}
+     LIMIT 8`,
+    [pattern],
+  );
+}
+
+/** Keeps LIKE's own wildcards from acting as wildcards. */
+function escapeLike(value: string): string {
+  return value.replace(/[\\%_]/g, (character) => `\\${character}`);
+}
+
 /** Records that the user opened this contact, which is what the dashboard's recently viewed list reads. */
 export async function markViewed(db: Db, id: number): Promise<void> {
   await db.execute("UPDATE contacts SET last_viewed_at = strftime('%Y-%m-%dT%H:%M:%fZ', 'now') WHERE id = $1", [id]);

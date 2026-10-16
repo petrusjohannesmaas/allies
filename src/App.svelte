@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Search } from '@lucide/svelte';
+  import SearchBox from './components/SearchBox.svelte';
   import { navigation, open, screens } from './lib/navigation.svelte';
   import Contact from './screens/Contact.svelte';
   import Contacts from './screens/Contacts.svelte';
@@ -12,16 +12,7 @@
 <header class="flex items-center gap-3 border-b border-line bg-surface px-4 py-3" data-testid="top-bar">
   <span class="text-sm font-semibold">Allies</span>
 
-  <div class="relative flex-1">
-    <Search class="pointer-events-none absolute top-1/2 left-2 size-4 -translate-y-1/2 text-muted" aria-hidden="true" />
-    <input
-      type="search"
-      class="input pl-8"
-      placeholder="Search contacts"
-      aria-label="Search contacts"
-      data-testid="search-box"
-    />
-  </div>
+  <SearchBox />
 
   <nav class="flex gap-1" aria-label="Screens">
     {#each screens as item (item.screen)}

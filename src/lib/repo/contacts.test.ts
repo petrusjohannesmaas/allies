@@ -10,6 +10,7 @@ import {
   getContact,
   listContacts,
   markViewed,
+  searchContacts,
   toInput,
   updateContact,
   type ContactInput,
@@ -133,6 +134,64 @@ describe('updating a contact', () => {
     await updateContact(db, id, input({ firstName: 'Ada', lastName: 'Byron' }));
 
     expect((await listContacts(db)).map(fullName)).toEqual(['Ada Byron']);
+  });
+});
+
+describe('searching contacts', () => {
+  beforeEach(async () => {
+    await addContact(db, input({ firstName: 'Ada', lastName: 'Lovelace' }));
+    await addContact(db, input({ firstName: 'Grace', lastName: 'Hopper' }));
+    await addContact(db, input({ firstName: 'Alan', lastName: 'Turing' }));
+  });
+
+  it('finds nothing in an empty box', async () => {
+    expect(await searchContacts(db, '')).toEqual([]);
+    expect(await searchContacts(db, '   ')).toEqual([]);
+  });
+
+  it('finds a contact by part of a first name', async () => {
+    expect((await searchContacts(db, 'Ada')).map(fullName)).toEqual(['Ada Lovelace']);
+  });
+
+  it('finds a contact by part of a last name', async () => {
+    expect((await searchContacts(db, 'Hopp')).map(fullName)).toEqual(['Grace Hopper']);
+  });
+
+  it('finds a contact by part of the whole name', async () => {
+    expect((await searchContacts(db, 'ce Ho')).map(fullName)).toEqual(['Grace Hopper']);
+  });
+
+  it('ignores letter case', async () => {
+    expect((await searchContacts(db, 'tURing')).map(fullName)).toEqual(['Alan Turing']);
+    expect((await searchContacts(db, 'ADA')).map(fullName)).toEqual(['Ada Lovelace']);
+  });
+
+  it('lists every match, by name', async () => {
+    await addContact(db, input({ firstName: 'Ada', lastName: 'Lovelace-Byron' }));
+
+    expect((await searchContacts(db, 'Ada')).map(fullName)).toEqual(['Ada Lovelace', 'Ada Lovelace-Byron']);
+  });
+
+  it('finds a contact known by one name', async () => {
+    await addContact(db, input({ firstName: 'Prince' }));
+    expect((await searchContacts(db, 'prin')).map(fullName)).toEqual(['Prince']);
+  });
+
+  it('answers nothing when nothing matches', async () => {
+    expect(await searchContacts(db, 'zzz')).toEqual([]);
+  });
+
+  it('treats a percent sign as text, not as a wildcard', async () => {
+    expect(await searchContacts(db, '%')).toEqual([]);
+    expect(await searchContacts(db, 'a%')).toEqual([]);
+  });
+
+  it('shows at most eight results', async () => {
+    for (let index = 0; index < 12; index++) {
+      await addContact(db, input({ firstName: `Ada${index}`, lastName: 'Lovelace' }));
+    }
+
+    expect(await searchContacts(db, 'Ada')).toHaveLength(8);
   });
 });
 
