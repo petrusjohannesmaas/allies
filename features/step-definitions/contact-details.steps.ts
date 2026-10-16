@@ -120,6 +120,14 @@ When(/^I choose "([^"]+)" as the significant other$/, async (name: string) => {
   await $('[data-testid="significant-other"] [data-testid="open-partner"]').waitForExist({ timeout: 5_000 });
 });
 
+Then('no children are listed', async () => {
+  await $('[data-testid="children"] [data-testid="children-empty"]').waitForExist({ timeout: 5_000 });
+});
+
+Then('no significant other is listed', async () => {
+  await $('[data-testid="significant-other"] [data-testid="significant-other-empty"]').waitForExist({ timeout: 5_000 });
+});
+
 Then(/^the significant other is "([^"]+)"$/, async (name: string) => {
   const shown = await sectionText('significant-other', 'open-partner');
   if (shown !== name) throw new Error(`The significant other reads "${shown}"`);

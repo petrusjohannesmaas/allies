@@ -128,6 +128,17 @@ Then('both journal entries are listed', async () => {
   await waitForRow(async () => (await listedRows()).filter((row) => row.kind === 'entry').length === 2, 'The journal showed fewer than two entries');
 });
 
+Then(/^the journal has a row reading "([^"]+)"$/, async (body: string) => {
+  await waitForRow(
+    async () => (await listedRows()).some((row) => row.body === body),
+    `The journal showed no row reading "${body}"`,
+  );
+});
+
+Then(/^the journal has no row reading "([^"]+)"$/, async (body: string) => {
+  expect((await listedRows()).filter((row) => row.body === body)).toEqual([]);
+});
+
 Then(/^the automatic entry "([^"]+)" is listed$/, async (body: string) => {
   await waitForRow(
     async () => (await listedRows()).some((row) => row.body === body && row.contact.startsWith('with ')),

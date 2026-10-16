@@ -82,3 +82,13 @@ Then(/^the (.+) table holds no rows$/, async (table: string) => {
     db.close();
   }
 });
+
+Then(/^the (.+) table holds (\d+) rows?$/, async (table: string, rows: string) => {
+  const db = openDatabase();
+  try {
+    const count = rowCount(db, table);
+    if (count !== Number(rows)) throw new Error(`${table} holds ${count} rows, not ${rows}`);
+  } finally {
+    db.close();
+  }
+});

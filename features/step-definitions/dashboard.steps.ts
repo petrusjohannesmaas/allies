@@ -141,6 +141,10 @@ Then(/^the recently viewed contacts are "([^"]+)", "([^"]+)" and "([^"]+)"$/, as
   expect(await recentContacts()).toEqual([first, second, third]);
 });
 
+Then(/^the recently viewed list does not show "([^"]+)"$/, async (name: string) => {
+  expect(await recentContacts()).not.toContain(name);
+});
+
 When(/^I select the recently viewed contact "([^"]+)"$/, async (name: string) => {
   const clicked = await browser.execute(
     (selector, wanted) => {
