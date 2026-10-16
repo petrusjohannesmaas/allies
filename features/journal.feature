@@ -30,6 +30,7 @@ Feature: The journal
     When I rate the day "happy"
     Then today's rating reads "happy"
     And the face "happy" is marked as chosen
+    And the journal lists a rating row for "today" reading "happy"
     When I close and reopen the app
     And I open the "Journal" screen
     Then today's rating reads "happy"
@@ -40,6 +41,7 @@ Feature: The journal
     And I rate the day "sad"
     And I rate the day "happy"
     Then the day is already rated as "sad"
+    And the journal lists a rating row for "today" reading "sad"
 
   Scenario: A logged activity appears in the journal
     Given the app has just started
@@ -84,3 +86,27 @@ Feature: The journal
     And I open the "Journal" screen
     Then the automatic entry "Lunch at the diner" is not listed
     And the automatic entry "Called about the book" is listed
+
+  Scenario: Deleting a call removes its entry
+    Given the app has just started
+    And a contact named "Ada Lovelace" exists
+    When I open the contact "Ada Lovelace"
+    And I log a call dated "today" with the description "Called about the book"
+    And I log a call dated "today" with the description "Caught up about the conference"
+    And I open the "Journal" screen
+    Then the automatic entry "Called about the book" is listed
+    And the automatic entry "Caught up about the conference" is listed
+    When I open the contact "Ada Lovelace"
+    And I delete the call "Called about the book"
+    And I open the "Journal" screen
+    Then the automatic entry "Called about the book" is not listed
+    And the automatic entry "Caught up about the conference" is listed
+
+  Scenario: The journal lists rows newest first
+    Given the app has just started
+    When I open the "Journal" screen
+    And I add a journal entry dated "1 day ago" with the text "Walked in the park"
+    And I add a journal entry dated "40 days ago" with the text "Started a new book"
+    And I add a journal entry dated "today" with the text "A quiet day at home"
+    And I add a journal entry dated "10 days ago" with the text "Visited the market"
+    Then the journal lists these entries newest first: "A quiet day at home", "Walked in the park", "Visited the market", "Started a new book"

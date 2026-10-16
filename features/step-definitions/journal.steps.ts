@@ -8,11 +8,12 @@ const FACES = { sad: 'Sad', neutral: 'Neutral', happy: 'Happy' } as const;
 type Face = keyof typeof FACES;
 
 /** Every row the journal shows, with its kind, body and the contact it was with. */
-async function listedRows(): Promise<{ kind: string; body: string; contact: string }[]> {
+async function listedRows(): Promise<{ kind: string; day: string; body: string; contact: string }[]> {
   return browser.execute(
     (selector) =>
       [...document.querySelectorAll(`${selector} [data-testid="journal-row"]`)].map((row) => ({
         kind: row.getAttribute('data-kind') ?? '',
+        day: row.getAttribute('data-day') ?? '',
         body: row.querySelector('[data-testid="journal-row-body"]')?.textContent?.trim() ?? '',
         contact: row.querySelector('[data-testid="journal-row-contact"]')?.textContent?.trim() ?? '',
       })),
@@ -197,4 +198,25 @@ Then(/^the journal entry "([^"]+)" has a delete button$/, async (body: string) =
 Then(/^the journal shows the month for "([^"]+)"$/, async (day: string) => {
   await waitForRow(async () => (await listedMonths()).length > 0, 'The journal showed no month heading');
   expect(await listedMonths()).toContain(formatMonth(monthOf(dayFromNow(day))));
+});
+
+Then(/^the journal lists a rating row for "([^"]+)" reading "([^"]+)"$/, async (day: string, face: string) => {
+  const wanted = { day: dayFromNow(day), body: `You rated your day: ${FACES[face as Face]}` };
+  await waitForRow(
+    async () => (await listedRows()).some((row) => row.kind === 'rating' && row.day === wanted.day && row.body === wanted.body),
+    `The journal list showed no rating row for ${wanted.day} reading "${wanted.body}"`,
+  );
+  expect((await listedRows()).filter((row) => row.kind === 'rating')).toHaveLength(1);
+});
+
+Then(/^the journal lists these entries newest first: (.+)$/, async (quoted: string) => {
+  const wanted = [...quoted.matchAll(/"([^"]+)"/g)].map((match) => match[1]);
+  await waitForRow(
+    async () => (await listedRows()).filter((row) => wanted.includes(row.body)).length === wanted.length,
+    'The journal did not list every entry in the order check',
+  );
+  const listed = (await listedRows()).filter((row) => wanted.includes(row.body));
+  expect(listed.map((row) => row.body)).toEqual(wanted);
+  const days = listed.map((row) => row.day);
+  expect(days).toEqual([...days].sort().reverse());
 });

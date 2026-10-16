@@ -3,7 +3,7 @@
   import { db } from '$lib/db';
   import { getRating, rateDay } from '$lib/repo/journal';
 
-  let { day }: { day: string } = $props();
+  let { day, onRated }: { day: string; onRated?: () => void | Promise<void> } = $props();
 
   const FACES = [
     { face: 1, name: 'Sad', Icon: Frown },
@@ -28,13 +28,25 @@
     failure = '';
     try {
       await rateDay(await db(), day, face);
-      chosen = face;
-    } catch {
-      // The primary key refuses the second rating for a day, so the face the
-      // day already has is read back and shown.
-      refused = 'Today is already rated.';
-      chosen = await getRating(await db(), day);
+    } catch (error) {
+      // The primary key refuses the second rating for a day. A rating that
+      // exists afterwards means the insert was that refusal, so its face is
+      // shown. With no rating, the insert failed for another reason.
+      try {
+        const existing = await getRating(await db(), day);
+        if (existing !== null) {
+          refused = 'Today is already rated.';
+          chosen = existing;
+          return;
+        }
+      } catch {
+        // The failure below says what went wrong with the insert.
+      }
+      failure = error instanceof Error ? error.message : String(error);
+      return;
     }
+    chosen = face;
+    await onRated?.();
   }
 </script>
 

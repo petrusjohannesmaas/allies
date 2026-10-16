@@ -10,9 +10,13 @@ export const DATABASE_PATH = join(configDir(), 'allies.db');
 export const PICTURES_PATH = join(configDir(), 'pictures');
 
 // A step may read or write the database while the app has it open, which is
-// how a scenario sets up what it needs and checks what was saved.
+// how a scenario sets up what it needs and checks what was saved. The app may
+// be writing at that moment, so a locked database is waited on for up to this
+// long before the step fails with "database is locked".
+const LOCK_WAIT_MS = 10_000;
+
 export function withDatabase<T>(work: (db: DatabaseSync) => T): T {
-  const db = new DatabaseSync(DATABASE_PATH);
+  const db = new DatabaseSync(DATABASE_PATH, { timeout: LOCK_WAIT_MS });
   try {
     db.exec('PRAGMA foreign_keys = ON;');
     return work(db);

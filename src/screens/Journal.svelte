@@ -46,7 +46,7 @@
   <p class="mt-2 text-sm text-muted">Your days, newest first.</p>
 
   <div class="mt-4 grid gap-4">
-    <DayRating day={today()} />
+    <DayRating day={today()} onRated={reload} />
 
     <section class="card">
       <h2 class="section-title">Add a journal entry</h2>
