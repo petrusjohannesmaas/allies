@@ -16,6 +16,11 @@ Given('a contact named {string} exists', async (name: string) => {
   insertContact({ firstName, lastName: lastName || undefined });
 });
 
+Given(/^a contact named "([^"]+)" exists with the category "([^"]+)"$/, async (name: string, category: string) => {
+  const [firstName, lastName = ''] = name.split(' ');
+  insertContact({ category, firstName, lastName: lastName || undefined });
+});
+
 When('I add a contact', async () => {
   await openTheForm();
 });

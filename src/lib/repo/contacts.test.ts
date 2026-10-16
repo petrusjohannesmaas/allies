@@ -9,6 +9,7 @@ import {
   fullName,
   getContact,
   listContacts,
+  markViewed,
   toInput,
   updateContact,
   type ContactInput,
@@ -132,6 +133,38 @@ describe('updating a contact', () => {
     await updateContact(db, id, input({ firstName: 'Ada', lastName: 'Byron' }));
 
     expect((await listContacts(db)).map(fullName)).toEqual(['Ada Byron']);
+  });
+});
+
+describe('marking a contact viewed', () => {
+  let id: number;
+
+  beforeEach(async () => {
+    id = await addContact(db, input({ firstName: 'Ada' }));
+  });
+
+  it('records that the user opened the contact', async () => {
+    expect((await getContact(db, id))?.last_viewed_at).toBeNull();
+
+    await markViewed(db, id);
+
+    expect((await getContact(db, id))?.last_viewed_at).toMatch(/^\d{4}-\d{2}-\d{2}T/);
+  });
+
+  it('records a later time the next time the page opens', async () => {
+    await markViewed(db, id);
+    const first = (await getContact(db, id))!.last_viewed_at!;
+
+    await new Promise((done) => setTimeout(done, 2));
+    await markViewed(db, id);
+
+    expect((await getContact(db, id))!.last_viewed_at! > first).toBe(true);
+  });
+
+  it('leaves the contact itself alone', async () => {
+    await markViewed(db, id);
+
+    expect((await getContact(db, id))?.first_name).toBe('Ada');
   });
 });
 

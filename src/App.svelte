@@ -44,7 +44,7 @@
   {:else if navigation.screen === 'contacts'}
     <Contacts />
   {:else if navigation.screen === 'contact'}
-    <Contact contactId={navigation.contactId} />
+    <Contact />
   {:else}
     <Journal />
   {/if}

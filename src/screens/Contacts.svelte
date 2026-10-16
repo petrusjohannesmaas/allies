@@ -2,6 +2,7 @@
   import Avatar from '../components/Avatar.svelte';
   import ContactForm from '../components/ContactForm.svelte';
   import { db } from '../lib/db';
+  import { openContact } from '../lib/navigation.svelte';
   import {
     addContactWithPicture,
     deleteContact,
@@ -97,11 +98,18 @@
     <ul class="grid gap-2" data-testid="contacts-list">
       {#each contacts as contact (contact.id)}
         <li class="card flex items-center gap-3" data-testid="contact-row" data-contact-name={fullName(contact)}>
-          <Avatar picture={contact.picture} name={fullName(contact)} size={40} />
-          <div class="min-w-0 flex-1">
-            <p class="truncate text-sm font-medium">{fullName(contact)}</p>
-            <p class="text-xs text-muted">{contact.category}</p>
-          </div>
+          <button
+            type="button"
+            class="flex min-w-0 flex-1 items-center gap-3 text-left"
+            data-testid="open-contact"
+            onclick={() => openContact(contact.id)}
+          >
+            <Avatar picture={contact.picture} name={fullName(contact)} size={40} />
+            <span class="min-w-0">
+              <span class="block truncate text-sm font-medium">{fullName(contact)}</span>
+              <span class="block text-xs text-muted">{contact.category}</span>
+            </span>
+          </button>
 
           {#if confirming === contact.id}
             <span class="text-sm">Delete {fullName(contact)}?</span>

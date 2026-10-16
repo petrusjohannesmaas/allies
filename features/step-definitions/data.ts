@@ -93,7 +93,10 @@ export function findContactId(name: string): number | undefined {
 }
 
 /** One column of one contact, found by the name the list shows. */
-export function contactValue(name: string, column: 'category' | 'email' | 'birthday' | 'picture'): unknown {
+export function contactValue(
+  name: string,
+  column: 'category' | 'email' | 'birthday' | 'picture' | 'last_viewed_at',
+): unknown {
   const id = findContactId(name);
   if (id === undefined) return undefined;
   return withDatabase(

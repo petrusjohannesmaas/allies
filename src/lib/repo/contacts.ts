@@ -124,6 +124,11 @@ export async function deleteContact(db: Db, contact: Contact): Promise<void> {
   await deletePicture(pictureStore, contact.picture);
 }
 
+/** Records that the user opened this contact, which is what the dashboard's recently viewed list reads. */
+export async function markViewed(db: Db, id: number): Promise<void> {
+  await db.execute("UPDATE contacts SET last_viewed_at = strftime('%Y-%m-%dT%H:%M:%fZ', 'now') WHERE id = $1", [id]);
+}
+
 /** The number of contacts the dashboard counts. */
 export async function countContacts(db: Db): Promise<number> {
   const rows = await db.select<{ n: number }>('SELECT COUNT(*) AS n FROM contacts');

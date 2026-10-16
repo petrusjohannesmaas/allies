@@ -1,7 +1,9 @@
-import { fireEvent, render, screen } from '@testing-library/svelte';
+import { fireEvent, render, screen, waitFor } from '@testing-library/svelte';
 import { beforeEach, describe, expect, it } from 'vitest';
 import App from './App.svelte';
+import { db } from './lib/db';
 import { navigation, open, openContact } from './lib/navigation.svelte';
+import { addContact, blankInput } from './lib/repo/contacts';
 
 beforeEach(() => {
   navigation.screen = 'dashboard';
@@ -37,11 +39,20 @@ describe('the top bar', () => {
     expect(screen.getByTestId('screen-dashboard')).toBeTruthy();
   });
 
-  it('shows the contact screen when a contact is opened, and still has the search box', () => {
-    openContact(7);
+  it('shows the contact screen when a contact is opened, and still has the search box', async () => {
+    const connection = await db();
+    const id = await addContact(connection, { ...blankInput(), firstName: 'Ada' });
+
+    openContact(id);
     render(App);
-    expect(screen.getByTestId('screen-contact')).toBeTruthy();
-    expect(screen.getByTestId('contact-id').textContent).toBe('Contact 7');
+
+    await waitFor(() => expect(screen.getByTestId('contact-name').textContent).toBe('Ada'));
     expect(screen.getByTestId('search-box')).toBeTruthy();
+  });
+
+  it('says so when the contact is gone', async () => {
+    openContact(999);
+    render(App);
+    await waitFor(() => expect(screen.getByTestId('contact-missing')).toBeTruthy());
   });
 });
