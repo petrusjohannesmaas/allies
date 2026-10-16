@@ -26,6 +26,11 @@ describe('the content security policy', () => {
     expect(conf.app.security.csp['img-src']).toContain('blob:');
   });
 
+  it('allows images only from the app itself and from blob URLs', () => {
+    const sources = conf.app.security.csp['img-src'].split(/\s+/).sort();
+    expect(sources).toEqual(["'self'", 'blob:']);
+  });
+
   it('allows only the app itself to reach anything', () => {
     expect(conf.app.security.csp['default-src']).toContain("'self'");
     expect(conf.app.security.csp['connect-src']).toContain('ipc:');
