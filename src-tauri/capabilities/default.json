@@ -9,7 +9,10 @@
     "core:default",
     "sql:default",
     "sql:allow-execute",
-    "fs:default",
+    {
+      "identifier": "fs:allow-mkdir",
+      "allow": [{ "path": "$APPCONFIG/pictures" }]
+    },
     {
       "identifier": "fs:allow-read-file",
       "allow": [{ "path": "$APPCONFIG/pictures/**" }]
