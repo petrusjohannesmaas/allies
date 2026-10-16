@@ -14,11 +14,13 @@ fn migrations() -> Vec<Migration> {
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    let builder = tauri::Builder::default().plugin(
-        Builder::default()
-            .add_migrations("sqlite:allies.db", migrations())
-            .build(),
-    );
+    let builder = tauri::Builder::default()
+        .plugin(tauri_plugin_fs::init())
+        .plugin(
+            Builder::default()
+                .add_migrations("sqlite:allies.db", migrations())
+                .build(),
+        );
 
     // Only the end-to-end builds enable the `wdio` feature, so a normal build
     // has no WebDriver server to reach.

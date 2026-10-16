@@ -137,16 +137,17 @@ describe('updating a contact', () => {
 
 describe('deleting a contact', () => {
   it('takes the contact out of the list and the count', async () => {
-    const ada = await addContact(db, input({ firstName: 'Ada' }));
+    const adaId = await addContact(db, input({ firstName: 'Ada' }));
     await addContact(db, input({ firstName: 'Grace' }));
+    const ada = await getContact(db, adaId);
 
-    await deleteContact(db, ada);
+    await deleteContact(db, ada!);
 
     expect((await listContacts(db)).map(fullName)).toEqual(['Grace']);
     expect(await countContacts(db)).toBe(1);
   });
 
   it('is quiet when the contact is already gone', async () => {
-    await expect(deleteContact(db, 99)).resolves.toBeUndefined();
+    await expect(deleteContact(db, { id: 99, picture: null } as never)).resolves.toBeUndefined();
   });
 });

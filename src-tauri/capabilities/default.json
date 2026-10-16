@@ -8,6 +8,19 @@
   "permissions": [
     "core:default",
     "sql:default",
-    "sql:allow-execute"
+    "sql:allow-execute",
+    "fs:default",
+    {
+      "identifier": "fs:allow-read-file",
+      "allow": [{ "path": "$APPCONFIG/pictures/**" }]
+    },
+    {
+      "identifier": "fs:allow-write-file",
+      "allow": [{ "path": "$APPCONFIG/pictures/**" }]
+    },
+    {
+      "identifier": "fs:allow-remove",
+      "allow": [{ "path": "$APPCONFIG/pictures/**" }]
+    }
   ]
 }

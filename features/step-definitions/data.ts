@@ -1,8 +1,13 @@
-import { DatabaseSync } from 'node:sqlite';
+import { existsSync, rmSync } from 'node:fs';
+import { readdirSync } from 'node:fs';
 import { join } from 'node:path';
+import { DatabaseSync } from 'node:sqlite';
 import { configDir } from './app';
 
 export const DATABASE_PATH = join(configDir(), 'allies.db');
+
+/** Where the app keeps contact pictures, which the fs plugin scopes to. */
+export const PICTURES_PATH = join(configDir(), 'pictures');
 
 // A step may read or write the database while the app has it open, which is
 // how a scenario sets up what it needs and checks what was saved.
@@ -37,6 +42,12 @@ export function emptyDatabase(): void {
     db.exec('PRAGMA foreign_keys = OFF;');
     for (const table of TABLES) db.exec(`DELETE FROM "${table}";`);
   });
+  rmSync(PICTURES_PATH, { recursive: true, force: true });
+}
+
+export function pictureFiles(): string[] {
+  if (!existsSync(PICTURES_PATH)) return [];
+  return readdirSync(PICTURES_PATH).sort();
 }
 
 export function insertContact(fields: {

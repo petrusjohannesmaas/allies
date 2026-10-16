@@ -1,5 +1,6 @@
 import type { Db } from '../db';
 import type { Category } from '../categories';
+import { deletePicture, pictureStore, savePicture } from './pictures';
 
 /** A contact as the contacts table holds it. */
 export interface Contact {
@@ -21,6 +22,12 @@ export interface ContactInput {
   lastName: string;
   email: string;
   birthday: string;
+}
+
+/** What the contact form hands back: the fields, and a picture only when the user picked a new one. */
+export interface ContactFormResult {
+  input: ContactInput;
+  picture: { type: string; bytes: Uint8Array } | null;
 }
 
 export function blankInput(): ContactInput {
@@ -73,8 +80,48 @@ export async function updateContact(db: Db, id: number, input: ContactInput): Pr
   );
 }
 
-export async function deleteContact(db: Db, id: number): Promise<void> {
-  await db.execute('DELETE FROM contacts WHERE id = $1', [id]);
+/** Points the contact row at a picture, or takes the picture away. */
+export async function setPicture(db: Db, id: number, picture: string | null): Promise<void> {
+  await db.execute('UPDATE contacts SET picture = $1 WHERE id = $2', [picture, id]);
+}
+
+/**
+ * Adds a contact and gives it the picture the user picked. The file name needs
+ * the new contact's id, so the row is written first, then the file, then the
+ * row's picture column. A file that cannot be written leaves the contact there
+ * without a picture, which the user can pick again.
+ */
+export async function addContactWithPicture(
+  db: Db,
+  input: ContactInput,
+  picture: { type: string; bytes: Uint8Array } | null,
+): Promise<number> {
+  const id = await addContact(db, input);
+  if (!picture) return id;
+
+  const name = await savePicture(pictureStore, id, { name: '', type: picture.type, bytes: picture.bytes }, null, new Date());
+  await setPicture(db, id, name);
+  return id;
+}
+
+/** Changes a contact's fields and, when a new picture was picked, its picture. */
+export async function updateContactWithPicture(
+  db: Db,
+  contact: Contact,
+  input: ContactInput,
+  picture: { type: string; bytes: Uint8Array } | null,
+): Promise<void> {
+  await updateContact(db, contact.id, input);
+  if (!picture) return;
+
+  const name = await savePicture(pictureStore, contact.id, { name: '', type: picture.type, bytes: picture.bytes }, contact.picture, new Date());
+  await setPicture(db, contact.id, name);
+}
+
+/** Removes the contact, and then its picture file. */
+export async function deleteContact(db: Db, contact: Contact): Promise<void> {
+  await db.execute('DELETE FROM contacts WHERE id = $1', [contact.id]);
+  await deletePicture(pictureStore, contact.picture);
 }
 
 /** The number of contacts the dashboard counts. */

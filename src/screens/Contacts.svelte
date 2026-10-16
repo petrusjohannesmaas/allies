@@ -1,14 +1,15 @@
 <script lang="ts">
+  import Avatar from '../components/Avatar.svelte';
   import ContactForm from '../components/ContactForm.svelte';
   import { db } from '../lib/db';
   import {
-    addContact,
+    addContactWithPicture,
     deleteContact,
     fullName,
     listContacts,
-    updateContact,
+    updateContactWithPicture,
     type Contact,
-    type ContactInput,
+    type ContactFormResult,
   } from '../lib/repo/contacts';
 
   let contacts = $state<Contact[]>([]);
@@ -26,12 +27,12 @@
     contacts = await listContacts(await db());
   }
 
-  async function save(input: ContactInput) {
+  async function save({ input, picture }: ContactFormResult) {
     const connection = await db();
     if (mode === 'edit' && editing) {
-      await updateContact(connection, editing.id, input);
+      await updateContactWithPicture(connection, editing, input, picture);
     } else {
-      await addContact(connection, input);
+      await addContactWithPicture(connection, input, picture);
     }
     mode = 'list';
     editing = null;
@@ -39,7 +40,9 @@
   }
 
   async function remove(id: number) {
-    await deleteContact(await db(), id);
+    const contact = contacts.find((candidate) => candidate.id === id);
+    if (!contact) return;
+    await deleteContact(await db(), contact);
     confirming = null;
     await reload();
   }
@@ -94,6 +97,7 @@
     <ul class="grid gap-2" data-testid="contacts-list">
       {#each contacts as contact (contact.id)}
         <li class="card flex items-center gap-3" data-testid="contact-row" data-contact-name={fullName(contact)}>
+          <Avatar picture={contact.picture} name={fullName(contact)} size={40} />
           <div class="min-w-0 flex-1">
             <p class="truncate text-sm font-medium">{fullName(contact)}</p>
             <p class="text-xs text-muted">{contact.category}</p>
