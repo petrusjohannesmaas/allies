@@ -46,17 +46,17 @@ Given(/^a contact named "([^"]+)" has the birthday "([^"]+)"$/, async (name: str
 });
 
 Then(/^the dashboard shows (\d+) contacts?$/, async (count: string) => {
-  await browser.waitUntil(async () => (await sectionText('count-contacts')).includes(`${count} Contacts`), {
-    timeout: 5_000,
-    timeoutMsg: 'The contact count never read the expected number',
-  });
+  await waitForListed(
+    async () => (await sectionText('count-contacts')).includes(`${count} Contacts`),
+    'The contact count never read the expected number',
+  );
 });
 
 Then(/^the dashboard shows (\d+) calls and activities$/, async (count: string) => {
-  await browser.waitUntil(async () => (await sectionText('count-interactions')).includes(`${count} Calls and activities`), {
-    timeout: 5_000,
-    timeoutMsg: 'The call and activity count never read the expected number',
-  });
+  await waitForListed(
+    async () => (await sectionText('count-interactions')).includes(`${count} Calls and activities`),
+    'The call and activity count never read the expected number',
+  );
 });
 
 Then('no upcoming dates are listed', async () => {
