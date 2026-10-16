@@ -1,6 +1,14 @@
 import { afterEach, vi } from 'vitest';
 import { clearMocks } from '@tauri-apps/api/mocks';
 import { randomFillSync } from 'node:crypto';
+import { setDb } from '../lib/db';
+import { migratedDb } from './sqlite-db';
+
+// The screens read through src/lib/db, which would otherwise reach for the
+// Tauri plugin. Each test file gets its own module registry, so each one gets
+// its own empty database with the app's schema applied. Tests that care about
+// the data make their own Db and pass it to the repository directly.
+setDb(migratedDb());
 
 // jsdom has no WebCrypto, which the Tauri mocks reach for.
 Object.defineProperty(window, 'crypto', {
