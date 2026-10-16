@@ -1,7 +1,5 @@
 DEFERRED
 - 16 October 2026 | #1 | How the user exports or backs up their data. | Low stakes, needs its own issue. The README lists it as a future enhancement.
-- 16 October 2026 | #1 | Should contact search list more than 8 matches? | Outcome 18 says matching contacts are listed, and the plan capped the list at 8. Low stakes, decide before archive.
-- 16 October 2026 | #1 | Keep LOGOS.png, the Monica screenshots and MONICA-FEATURES.md in the repository? | They were committed with the schema work and nothing refers to them. Decide before archive.
 OUT OF SCOPE
 - 16 October 2026 | #1 | Gifts and debts. | The issue lists them as out of scope.
 - 16 October 2026 | #1 | Email and system notifications for reminders. Monica emails every reminder on the morning it happens. Outcome 12 says reminders stay inside the app.
@@ -14,7 +12,10 @@ OUT OF SCOPE
 - 16 October 2026 | #1 | Monica's pets section on a contact. | Outcome 6 does not list pets among what a contact records.
 - 16 October 2026 | #1 | Monica's journal templates and sections. | Monica v4 gives journal posts a template with named sections. Outcome 13 asks for a flat list of entries.
 - 16 October 2026 | #1 | Monica's multiple vaults, users and permissions. | The issue is for one person on one machine.
+DECISIONS
+- 17 October 2026 | #1 | Contact search stays at 8 results. | Outcome 18 says matching contacts are listed. The user chose to keep the cap, since more letters narrow the list.
+- 17 October 2026 | #1 | Only LOGOS.png stays tracked. The Monica screenshots and MONICA-FEATURES.md are untracked and stay on the user's disk. | The user decided this before the pull request. The files remain in the branch's earlier commits.
 NOTES
-- 16 October 2026 | #1 | Monica 1.6.0 is the reference. | The three screenshots in the repository root are Monica 1.6.0, taken from contact.webp's version marker. Where a detail was not visible there, the rule the user set on 16 October 2026 applies: match Monica.
+- 16 October 2026 | #1 | Monica 1.6.0 is the reference. | The three screenshots the user keeps outside git are Monica 1.6.0, taken from contact.webp's version marker. Where a detail was not visible there, the rule the user set on 16 October 2026 applies: match Monica.
 - 16 October 2026 | #1 | The admin password in create_ally.html stays in the git history of a public repository after the file is deleted. | Rotate the PocketBase admin password.
 - 16 October 2026 | #1 | tauri-plugin-sql resolves SQLite paths against the config folder, and its reference page wrongly says the app folder. | Checked in the plugin source, wrapper.rs on the v2 branch.
