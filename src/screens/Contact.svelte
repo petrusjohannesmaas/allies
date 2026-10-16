@@ -8,6 +8,7 @@
   import Notes from '../components/Notes.svelte';
   import Phones from '../components/Phones.svelte';
   import Profile from '../components/Profile.svelte';
+  import Reminders from '../components/Reminders.svelte';
   import SignificantOther from '../components/SignificantOther.svelte';
   import Tags from '../components/Tags.svelte';
   import { db, type Db } from '../lib/db';
@@ -62,6 +63,7 @@
       <SignificantOther contactId={contact.id} />
       <Children contactId={contact.id} />
       <Profile contactId={contact.id} />
+      <Reminders contactId={contact.id} />
       <Tags contactId={contact.id} />
       <Notes contactId={contact.id} />
       <Missions contactId={contact.id} />

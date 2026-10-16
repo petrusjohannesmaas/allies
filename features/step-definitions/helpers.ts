@@ -58,14 +58,18 @@ export async function contactRows(): Promise<string[]> {
 }
 
 /**
- * "today", "yesterday" or "3 days ago" as a YYYY-MM-DD string, so a scenario
- * can say how long ago something happened without fixing the day it runs on.
+ * "today", "yesterday", "tomorrow", "3 days ago" or "in 10 days" as a
+ * YYYY-MM-DD string, so a scenario can say how long ago or how long ahead
+ * something happens without fixing the day it runs on.
  */
 export function dayFromNow(phrase: string): string {
   const when = new Date();
   const ago = /^(\d+) days? ago$/.exec(phrase);
+  const ahead = /^in (\d+) days?$/.exec(phrase);
   if (ago) when.setDate(when.getDate() - Number(ago[1]));
+  else if (ahead) when.setDate(when.getDate() + Number(ahead[1]));
   else if (phrase === 'yesterday') when.setDate(when.getDate() - 1);
+  else if (phrase === 'tomorrow') when.setDate(when.getDate() + 1);
   else if (phrase !== 'today') throw new Error(`No step reads the date "${phrase}"`);
   return when.toLocaleDateString('en-CA');
 }
