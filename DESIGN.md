@@ -6,7 +6,7 @@ Allies is a desktop app for one person on one machine. It keeps contacts, what t
 
 - Tauri 2 with a plain Vite and Svelte 5 frontend (runes only, no SvelteKit), Tailwind 4, `@lucide/svelte` and Geist bundled through `@fontsource-variable/geist`. Target is Debian 13.
 - SQLite through `tauri-plugin-sql` (sqlx). Profile pictures go through `tauri-plugin-fs`. The app has no settings, so it does not use `tauri-plugin-store`.
-- The app makes no network request. `tauri.conf.json` sets a content security policy that allows only the app's own origin, `blob:` images and Tauri's IPC.
+- The app makes no network request. `tauri.conf.json` sets a content security policy that allows only the app's own origin, `blob:` images and Tauri's IPC. It also allows inline styles, because the avatar sets its size in a `style` attribute.
 - Package and binary name `allies`, product name Allies, identifier `privatelink.allies`. The identifier never changes, because the data folder follows it.
 
 ## Layout
@@ -20,12 +20,18 @@ src/
   lib/db.ts               the Db interface (select, execute) and the plugin-backed Db
   lib/dates.ts            date strings, adding months, the upcoming-dates function
   lib/navigation.svelte.ts  the open screen and the open contact
+  lib/categories.ts       the eight contact categories
+  lib/activity-categories.ts  the activity categories
+  lib/contact-validation.ts  the contact form rules
   lib/repo/               one module per table group: contacts, notes, calls and so on
   screens/                Dashboard, Contacts, Contact, Journal
   components/             shared pieces
   test/                   Vitest setup, the node:sqlite Db used by data tests
 features/                 Gherkin files, with step definitions in features/step-definitions/
 scripts/install-desktop.sh  npm run desktop:install
+vite.config.ts            Vite, the Tailwind and Svelte plugins, and the Vitest settings
+svelte.config.js          Svelte compiler settings
+wdio.conf.ts              the WebdriverIO configuration
 src-tauri/
   migrations/*.sql        the schema, one file per version
   src/lib.rs              plugins and the migration list
@@ -98,5 +104,5 @@ Scenario dates are computed from today in the step definitions, so no scenario n
 - 16 October 2026. The identifier is `privatelink.allies`, with no `com.` prefix, so the app claims no domain.
 - 16 October 2026. All user data lives in the config folder, because the SQL plugin puts the database there. One folder keeps backup and restore to one step.
 - 16 October 2026. The journal is a view over four sources, not a copy kept in step by code.
-- 16 October 2026. Marking the home address is two statements, not the single `UPDATE ... SET is_home = (id = $1)` the index seems to allow. SQLite checks the one-home-address index row by row as it updates, so one statement that moves the mark onto an earlier row collides with the row it has not cleared yet. Each statement is its own atomic.
+- 16 October 2026. Marking the home address is two statements, not the single `UPDATE ... SET is_home = (id = $1)` the index seems to allow. SQLite checks the one-home-address index row by row as it updates, so one statement that moves the mark onto an earlier row collides with the row it has not cleared yet. Each statement commits on its own, so a failure on the second leaves the contact with no home address.
 - 16 October 2026. Where a detail is not settled elsewhere, the app matches Monica 1.6.0.

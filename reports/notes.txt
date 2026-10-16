@@ -1,5 +1,7 @@
 DEFERRED
 - 16 October 2026 | #1 | How the user exports or backs up their data. | Low stakes, needs its own issue. The README lists it as a future enhancement.
+- 16 October 2026 | #1 | Should contact search list more than 8 matches? | Outcome 18 says matching contacts are listed, and the plan capped the list at 8. Low stakes, decide before archive.
+- 16 October 2026 | #1 | Keep LOGOS.png, the Monica screenshots and MONICA-FEATURES.md in the repository? | They were committed with the schema work and nothing refers to them. Decide before archive.
 OUT OF SCOPE
 - 16 October 2026 | #1 | Gifts and debts. | The issue lists them as out of scope.
 - 16 October 2026 | #1 | Email and system notifications for reminders. Monica emails every reminder on the morning it happens. Outcome 12 says reminders stay inside the app.
