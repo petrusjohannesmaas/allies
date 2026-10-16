@@ -79,3 +79,28 @@ Feature: The dashboard
     And I open the "Dashboard" screen
     Then no birthday is listed for "Ada Lovelace"
     And the dashboard shows 1 contacts
+
+  Scenario: The dashboard lists at most eight recent contacts
+    Given the app has just started
+    And a contact named "Contact One" exists
+    And a contact named "Contact Two" exists
+    And a contact named "Contact Three" exists
+    And a contact named "Contact Four" exists
+    And a contact named "Contact Five" exists
+    And a contact named "Contact Six" exists
+    And a contact named "Contact Seven" exists
+    And a contact named "Contact Eight" exists
+    And a contact named "Contact Nine" exists
+    When I open the contact "Contact One"
+    And I open the contact "Contact Two"
+    And I open the contact "Contact Three"
+    And I open the contact "Contact Four"
+    And I open the contact "Contact Five"
+    And I open the contact "Contact Six"
+    And I open the contact "Contact Seven"
+    And I open the contact "Contact Eight"
+    And I open the contact "Contact Nine"
+    And I open the "Dashboard" screen
+    Then the dashboard lists 8 recently viewed contacts
+    And the recently viewed list does not show "Contact One"
+    And the recently viewed list shows "Contact Nine"

@@ -141,6 +141,18 @@ Then(/^the recently viewed contacts are "([^"]+)", "([^"]+)" and "([^"]+)"$/, as
   expect(await recentContacts()).toEqual([first, second, third]);
 });
 
+Then(/^the dashboard lists (\d+) recently viewed contacts$/, async (count: string) => {
+  await waitForListed(
+    async () => (await recentContacts()).length >= Number(count),
+    `The recently viewed row never showed ${count} contacts`,
+  );
+  expect(await recentContacts()).toHaveLength(Number(count));
+});
+
+Then(/^the recently viewed list shows "([^"]+)"$/, async (name: string) => {
+  expect(await recentContacts()).toContain(name);
+});
+
 Then(/^the recently viewed list does not show "([^"]+)"$/, async (name: string) => {
   expect(await recentContacts()).not.toContain(name);
 });
