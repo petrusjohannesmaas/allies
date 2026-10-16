@@ -1,6 +1,8 @@
 <script lang="ts">
+  import Activities from '../components/Activities.svelte';
   import Addresses from '../components/Addresses.svelte';
   import Avatar from '../components/Avatar.svelte';
+  import Calls from '../components/Calls.svelte';
   import Children from '../components/Children.svelte';
   import Missions from '../components/Missions.svelte';
   import Notes from '../components/Notes.svelte';
@@ -54,6 +56,8 @@
          touching what is here. -->
     <div class="grid gap-4">
       <Phones contactId={contact.id} />
+      <Calls contactId={contact.id} />
+      <Activities contactId={contact.id} />
       <Addresses contactId={contact.id} />
       <SignificantOther contactId={contact.id} />
       <Children contactId={contact.id} />
