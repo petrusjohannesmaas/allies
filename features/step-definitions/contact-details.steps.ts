@@ -58,55 +58,51 @@ When(/^I add the address "([^"]+)" in "([^"]+)"$/, async (street: string, city: 
 });
 
 When(/^I make "([^"]+)" the home address$/, async (street: string) => {
-  await browser.execute(
+  const clicked = await browser.execute(
     (root, wanted) => {
-      const row = [...document.querySelectorAll(`${root} [data-testid="address"]`)].find((candidate) =>
-        candidate.querySelector('[data-testid="address-text"]')?.textContent?.startsWith(wanted),
+      const row = [...document.querySelectorAll(`${root} [data-testid="address"]`)].find(
+        (candidate) => candidate.getAttribute('data-street') === wanted,
       );
-      if (!row) throw new Error(`No address starting with "${wanted}" on the page`);
+      if (!row) return false;
       (row.querySelector('[data-testid="home-address"]') as HTMLButtonElement).click();
+      return true;
     },
     PAGE,
     street,
   );
-  await browser.waitUntil(
-    async () =>
-      (
-        await browser.execute(
-          (root, wanted) =>
-            [...document.querySelectorAll(`${root} [data-testid="address"]`)].some(
-              (row) =>
-                row.getAttribute('data-home') === 'true' &&
-                row.querySelector('[data-testid="address-text"]')?.textContent?.startsWith(wanted),
-            ),
-          PAGE,
-          street,
-        )
-      ) === true,
-    { timeout: 5_000, timeoutMsg: 'The home mark never moved' },
-  );
+  if (!clicked) throw new Error(`No address on "${street}" on the page`);
+
+  await browser.waitUntil(async () => (await homeStreets()).includes(street), {
+    timeout: 5_000,
+    timeoutMsg: 'The home mark never moved',
+  });
 });
 
 Then(/^"([^"]+)" is the home address$/, async (street: string) => {
-  expect(await homeAddress()).toContain(street);
+  expect(await homeStreets()).toContain(street);
 });
 
 Then(/^"([^"]+)" is not the home address$/, async (street: string) => {
-  expect(await homeAddress()).not.toContain(street);
+  expect(await homeStreets()).not.toContain(street);
 });
 
 Then('no address is the home address', async () => {
-  expect(await homeAddress()).toEqual([]);
+  expect(await homeStreets()).toEqual([]);
 });
 
-/** The addresses the page marks as the home address. */
-async function homeAddress(): Promise<string[]> {
-  const listed = await browser.execute(() =>
-    [...document.querySelectorAll('[data-testid="address"][data-home="true"] [data-testid="address-text"]')].map(
-      (row) => row.textContent ?? '',
-    ),
+/**
+ * The streets of the addresses the page marks as the home address. The row
+ * carries the street on its own, so a step asks about one address and not
+ * about the whole line it reads as.
+ */
+async function homeStreets(): Promise<string[]> {
+  return browser.execute(
+    (root) =>
+      [...document.querySelectorAll(`${root} [data-testid="address"][data-home="true"]`)].map(
+        (row) => row.getAttribute('data-street') ?? '',
+      ),
+    PAGE,
   );
-  return listed;
 }
 
 When(/^I add "([^"]+)" as a child$/, async (name: string) => {

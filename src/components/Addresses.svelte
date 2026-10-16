@@ -59,7 +59,12 @@
   {:else}
     <ul class="mt-3 grid gap-2" data-testid="address-list">
       {#each addresses as address (address.id)}
-        <li class="border-line flex items-center gap-3 border-t pt-2" data-testid="address" data-home={address.is_home === 1}>
+        <li
+          class="border-line flex items-center gap-3 border-t pt-2"
+          data-testid="address"
+          data-home={address.is_home === 1}
+          data-street={address.street ?? ''}
+        >
           <button
             type="button"
             class="shrink-0"

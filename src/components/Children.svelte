@@ -2,7 +2,7 @@
   import { openContact } from '$lib/navigation.svelte';
   import { db } from '$lib/db';
   import { fullName, listContacts, type Contact } from '$lib/repo/contacts';
-import { addChild, listChildren, removeChild, type Child } from '$lib/repo/details';
+  import { addChild, listChildren, removeChild, type Child } from '$lib/repo/details';
 
   let { contactId }: { contactId: number } = $props();
 

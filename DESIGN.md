@@ -98,4 +98,5 @@ Scenario dates are computed from today in the step definitions, so no scenario n
 - 16 October 2026. The identifier is `privatelink.allies`, with no `com.` prefix, so the app claims no domain.
 - 16 October 2026. All user data lives in the config folder, because the SQL plugin puts the database there. One folder keeps backup and restore to one step.
 - 16 October 2026. The journal is a view over four sources, not a copy kept in step by code.
+- 16 October 2026. Marking the home address is two statements, not the single `UPDATE ... SET is_home = (id = $1)` the index seems to allow. SQLite checks the one-home-address index row by row as it updates, so one statement that moves the mark onto an earlier row collides with the row it has not cleared yet. Each statement is its own atomic.
 - 16 October 2026. Where a detail is not settled elsewhere, the app matches Monica 1.6.0.

@@ -5,13 +5,13 @@
   let { contactId }: { contactId: number } = $props();
 
   let phones = $state<Phone[]>([]);
-let label = $state('');
-let number = $state('');
-let failure = $state('');
+  let label = $state('');
+  let number = $state('');
+  let failure = $state('');
 
-$effect(() => {
-  void reload(contactId);
-});
+  $effect(() => {
+    void reload(contactId);
+  });
 
 async function reload(id: number) {
   phones = await listPhones(await db(), id);
