@@ -1,7 +1,13 @@
 <script lang="ts">
+  import Addresses from '../components/Addresses.svelte';
   import Avatar from '../components/Avatar.svelte';
+  import Children from '../components/Children.svelte';
   import Missions from '../components/Missions.svelte';
   import Notes from '../components/Notes.svelte';
+  import Phones from '../components/Phones.svelte';
+  import Profile from '../components/Profile.svelte';
+  import SignificantOther from '../components/SignificantOther.svelte';
+  import Tags from '../components/Tags.svelte';
   import { db, type Db } from '../lib/db';
   import { goBackFromContact, navigation } from '../lib/navigation.svelte';
   import { fullName, getContact, markViewed, type Contact } from '../lib/repo/contacts';
@@ -47,6 +53,12 @@
     <!-- One component per section, so the later screens add theirs without
          touching what is here. -->
     <div class="grid gap-4">
+      <Phones contactId={contact.id} />
+      <Addresses contactId={contact.id} />
+      <SignificantOther contactId={contact.id} />
+      <Children contactId={contact.id} />
+      <Profile contactId={contact.id} />
+      <Tags contactId={contact.id} />
       <Notes contactId={contact.id} />
       <Missions contactId={contact.id} />
     </div>
