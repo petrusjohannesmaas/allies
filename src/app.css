@@ -1,0 +1,122 @@
+@import '@fontsource-variable/geist';
+@import 'tailwindcss' source('./');
+
+/* One palette for the whole app. Screens and components use the Tailwind
+   colour names below, so nothing reaches for a raw hex value. */
+:root {
+  --bg: #faf9f7;
+  --surface: #ffffff;
+  --fg: #1f1d1b;
+  --muted: #6f6a64;
+  --border: #e4e0da;
+  --accent: #b4552d;
+  --accent-fg: #ffffff;
+  --danger: #b02a2a;
+  --radius: 0.5rem;
+}
+
+@theme inline {
+  --font-sans: 'Geist Variable', system-ui, sans-serif;
+
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-fg: var(--fg);
+  --color-muted: var(--muted);
+  --color-line: var(--border);
+  --color-accent: var(--accent);
+  --color-accent-fg: var(--accent-fg);
+  --color-danger: var(--danger);
+}
+
+@layer base {
+  html,
+  body {
+    height: 100%;
+  }
+
+  body {
+    margin: 0;
+    background-color: var(--bg);
+    color: var(--fg);
+    font-family: var(--font-sans);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+}
+
+@layer components {
+  /* Every text field and textarea in the app, so they look the same. */
+  .input {
+    background-color: var(--surface);
+    color: var(--fg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 0.375rem 0.625rem;
+    font-size: 0.875rem;
+    width: 100%;
+  }
+
+  .input:disabled {
+    opacity: 0.5;
+  }
+
+  .btn {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
+    background-color: var(--surface);
+    color: var(--fg);
+    cursor: pointer;
+  }
+
+  .btn:hover {
+    background-color: var(--bg);
+  }
+
+  .btn-primary {
+    background-color: var(--accent);
+    color: var(--accent-fg);
+    border-color: var(--accent);
+  }
+
+  .btn-primary:hover {
+    background-color: var(--accent);
+    filter: brightness(0.93);
+  }
+
+  .btn-danger {
+    color: var(--danger);
+  }
+
+  .card {
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1rem;
+  }
+
+  /* A section heading on the dashboard, a contact page and the journal. */
+  .section-title {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    font-weight: 600;
+  }
+
+  .field-label {
+    display: block;
+    font-size: 0.8125rem;
+    color: var(--muted);
+    margin-bottom: 0.25rem;
+  }
+
+  .error {
+    color: var(--danger);
+    font-size: 0.8125rem;
+  }
+}

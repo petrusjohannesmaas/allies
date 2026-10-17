@@ -1,0 +1,13 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "wdio",
+  "description": "The test plugin permissions, added only to end-to-end builds",
+  "windows": [
+    "main"
+  ],
+  "permissions": [
+    "core:app:allow-exit",
+    "wdio:default",
+    "wdio-webdriver:default"
+  ]
+}
