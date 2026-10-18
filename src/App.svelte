@@ -1,4 +1,6 @@
 <script lang="ts">
+  // The CSP has no data: in img-src, so the logo must stay a file and not inline.
+  import logo from './assets/logo.png?no-inline';
   import SearchBox from './components/SearchBox.svelte';
   import { navigation, open, screens } from './lib/navigation.svelte';
   import Contact from './screens/Contact.svelte';
@@ -10,7 +12,7 @@
 <!-- The search box stays on every screen, so a contact is always one keystroke
      away from wherever the user is. -->
 <header class="flex items-center gap-3 border-b border-line bg-surface px-4 py-3" data-testid="top-bar">
-  <span class="text-sm font-semibold">Allies</span>
+  <img src={logo} alt="Allies" class="size-7 shrink-0" />
 
   <SearchBox />
 
