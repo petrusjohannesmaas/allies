@@ -11,6 +11,14 @@ beforeEach(() => {
 });
 
 describe('the top bar', () => {
+  it('shows the logo, named Allies for screen readers, instead of the Allies text', () => {
+    render(App);
+    const topBar = screen.getByTestId('top-bar');
+    const logo = screen.getByRole('img', { name: 'Allies' });
+    expect(topBar.contains(logo)).toBe(true);
+    expect(topBar.textContent).not.toContain('Allies');
+  });
+
   it('shows the search box on the dashboard', () => {
     render(App);
     expect(screen.getByTestId('search-box')).toBeTruthy();

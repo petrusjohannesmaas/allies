@@ -14,7 +14,8 @@ Allies is a desktop app for one person on one machine. It keeps contacts, what t
 ```
 src/
   main.ts                 mounts App
-  App.svelte              top bar with the search box, and the open screen
+  App.svelte              top bar with the logo and the search box, and the open screen
+  assets/logo.png         the logo shown in the top bar, cropped from LOGOS.png
   app.css                 Tailwind, colour variables, focus ring
   lib/platform.ts         the only file that imports @tauri-apps/*
   lib/db.ts               the Db interface (select, execute) and the plugin-backed Db
@@ -33,6 +34,7 @@ vite.config.ts            Vite, the Tailwind and Svelte plugins, and the Vitest 
 svelte.config.js          Svelte compiler settings
 wdio.conf.ts              the WebdriverIO configuration
 src-tauri/
+  icons/                  generated from assets/logo.png with `tauri icon`
   migrations/*.sql        the schema, one file per version
   src/lib.rs              plugins and the migration list
   capabilities/           default.json, and wdio.json for end-to-end builds only
@@ -42,7 +44,7 @@ src-tauri/
 
 ## Screens
 
-The window has a top bar with a search box and four screens: dashboard, contacts, contact and journal. `navigation.svelte.ts` holds the open screen and the open contact id. There is no router and no settings screen.
+The window has a top bar with the logo and a search box, and four screens: dashboard, contacts, contact and journal. `navigation.svelte.ts` holds the open screen and the open contact id. There is no router and no settings screen.
 
 ## Data
 
@@ -106,3 +108,4 @@ Scenario dates are computed from today in the step definitions, so no scenario n
 - 16 October 2026. The journal is a view over four sources, not a copy kept in step by code.
 - 16 October 2026. Marking the home address is two statements, not the single `UPDATE ... SET is_home = (id = $1)` the index seems to allow. SQLite checks the one-home-address index row by row as it updates, so one statement that moves the mark onto an earlier row collides with the row it has not cleared yet. Each statement commits on its own, so a failure on the second leaves the contact with no home address.
 - 16 October 2026. Where a detail is not settled elsewhere, the app matches Monica 1.6.0.
+- 18 October 2026. The logo is imported with `?no-inline`, so the build emits it as a file. The content security policy has no `data:` in `img-src`, and Vite would otherwise inline a small image as a `data:` URL. The desktop icons are regenerated from `src/assets/logo.png` with `tauri icon`. Only the desktop icons are kept, since the app targets Debian.
