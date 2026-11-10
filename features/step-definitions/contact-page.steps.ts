@@ -124,7 +124,7 @@ When(/^I delete the mission "([^"]+)"$/, async (description: string) => {
   });
 });
 
-Then(/^the contact page shows "([^"]+)"$/, async (name: string) => {
+Then(/^the contact page shows "((?!Born )[^"]+)"$/, async (name: string) => {
   const shown = await browser.execute(() => document.querySelector('[data-testid="contact-name"]')?.textContent?.trim());
   expect(shown).toBe(name);
 });
