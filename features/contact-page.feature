@@ -5,11 +5,12 @@ Feature: The contact page
 
   Scenario: Open a contact
     Given the app has just started
-    And a contact named "Ada Lovelace" exists with the category "colleague"
+    And a contact named "Ada Lovelace" exists with the category "colleague" and the birthday 1990-05-01
     When I open the "Contacts" screen
     And I select the contact "Ada Lovelace"
     Then the contact page shows "Ada Lovelace"
-    And the contact page shows the category "colleague"
+    And the contact page shows the category "Colleague"
+    And the contact page shows "Born 1 May 1990"
     And the contact "Ada Lovelace" counts as recently viewed
 
   Scenario: Write a note

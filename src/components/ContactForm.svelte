@@ -1,6 +1,6 @@
 <script lang="ts">
   import Avatar from './Avatar.svelte';
-  import { CATEGORIES } from '$lib/categories';
+  import { CATEGORIES, labelFor } from '$lib/categories';
   import { validateContact, type ContactErrors } from '$lib/contact-validation';
   import {
     blankInput,
@@ -91,7 +91,7 @@
     <span class="field-label">Category</span>
     <select class="input" data-testid="contact-category" bind:value={input.category}>
       {#each CATEGORIES as category (category)}
-        <option value={category}>{category}</option>
+        <option value={category}>{labelFor(category)}</option>
       {/each}
     </select>
   </label>

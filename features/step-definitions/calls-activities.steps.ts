@@ -1,4 +1,5 @@
 import { Then, When } from '@wdio/cucumber-framework';
+import { labelFor } from '../../src/lib/categories';
 import { formatDate } from '../../src/lib/dates';
 import { dayFromNow, setFieldValue, typeInto } from './helpers';
 
@@ -135,7 +136,7 @@ Then(/^the call "([^"]+)" reads the date "([^"]+)"$/, async (description: string
 
 Then(/^the activity "([^"]+)" is listed as "([^"]+)"$/, async (description: string, category: string) => {
   expect((await listedActivities()).map((row) => `${row.category}|${row.description}`)).toContain(
-    `${category}|${description}`,
+    `${labelFor(category)}|${description}`,
   );
 });
 

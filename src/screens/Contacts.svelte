@@ -1,6 +1,7 @@
 <script lang="ts">
   import Avatar from '../components/Avatar.svelte';
   import ContactForm from '../components/ContactForm.svelte';
+  import { labelFor } from '../lib/categories';
   import { db } from '../lib/db';
   import { openContact } from '../lib/navigation.svelte';
   import {
@@ -107,7 +108,7 @@
             <Avatar picture={contact.picture} name={fullName(contact)} size={40} />
             <span class="min-w-0">
               <span class="block truncate text-sm font-medium">{fullName(contact)}</span>
-              <span class="block text-xs text-muted">{contact.category}</span>
+              <span class="block text-xs text-muted">{labelFor(contact.category)}</span>
             </span>
           </button>
 

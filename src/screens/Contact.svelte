@@ -11,6 +11,8 @@
   import Reminders from '../components/Reminders.svelte';
   import SignificantOther from '../components/SignificantOther.svelte';
   import Tags from '../components/Tags.svelte';
+  import { labelFor } from '../lib/categories';
+  import { formatDate } from '../lib/dates';
   import { db, type Db } from '../lib/db';
   import { goBackFromContact, navigation } from '../lib/navigation.svelte';
   import { fullName, getContact, markViewed, type Contact } from '../lib/repo/contacts';
@@ -47,9 +49,9 @@
       <Avatar picture={contact.picture} name={fullName(contact)} size={72} />
       <div class="min-w-0">
         <h1 class="truncate text-xl font-semibold" data-testid="contact-name">{fullName(contact)}</h1>
-        <p class="text-sm text-muted" data-testid="contact-category">{contact.category}</p>
+        <p class="text-sm text-muted" data-testid="contact-category">{labelFor(contact.category)}</p>
         {#if contact.email}<p class="text-sm text-muted" data-testid="contact-email">{contact.email}</p>{/if}
-        {#if contact.birthday}<p class="text-sm text-muted" data-testid="contact-birthday">Born {contact.birthday}</p>{/if}
+        {#if contact.birthday}<p class="text-sm text-muted" data-testid="contact-birthday">Born {formatDate(contact.birthday)}</p>{/if}
       </div>
     </header>
 

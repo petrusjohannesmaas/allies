@@ -1,7 +1,7 @@
 <script lang="ts">
   import { db } from '$lib/db';
   import { formatDate, today } from '$lib/dates';
-  import { ACTIVITY_CATEGORIES } from '$lib/activity-categories';
+  import { ACTIVITY_CATEGORIES, labelFor } from '$lib/activity-categories';
   import { addActivity, deleteActivity, lastActivityTogether, listActivities, type Activity } from '$lib/repo/activities';
 
   let { contactId }: { contactId: number } = $props();
@@ -57,7 +57,7 @@
   >
     <select class="input sm:col-span-2" data-testid="activity-category" bind:value={category}>
       {#each ACTIVITY_CATEGORIES as option (option)}
-        <option value={option}>{option}</option>
+        <option value={option}>{labelFor(option)}</option>
       {/each}
     </select>
     <input class="input" type="date" data-testid="activity-date" bind:value={happenedOn} />
@@ -72,7 +72,7 @@
       {#each activities as activity (activity.id)}
         <li class="border-line flex items-center gap-3 border-t pt-2" data-testid="activity" data-date={activity.happened_on}>
           <div class="min-w-0 flex-1">
-            <p class="text-xs text-muted" data-testid="activity-category-value">{activity.category}</p>
+            <p class="text-xs text-muted" data-testid="activity-category-value">{labelFor(activity.category)}</p>
             <p class="text-sm" data-testid="activity-description-value">{activity.description}</p>
             <p class="text-xs text-muted" data-testid="activity-date-value">{formatDate(activity.happened_on)}</p>
           </div>

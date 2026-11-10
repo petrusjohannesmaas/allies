@@ -10,6 +10,8 @@ export const ACTIVITY_CATEGORIES = [
   'did something else',
 ] as const;
 
+export { labelFor } from './categories';
+
 export type ActivityCategory = (typeof ACTIVITY_CATEGORIES)[number];
 
 export function isActivityCategory(value: string): value is ActivityCategory {

@@ -134,6 +134,11 @@ Then(/^the contact page shows the category "([^"]+)"$/, async (category: string)
   expect(shown).toBe(category);
 });
 
+Then(/^the contact page shows "(Born [^"]+)"$/, async (text: string) => {
+  const shown = await browser.execute(() => document.querySelector('[data-testid="contact-birthday"]')?.textContent?.trim());
+  expect(shown).toBe(text);
+});
+
 Then(/^the contact "([^"]+)" counts as recently viewed$/, async (name: string) => {
   await browser.waitUntil(async () => Boolean(contactValue(name, 'last_viewed_at')), {
     timeout: 5_000,

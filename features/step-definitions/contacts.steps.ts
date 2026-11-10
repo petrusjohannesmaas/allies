@@ -1,5 +1,5 @@
 import { Given, Then, When } from '@wdio/cucumber-framework';
-import { CATEGORIES } from '../../src/lib/categories';
+import { CATEGORIES, labelFor } from '../../src/lib/categories';
 import { chooseOption, contactRows, setFieldValue, textOf, typeInto } from './helpers';
 import { contactValue, countRows, insertContact } from './data';
 
@@ -15,6 +15,14 @@ Given('a contact named {string} exists', async (name: string) => {
   const [firstName, lastName = ''] = name.split(' ');
   insertContact({ firstName, lastName: lastName || undefined });
 });
+
+Given(
+  /^a contact named "([^"]+)" exists with the category "([^"]+)" and the birthday (\d{4}-\d{2}-\d{2})$/,
+  async (name: string, category: string, birthday: string) => {
+    const [firstName, lastName = ''] = name.split(' ');
+    insertContact({ category, birthday, firstName, lastName: lastName || undefined });
+  },
+);
 
 Given(/^a contact named "([^"]+)" exists with the category "([^"]+)"$/, async (name: string, category: string) => {
   const [firstName, lastName = ''] = name.split(' ');
@@ -38,7 +46,7 @@ When(/^I fill in "([^"]*)" as the email$/, async (value: string) => {
 });
 
 When(/^I choose "([^"]+)" as the category$/, async (value: string) => {
-  await chooseOption(`${FORM} [data-testid="contact-category"]`, value);
+  await chooseOption(`${FORM} [data-testid="contact-category"]`, labelFor(value));
 });
 
 When(/^I set the birthday to (\d{4}-\d{2}-\d{2})$/, async (value: string) => {
@@ -105,7 +113,7 @@ Then(/^the contact "([^"]+)" has the category "([^"]+)"$/, async (name: string, 
   const row = `[data-testid="contact-row"][data-contact-name="${name}"]`;
   await $(row).waitForExist({ timeout: 5_000 });
 
-  expect(await textOf(row)).toContain(category);
+  expect(await textOf(row)).toContain(labelFor(category));
   expect(contactValue(name, 'category')).toBe(category);
 });
 
@@ -133,7 +141,7 @@ Then(
       return [...select.options].map((option) => option.textContent?.trim() ?? '');
     }, `${FORM} [data-testid="contact-category"]`);
 
-    expect(offered).toEqual([...CATEGORIES]);
+    expect(offered).toEqual(CATEGORIES.map(labelFor));
   },
 );
 

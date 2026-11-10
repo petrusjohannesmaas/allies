@@ -1,5 +1,6 @@
 <script lang="ts">
   import { Search } from '@lucide/svelte';
+  import { labelFor } from '$lib/categories';
   import { db } from '$lib/db';
   import { openContact } from '$lib/navigation.svelte';
   import { fullName, searchContacts, type Contact } from '$lib/repo/contacts';
@@ -70,7 +71,7 @@
                 onclick={() => choose(contact)}
               >
                 {fullName(contact)}
-                <span class="text-xs text-muted">{contact.category}</span>
+                <span class="text-xs text-muted">{labelFor(contact.category)}</span>
               </button>
             </li>
           {/each}
