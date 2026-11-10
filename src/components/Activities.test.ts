@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import Activities from './Activities.svelte';
 import { db } from '$lib/db';
 import { today } from '$lib/dates';
-import { ACTIVITY_CATEGORIES } from '$lib/activity-categories';
+import { ACTIVITY_CATEGORIES, labelFor } from '$lib/activity-categories';
 import { addContact, blankInput } from '$lib/repo/contacts';
 import { addActivity, listActivities } from '$lib/repo/activities';
 
@@ -40,7 +40,7 @@ describe('the activities section', () => {
       (option) => option.textContent?.trim(),
     );
 
-    expect(offered).toEqual([...ACTIVITY_CATEGORIES]);
+    expect(offered).toEqual(ACTIVITY_CATEGORIES.map(labelFor));
   });
 
   it('starts the date at today', async () => {
@@ -54,7 +54,7 @@ describe('the activities section', () => {
     await logActivity('2026-10-14', 'did sport together', 'We went skiing');
 
     await waitFor(() => expect(screen.getByTestId('activity-description-value').textContent).toBe('We went skiing'));
-    expect(screen.getByTestId('activity-category-value').textContent).toBe('did sport together');
+    expect(screen.getByTestId('activity-category-value').textContent).toBe('Did sport together');
     expect(screen.getByTestId('activity-date-value').textContent).toBe('14 October 2026');
     expect((await listActivities(await db(), contactId))[0].happened_on).toBe('2026-10-14');
   });
