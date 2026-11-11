@@ -31,7 +31,7 @@
   }
 </script>
 
-<section class="min-w-0 md:w-80" data-testid="missions">
+<section class="min-w-0 md:ml-auto md:w-80" data-testid="missions">
   <h3 class="section-title">Missions</h3>
 
   {#if failure}<p class="error" data-testid="missions-failure">{failure}</p>{/if}

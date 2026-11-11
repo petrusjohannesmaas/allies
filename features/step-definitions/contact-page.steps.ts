@@ -193,3 +193,13 @@ Then(
     });
   },
 );
+
+Then('the Missions box is at the right of the header', async () => {
+  const gap = await browser.execute(() => {
+    const box = document.querySelector('[data-testid="contact-header"] [data-testid="missions"]')!;
+    const row = box.parentElement!;
+    const inner = row.getBoundingClientRect().right - parseFloat(getComputedStyle(row).paddingRight);
+    return inner - box.getBoundingClientRect().right;
+  });
+  expect(Math.abs(gap)).toBeLessThanOrEqual(2);
+});

@@ -22,6 +22,7 @@ Feature: The contact page
     When the window is 700 px wide
     Then the cards are in the order About, Notes, Phone calls, Activities, Address, Reminders, one to a row
     When the window is 1280 px wide
+    Then the Missions box is at the right of the header
 
   Scenario: Leaving the page discards unsaved changes
     Given the app has just started
