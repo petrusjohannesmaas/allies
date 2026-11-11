@@ -26,28 +26,6 @@ async function sectionText(section: string, testId: string): Promise<string> {
   );
 }
 
-When(/^I add the phone number "([^"]+)" "([^"]*)"$/, async (label: string, number: string) => {
-  await typeInto(`${PAGE} [data-testid="phones"] [data-testid="phone-label"]`, label);
-  await typeInto(`${PAGE} [data-testid="phones"] [data-testid="phone-number"]`, number);
-  await $(`${PAGE} [data-testid="phones"] [data-testid="save-phone"]`).click();
-  await browser.waitUntil(async () => (await rowsOf('phones', 'phone', 'phone-number-value')).includes(number), {
-    timeout: 5_000,
-    timeoutMsg: 'The phone number never showed up on the page',
-  });
-});
-
-Then(/^the phone "([^"]+)" is listed as "([^"]+)"$/, async (number: string, label: string) => {
-  const listed = await browser.execute(
-    (root) =>
-      [...document.querySelectorAll(`${root} [data-testid="phone"]`)].map(
-        (row) =>
-          `${row.querySelector('[data-testid="phone-label-value"]')?.textContent ?? ''}|${row.querySelector('[data-testid="phone-number-value"]')?.textContent ?? ''}`,
-      ),
-    PAGE,
-  );
-  if (!listed.includes(`${label}|${number}`)) throw new Error(`The page lists: ${listed.join(', ')}`);
-});
-
 When(/^I add the address "([^"]+)" in "([^"]+)"$/, async (street: string, city: string) => {
   await typeInto(`${PAGE} [data-testid="addresses"] [data-testid="address-street"]`, street);
   await typeInto(`${PAGE} [data-testid="addresses"] [data-testid="address-city"]`, city);
@@ -131,25 +109,6 @@ Then('no significant other is listed', async () => {
 Then(/^the significant other is "([^"]+)"$/, async (name: string) => {
   const shown = await sectionText('significant-other', 'open-partner');
   if (shown !== name) throw new Error(`The significant other reads "${shown}"`);
-});
-
-When(/^I add the tag "([^"]+)"$/, async (tag: string) => {
-  await typeInto(`${PAGE} [data-testid="tags"] [data-testid="tag-input"]`, tag);
-  await $(`${PAGE} [data-testid="tags"] [data-testid="save-tag"]`).click();
-  await $(`[data-testid="tag"][data-tag="${tag}"]`).waitForExist({ timeout: 5_000 });
-});
-
-When(/^I remove the tag "([^"]+)"$/, async (tag: string) => {
-  await $(`[data-testid="tag"][data-tag="${tag}"] [data-testid="remove-tag"]`).click();
-  await $(`[data-testid="tag"][data-tag="${tag}"]`).waitForExist({ reverse: true, timeout: 5_000 });
-});
-
-Then(/^the tag "([^"]+)" is listed$/, async (tag: string) => {
-  await $(`[data-testid="tag"][data-tag="${tag}"]`).waitForExist({ timeout: 5_000 });
-});
-
-Then(/^the tag "([^"]+)" is not listed$/, async (tag: string) => {
-  expect(await $(`[data-testid="tag"][data-tag="${tag}"]`).isExisting()).toBe(false);
 });
 
 const PROFILE_FIELDS = [

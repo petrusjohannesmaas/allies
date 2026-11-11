@@ -5,17 +5,14 @@ import { addContact, blankInput, fullName } from './contacts';
 import {
   addAddress,
   addChild,
-  addPhone,
   addTag,
   addressIsUsable,
   deleteAddress,
-  deletePhone,
   formatAddress,
   getProfileText,
   getSignificantOther,
   listAddresses,
   listChildren,
-  listPhones,
   listTags,
   removeChild,
   removeTag,
@@ -30,41 +27,6 @@ let ada: number;
 beforeEach(async () => {
   db = migratedDb();
   ada = await addContact(db, { ...blankInput(), firstName: 'Ada', lastName: 'Lovelace' });
-});
-
-/* Phone numbers */
-
-describe('phone numbers', () => {
-  it('starts with none', async () => {
-    expect(await listPhones(db, ada)).toEqual([]);
-  });
-
-  it('keeps each number with its own label', async () => {
-    await addPhone(db, ada, 'mobile', '082 123 4567');
-    await addPhone(db, ada, 'work', '021 555 0000');
-    await addPhone(db, ada, 'mobile', '083 987 6543');
-
-    expect(await listPhones(db, ada)).toEqual([
-      expect.objectContaining({ label: 'mobile', number: '082 123 4567' }),
-      expect.objectContaining({ label: 'mobile', number: '083 987 6543' }),
-      expect.objectContaining({ label: 'work', number: '021 555 0000' }),
-    ]);
-  });
-
-  it('trims what the user typed', async () => {
-    await addPhone(db, ada, '  mobile  ', '  082 123 4567  ');
-
-    expect(await listPhones(db, ada)).toEqual([expect.objectContaining({ label: 'mobile', number: '082 123 4567' })]);
-  });
-
-  it('removes one', async () => {
-    const first = await addPhone(db, ada, 'mobile', '082 123 4567');
-    await addPhone(db, ada, 'work', '021 555 0000');
-
-    await deletePhone(db, first);
-
-    expect((await listPhones(db, ada)).map((phone) => phone.number)).toEqual(['021 555 0000']);
-  });
 });
 
 /* Addresses */

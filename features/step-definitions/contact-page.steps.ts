@@ -1,8 +1,7 @@
 import { Given, Then, When } from '@wdio/cucumber-framework';
-import { contactValue } from './data';
-import { setFieldValue, typeInto } from './helpers';
+import { contactValue, insertContact } from './data';
+import { selectContact, setFieldValue, typeInto } from './helpers';
 
-const CONTACT_PAGE = '[data-testid="screen-contact"]';
 const NOTES = '[data-testid="notes"]';
 const MISSIONS = '[data-testid="missions"]';
 
@@ -41,13 +40,6 @@ async function clickNoteButton(body: string, testId: string) {
     testId,
   );
   if (!clicked) throw new Error(`No note reading "${body}" on the page`);
-}
-
-async function selectContact(name: string) {
-  const row = $(`[data-testid="contact-row"][data-contact-name="${name}"] [data-testid="open-contact"]`);
-  await row.waitForExist({ timeout: 5_000 });
-  await row.click();
-  await $(`${CONTACT_PAGE} [data-testid="contact-header"]`).waitForExist({ timeout: 5_000 });
 }
 
 When(/^I select the contact "([^"]+)"$/, async (name: string) => {
@@ -182,4 +174,28 @@ Then(/^the mission "([^"]+)" is due (\d{4}-\d{2}-\d{2})$/, async (description: s
 
 Then('no missions are listed', async () => {
   await $(`${MISSIONS} [data-testid="missions-empty"]`).waitForExist({ timeout: 5_000 });
+});
+
+Given(/^a contact named "([^"]+)" exists with the email "([^"]+)"$/, async (name: string, email: string) => {
+  const [firstName, lastName = ''] = name.split(' ');
+  insertContact({ email, firstName, lastName: lastName || undefined });
+});
+
+async function headerText(testId: string): Promise<string> {
+  return browser.execute(
+    (wanted) => document.querySelector(`[data-testid="contact-header"] [data-testid="${wanted}"]`)?.textContent?.trim() ?? '',
+    testId,
+  );
+}
+
+Then(/^the contact page shows the email "([^"]+)"$/, async (email: string) => {
+  expect(await headerText('contact-email')).toBe(email);
+});
+
+Then(/^the contact page shows the phone "([^"]+)"$/, async (phone: string) => {
+  expect(await headerText('contact-phone')).toBe(phone);
+});
+
+Then(/^the contact page shows the tag "([^"]+)"$/, async (tag: string) => {
+  await $(`[data-testid="contact-header"] [data-testid="contact-tag"][data-tag="${tag}"]`).waitForExist({ timeout: 5_000 });
 });

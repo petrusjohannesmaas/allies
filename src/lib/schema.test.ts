@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { migratedDb, migrationFiles } from '../test/sqlite-db';
+import { migratedDb, migrationFiles, steppedDb } from '../test/sqlite-db';
 import type { Db } from './db';
 
 const CATEGORIES = [
@@ -39,7 +39,6 @@ async function addContact(firstName: string, category = 'friend'): Promise<numbe
 async function counts(): Promise<Record<string, number>> {
   const tables = [
     'notes',
-    'phone_numbers',
     'addresses',
     'contact_children',
     'contact_tags',
@@ -168,7 +167,6 @@ describe('deleting a contact', () => {
     await addContact('Alan');
 
     await db.execute('INSERT INTO notes (contact_id, body) VALUES ($1, $2)', [contact, 'A note']);
-    await db.execute('INSERT INTO phone_numbers (contact_id, label, number) VALUES ($1, $2, $3)', [contact, 'mobile', '082123']);
     await db.execute('INSERT INTO addresses (contact_id, city, is_home) VALUES ($1, $2, 1)', [contact, 'Cape Town']);
     await db.execute('INSERT INTO contact_children (parent_id, child_id) VALUES ($1, $2)', [contact, child]);
     await db.execute('INSERT INTO contact_tags (contact_id, tag) VALUES ($1, $2)', [contact, 'chess']);
@@ -186,7 +184,6 @@ describe('deleting a contact', () => {
 
     expect(await counts()).toEqual({
       notes: 0,
-      phone_numbers: 0,
       addresses: 0,
       contact_children: 0,
       contact_tags: 0,
@@ -284,5 +281,22 @@ describe('the journal view', () => {
     await db.execute('INSERT INTO journal_entries (entry_date, body) VALUES ($1, $2)', ['2026-10-03', 'A quiet day']);
     await db.execute('DELETE FROM contacts WHERE id = $1', [contact]);
     expect(await db.select<JournalRow>('SELECT kind FROM journal')).toEqual([{ kind: 'entry' }]);
+  });
+});
+
+describe('the phone migration', () => {
+  it('the phone migration keeps the first number', async () => {
+    const { db, applyMigration } = steppedDb();
+    applyMigration(0);
+    await db.execute("INSERT INTO contacts (id, category, first_name) VALUES (1, 'friend', 'Ada')");
+    await db.execute("INSERT INTO phone_numbers (contact_id, label, number) VALUES (1, 'mobile', '082 123 4567')");
+    await db.execute("INSERT INTO phone_numbers (contact_id, label, number) VALUES (1, 'work', '021 555 0000')");
+
+    applyMigration(1);
+
+    const rows = await db.select<{ phone: string | null }>('SELECT phone FROM contacts WHERE id = 1');
+    expect(rows[0].phone).toBe('082 123 4567');
+    const tables = await db.select("SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'phone_numbers'");
+    expect(tables).toEqual([]);
   });
 });

@@ -4,12 +4,20 @@ use tauri_plugin_sql::{Builder, Migration, MigrationKind};
 /// refuses a database whose applied migration has changed, so a change to one
 /// of these files is a new, higher-numbered file rather than an edit.
 fn migrations() -> Vec<Migration> {
-    vec![Migration {
-        version: 1,
-        description: "init",
-        sql: include_str!("../migrations/0001_init.sql"),
-        kind: MigrationKind::Up,
-    }]
+    vec![
+        Migration {
+            version: 1,
+            description: "init",
+            sql: include_str!("../migrations/0001_init.sql"),
+            kind: MigrationKind::Up,
+        },
+        Migration {
+            version: 2,
+            description: "phone_and_header",
+            sql: include_str!("../migrations/0002_phone_and_header.sql"),
+            kind: MigrationKind::Up,
+        },
+    ]
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]

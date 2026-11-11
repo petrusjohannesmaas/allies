@@ -13,6 +13,16 @@ Feature: The contact page
     And the contact page shows "Born 1 May 1990"
     And the contact "Ada Lovelace" counts as recently viewed
 
+  Scenario: Leaving the page discards unsaved changes
+    Given the app has just started
+    And a contact named "Ada Lovelace" exists with the email "ada@example.com"
+    When I open the contact "Ada Lovelace"
+    And I edit the contact "Ada Lovelace"
+    And I fill in "new@example.com" as the email
+    And I open the "Contacts" screen
+    And I select the contact "Ada Lovelace"
+    Then the contact page shows the email "ada@example.com"
+
   Scenario: Write a note
     Given the app has just started
     And a contact named "Ada Lovelace" exists

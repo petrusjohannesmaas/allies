@@ -9,14 +9,12 @@
     deleteContact,
     fullName,
     listContacts,
-    updateContactWithPicture,
     type Contact,
     type ContactFormResult,
   } from '../lib/repo/contacts';
 
   let contacts = $state<Contact[]>([]);
-  let mode = $state<'list' | 'add' | 'edit'>('list');
-  let editing = $state<Contact | null>(null);
+  let mode = $state<'list' | 'add'>('list');
   // The id of the contact whose delete button is showing its confirmation.
   let confirming = $state<number | null>(null);
   let failure = $state('');
@@ -31,13 +29,8 @@
 
   async function save({ input, picture }: ContactFormResult) {
     const connection = await db();
-    if (mode === 'edit' && editing) {
-      await updateContactWithPicture(connection, editing, input, picture);
-    } else {
-      await addContactWithPicture(connection, input, picture);
-    }
+    await addContactWithPicture(connection, input, picture);
     mode = 'list';
-    editing = null;
     await reload();
   }
 
@@ -64,7 +57,7 @@
   <div class="mb-4 flex items-center justify-between">
     <h1 class="text-xl font-semibold">Contacts</h1>
     {#if mode === 'list'}
-      <button type="button" class="btn btn-primary" data-testid="add-contact" onclick={() => (mode = 'add')}>Add contact</button>
+      <button type="button" class="btn btn-primary" data-testid="add-contact" onclick={() => (mode = 'add')}>New contact</button>
     {/if}
   </div>
 
@@ -76,19 +69,6 @@
     <div class="mb-4 max-w-sm">
       {#key 'add'}
         <ContactForm onsave={(input) => run(() => save(input))} oncancel={() => (mode = 'list')} />
-      {/key}
-    </div>
-  {:else if mode === 'edit' && editing}
-    <div class="mb-4 max-w-sm">
-      {#key editing.id}
-        <ContactForm
-          contact={editing}
-          onsave={(input) => run(() => save(input))}
-          oncancel={() => {
-            mode = 'list';
-            editing = null;
-          }}
-        />
       {/key}
     </div>
   {/if}
@@ -119,17 +99,6 @@
             </button>
             <button type="button" class="btn" data-testid="cancel-delete" onclick={() => (confirming = null)}>Cancel</button>
           {:else}
-            <button
-              type="button"
-              class="btn"
-              data-testid="edit-contact"
-              onclick={() => {
-                editing = contact;
-                mode = 'edit';
-              }}
-            >
-              Edit
-            </button>
             <button
               type="button"
               class="btn btn-danger"

@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { migratedDb } from '../../test/sqlite-db';
 import type { Db } from '../db';
+import { listTags } from './details';
 import {
   addContact,
   blankInput,
@@ -61,6 +62,13 @@ describe('adding a contact', () => {
     await expect(addContact(db, input({ category: 'coworker' as never }))).rejects.toThrow(/CHECK constraint failed/);
   });
 
+  it('a new contact keeps its phone and tags', async () => {
+    const id = await addContact(db, input({ phone: '082 123 4567', tags: ['chess'] }));
+
+    expect((await getContact(db, id))?.phone).toBe('082 123 4567');
+    expect(await listTags(db, id)).toEqual(['chess']);
+  });
+
   it('counts what the dashboard counts', async () => {
     expect(await countContacts(db)).toBe(0);
     await addContact(db, input({ firstName: 'Ada' }));
@@ -112,7 +120,9 @@ describe('reading one contact', () => {
       firstName: 'Ada',
       lastName: 'Lovelace',
       email: 'ada@example.com',
+      phone: '',
       birthday: '',
+      tags: [],
     });
   });
 });
@@ -134,6 +144,28 @@ describe('updating a contact', () => {
     await updateContact(db, id, input({ firstName: 'Ada', lastName: 'Byron' }));
 
     expect((await listContacts(db)).map(fullName)).toEqual(['Ada Byron']);
+  });
+});
+
+describe('saving the header', () => {
+  it('saving the header replaces the tags and sets the phone', async () => {
+    const id = await addContact(db, input({ tags: ['chess', 'books'] }));
+
+    await updateContact(db, id, input({ phone: '021 555 0000', tags: ['books', 'go'] }));
+
+    expect(await listTags(db, id)).toEqual(['books', 'go']);
+    expect((await getContact(db, id))?.phone).toBe('021 555 0000');
+  });
+
+  it('a failed header save changes nothing', async () => {
+    const id = await addContact(db, input({ category: 'friend', tags: ['chess'] }));
+
+    await expect(updateContact(db, id, input({ category: 'nobody' as never, tags: ['go'] }))).rejects.toThrow(
+      /CHECK constraint failed/,
+    );
+
+    expect((await getContact(db, id))?.category).toBe('friend');
+    expect(await listTags(db, id)).toEqual(['chess']);
   });
 });
 

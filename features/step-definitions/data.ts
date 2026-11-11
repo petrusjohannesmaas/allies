@@ -36,7 +36,6 @@ const TABLES = [
   'contact_tags',
   'contact_children',
   'addresses',
-  'phone_numbers',
   'notes',
   'contacts',
 ];

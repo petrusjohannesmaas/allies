@@ -1,6 +1,6 @@
 import { Given, Then, When } from '@wdio/cucumber-framework';
 import { CATEGORIES, labelFor } from '../../src/lib/categories';
-import { chooseOption, contactRows, setFieldValue, textOf, typeInto } from './helpers';
+import { chooseOption, contactRows, openHeaderEditor, selectContact, setFieldValue, textOf, typeInto } from './helpers';
 import { contactValue, countRows, insertContact } from './data';
 
 const FORM = '[data-testid="contact-form"]';
@@ -53,7 +53,9 @@ When(/^I set the birthday to (\d{4}-\d{2}-\d{2})$/, async (value: string) => {
   await setFieldValue(`${FORM} [data-testid="contact-birthday"]`, value);
 });
 
-When('I save the contact', async () => {
+When('I save the contact', saveTheContact);
+
+async function saveTheContact() {
   await $(`${FORM} [data-testid="save-contact"]`).click();
   // Saving either closes the form or leaves it open with a message under the
   // field that stopped it, so the wait covers both.
@@ -61,16 +63,35 @@ When('I save the contact', async () => {
     async () => (await $(FORM).isExisting()) === false || (await $('[data-testid^="error-"]').isExisting()) === true,
     { timeout: 5_000, timeoutMsg: 'Saving neither closed the form nor showed a message' },
   );
-});
+}
 
 When(/^I edit the contact "([^"]+)"$/, async (name: string) => {
-  await browser.execute((wanted) => {
-    const rows = [...document.querySelectorAll('[data-testid="contact-row"]')];
-    const row = rows.find((candidate) => candidate.getAttribute('data-contact-name') === wanted);
-    if (!row) throw new Error(`No contact named "${wanted}"`);
-    (row.querySelector('[data-testid="edit-contact"]') as HTMLButtonElement).click();
-  }, name);
-  await $(FORM).waitForExist({ timeout: 5_000 });
+  // The pencil on the contact page is the only way to edit, so a step that
+  // starts on the Contacts list first opens the contact.
+  if (!(await $('[data-testid="screen-contact"]').isExisting())) await selectContact(name);
+  await openHeaderEditor();
+});
+
+When(/^I fill in "([^"]*)" as the phone$/, async (value: string) => {
+  await typeInto(`${FORM} [data-testid="contact-phone"]`, value);
+});
+
+When(/^I fill in the tags "([^"]*)"$/, async (value: string) => {
+  await typeInto(`${FORM} [data-testid="contact-tags"]`, value);
+});
+
+When(/^I add the phone number "([^"]+)"$/, async (number: string) => {
+  await openHeaderEditor();
+  await typeInto(`${FORM} [data-testid="contact-phone"]`, number);
+  await saveTheContact();
+});
+
+When(/^I add the tag "([^"]+)"$/, async (tag: string) => {
+  await openHeaderEditor();
+  const field = `${FORM} [data-testid="contact-tags"]`;
+  const current = (await $(field).getValue()).trim();
+  await typeInto(field, current === '' ? tag : `${current}, ${tag}`);
+  await saveTheContact();
 });
 
 When(/^I delete the contact "([^"]+)"$/, async (name: string) => {
@@ -91,6 +112,11 @@ When('I confirm the deletion', async () => {
 When('I cancel the deletion', async () => {
   await $('[data-testid="cancel-delete"]').click();
   await $('[data-testid="cancel-delete"]').waitForExist({ reverse: true, timeout: 5_000 });
+});
+
+Then('the contacts list has no Edit button', async () => {
+  expect(await $('[data-testid="edit-contact"]').isExisting()).toBe(false);
+  expect(await $('[data-testid="screen-contacts"] [data-testid="contact-row"] [data-testid="delete-contact"]').isExisting()).toBe(true);
 });
 
 Then('the contacts list is empty', async () => {

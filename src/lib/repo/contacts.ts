@@ -9,6 +9,7 @@ export interface Contact {
   first_name: string;
   last_name: string | null;
   email: string | null;
+  phone: string | null;
   birthday: string | null;
   picture: string | null;
   last_viewed_at: string | null;
@@ -21,7 +22,9 @@ export interface ContactInput {
   firstName: string;
   lastName: string;
   email: string;
+  phone: string;
   birthday: string;
+  tags: string[];
 }
 
 /** What the contact form hands back: the fields, and a picture only when the user picked a new one. */
@@ -31,16 +34,18 @@ export interface ContactFormResult {
 }
 
 export function blankInput(): ContactInput {
-  return { category: 'friend', firstName: '', lastName: '', email: '', birthday: '' };
+  return { category: 'friend', firstName: '', lastName: '', email: '', phone: '', birthday: '', tags: [] };
 }
 
-export function toInput(contact: Contact): ContactInput {
+export function toInput(contact: Contact, tags: string[] = []): ContactInput {
   return {
     category: contact.category,
     firstName: contact.first_name,
     lastName: contact.last_name ?? '',
     email: contact.email ?? '',
+    phone: contact.phone ?? '',
     birthday: contact.birthday ?? '',
+    tags,
   };
 }
 
@@ -49,7 +54,7 @@ export function fullName(contact: Pick<Contact, 'first_name' | 'last_name'>): st
   return [contact.first_name, contact.last_name].filter(Boolean).join(' ');
 }
 
-const COLUMNS = 'id, category, first_name, last_name, email, birthday, picture, last_viewed_at, created_at';
+const COLUMNS = 'id, category, first_name, last_name, email, phone, birthday, picture, last_viewed_at, created_at';
 
 // A contact known by one name sorts under that name, so the list reads the way
 // the user wrote it down.
@@ -67,16 +72,35 @@ export async function getContact(db: Db, id: number): Promise<Contact | null> {
 
 export async function addContact(db: Db, input: ContactInput): Promise<number> {
   const result = await db.execute(
-    'INSERT INTO contacts (category, first_name, last_name, email, birthday) VALUES ($1, $2, $3, $4, $5)',
-    [input.category, trimmed(input.firstName), empty(input.lastName), empty(input.email), empty(input.birthday)],
+    'INSERT INTO contacts (category, first_name, last_name, email, phone, birthday) VALUES ($1, $2, $3, $4, $5, $6)',
+    [input.category, trimmed(input.firstName), empty(input.lastName), empty(input.email), empty(input.phone), empty(input.birthday)],
   );
-  return result.lastInsertId;
+  const id = result.lastInsertId;
+  if (input.tags.length > 0) await updateContact(db, id, input);
+  return id;
 }
 
+/** Trims each tag, drops the blank ones and keeps the first of any repeat. */
+export function parseTags(tags: readonly string[]): string[] {
+  return [...new Set(tags.map((tag) => tag.trim()).filter((tag) => tag !== ''))];
+}
+
+/** Saves the header fields and replaces the contact's tags, in one statement. */
 export async function updateContact(db: Db, id: number, input: ContactInput): Promise<void> {
   await db.execute(
-    'UPDATE contacts SET category = $1, first_name = $2, last_name = $3, email = $4, birthday = $5 WHERE id = $6',
-    [input.category, trimmed(input.firstName), empty(input.lastName), empty(input.email), empty(input.birthday), id],
+    `UPDATE contact_header
+        SET category = $1, first_name = $2, last_name = $3, email = $4, phone = $5, birthday = $6, tags = $7
+      WHERE id = $8`,
+    [
+      input.category,
+      trimmed(input.firstName),
+      empty(input.lastName),
+      empty(input.email),
+      empty(input.phone),
+      empty(input.birthday),
+      JSON.stringify(parseTags(input.tags)),
+      id,
+    ],
   );
 }
 

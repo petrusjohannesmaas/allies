@@ -1,20 +1,7 @@
 Feature: Contact profile details
 
-  A contact's page holds a significant other, children, phone numbers,
-  addresses, how they met, work information, food preferences and tags.
-
-  Scenario: Add phone numbers with labels
-    Given the app has just started
-    And a contact named "Ada Lovelace" exists
-    When I open the contact "Ada Lovelace"
-    And I add the phone number "mobile" "082 123 4567"
-    And I add the phone number "work" "021 555 0000"
-    Then the phone "082 123 4567" is listed as "mobile"
-    And the phone "021 555 0000" is listed as "work"
-    When I close and reopen the app
-    And I open the contact "Ada Lovelace"
-    Then the phone "082 123 4567" is listed as "mobile"
-    And the phone "021 555 0000" is listed as "work"
+  A contact's page holds a significant other, children, addresses, how they
+  met, work information and food preferences.
 
   Scenario: Mark an address as home
     Given the app has just started
@@ -51,18 +38,6 @@ Feature: Contact profile details
     When I close and reopen the app
     And I open the contact "Ada Lovelace"
     Then the significant other is "Alan Turing"
-
-  Scenario: Add a tag
-    Given the app has just started
-    And a contact named "Ada Lovelace" exists
-    When I open the contact "Ada Lovelace"
-    And I add the tag "chess"
-    And I add the tag "books"
-    Then the tag "chess" is listed
-    And the tag "books" is listed
-    When I remove the tag "chess"
-    Then the tag "chess" is not listed
-    And the tag "books" is listed
 
   Scenario: Record how they met, work and food preferences
     Given the app has just started

@@ -12,7 +12,7 @@ Feature: Deleting a contact
     And I choose the portrait fixture as the picture
     And I save the contact
     And I open the contact "Ada Lovelace"
-    And I add the phone number "mobile" "082 123 4567"
+    And I add the phone number "082 123 4567"
     And I add the address "12 Kei Road" in "Cape Town"
     And I add the tag "chess"
     And I record how they met "At a conference in London"
@@ -36,7 +36,6 @@ Feature: Deleting a contact
     And the calls table holds 0 rows
     And the activities table holds 0 rows
     And the reminders table holds 0 rows
-    And the phone_numbers table holds 0 rows
     And the addresses table holds 0 rows
     And the contact_tags table holds 0 rows
     And the contact_children table holds 0 rows

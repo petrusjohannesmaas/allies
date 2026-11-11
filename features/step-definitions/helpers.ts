@@ -73,3 +73,20 @@ export function dayFromNow(phrase: string): string {
   else if (phrase !== 'today') throw new Error(`No step reads the date "${phrase}"`);
   return when.toLocaleDateString('en-CA');
 }
+
+/** Opens a contact from the Contacts list and waits for its page. */
+export async function selectContact(name: string) {
+  const row = $(`[data-testid="contact-row"][data-contact-name="${name}"] [data-testid="open-contact"]`);
+  await row.waitForExist({ timeout: 5_000 });
+  await row.click();
+  await $('[data-testid="screen-contact"] [data-testid="contact-header"]').waitForExist({ timeout: 5_000 });
+}
+
+const HEADER_FORM = '[data-testid="contact-header"] [data-testid="contact-form"]';
+
+/** Opens the header's editor with the pencil, unless it is open already. */
+export async function openHeaderEditor() {
+  if (await $(HEADER_FORM).isExisting()) return;
+  await $('[data-testid="contact-header"] [data-testid="edit-card"]').click();
+  await $(HEADER_FORM).waitForExist({ timeout: 5_000 });
+}

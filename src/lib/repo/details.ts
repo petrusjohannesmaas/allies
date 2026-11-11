@@ -3,13 +3,6 @@ import type { Db } from '../db';
 // Everything on this page sits on the contact row or in a table of its own, so
 // each kind of detail is one table and one pair of functions.
 
-export interface Phone {
-  id: number;
-  contact_id: number;
-  label: string;
-  number: string;
-}
-
 export interface Address {
   id: number;
   contact_id: number;
@@ -31,27 +24,6 @@ export interface AddressInput {
   city: string;
   postalCode: string;
   country: string;
-}
-
-/* Phone numbers */
-
-export async function listPhones(db: Db, contactId: number): Promise<Phone[]> {
-  return db.select<Phone>('SELECT * FROM phone_numbers WHERE contact_id = $1 ORDER BY label COLLATE NOCASE, number', [
-    contactId,
-  ]);
-}
-
-export async function addPhone(db: Db, contactId: number, label: string, number: string): Promise<number> {
-  const result = await db.execute('INSERT INTO phone_numbers (contact_id, label, number) VALUES ($1, $2, $3)', [
-    contactId,
-    label.trim(),
-    number.trim(),
-  ]);
-  return result.lastInsertId;
-}
-
-export async function deletePhone(db: Db, id: number): Promise<void> {
-  await db.execute('DELETE FROM phone_numbers WHERE id = $1', [id]);
 }
 
 /* Addresses */
