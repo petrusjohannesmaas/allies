@@ -195,11 +195,14 @@
             data-testid="task-done"
             aria-label={`Done: ${task.description}`}
             checked={task.is_done === 1}
-            onchange={(event) =>
-              run(async () => {
-                await setTaskDone(await db(), task.id, event.currentTarget.checked);
+            onchange={(event) => {
+              // currentTarget is gone once the handler returns, so read it first.
+              const done = event.currentTarget.checked;
+              void run(async () => {
+                await setTaskDone(await db(), task.id, done);
                 await reload();
-              })}
+              });
+            }}
           />
           {#if editing}
             <input

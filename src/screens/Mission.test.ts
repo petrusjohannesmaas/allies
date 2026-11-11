@@ -4,7 +4,9 @@ import Mission from './Mission.svelte';
 import { db } from '$lib/db';
 import { openMission } from '$lib/navigation.svelte';
 import { addContact, blankInput } from '$lib/repo/contacts';
-import { addMission, addTask } from '$lib/repo/missions';
+import { addMission, addTask, listTasks } from '$lib/repo/missions';
+
+let missionId = 0;
 
 async function renderMission(tasks: string[]) {
   const connection = await db();
@@ -12,6 +14,7 @@ async function renderMission(tasks: string[]) {
   const contact = await addContact(connection, { ...blankInput(), firstName: 'Ada' });
   const mission = await addMission(connection, contact, 'Send the photos', '');
   for (const task of tasks) await addTask(connection, mission, task);
+  missionId = mission;
   openMission(contact, mission);
   render(Mission);
   await waitFor(() => expect(screen.queryAllByTestId('task')).toHaveLength(tasks.length));
@@ -39,5 +42,15 @@ describe('deleting a mission', () => {
     await fireEvent.click(screen.getByTestId('delete-mission'));
 
     expect(screen.getByTestId('delete-mission-warning').textContent).toContain('This also deletes 3 tasks');
+  });
+});
+
+describe('ticking a task', () => {
+  it('ticking works without edit mode and saves', async () => {
+    await renderMission(['A', 'B']);
+
+    await fireEvent.click(screen.getAllByTestId('task-done')[1]);
+
+    await waitFor(async () => expect((await listTasks(await db(), missionId)).map((task) => task.is_done)).toEqual([0, 1]));
   });
 });
