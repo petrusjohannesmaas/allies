@@ -59,7 +59,7 @@
   }
 
   // Runs when the editor opens, so the form starts from the saved values.
-  function seed() {
+  function seed(_form: HTMLElement) {
     detailsDescription = mission?.description ?? '';
     detailsDue = mission?.due_date ?? '';
   }
