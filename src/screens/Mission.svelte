@@ -82,13 +82,13 @@
 
         {#snippet edit(close)}
           {#if mission}
+            {@const missionId = mission.id}
             <MissionForm
               {mission}
               oncancel={close}
               onsave={(description, due) => {
-                const id = mission!.id;
                 return run(async () => {
-                  await updateMission(await db(), id, description, due);
+                  await updateMission(await db(), missionId, description, due);
                   await reload();
                   close();
                 });

@@ -68,7 +68,7 @@ export async function addTask(db: Db, missionId: number, description: string): P
   return result.lastInsertId;
 }
 
-/** A mission needs something to do. A due date is optional. */
+/** True when the text holds something other than spaces. */
 export function hasText(description: string): boolean {
   return description.trim() !== '';
 }
