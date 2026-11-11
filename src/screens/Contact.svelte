@@ -4,7 +4,6 @@
   import Addresses from '../components/Addresses.svelte';
   import Calls from '../components/Calls.svelte';
   import ContactHeader from '../components/ContactHeader.svelte';
-  import Missions from '../components/Missions.svelte';
   import Notes from '../components/Notes.svelte';
   import Reminders from '../components/Reminders.svelte';
   import { db, type Db } from '../lib/db';
@@ -61,10 +60,6 @@
       <Activities contactId={contact.id} />
       <Addresses contactId={contact.id} />
       <Reminders contactId={contact.id} />
-    </div>
-
-    <div class="mt-4">
-      <Missions contactId={contact.id} />
     </div>
   {/if}
 </section>

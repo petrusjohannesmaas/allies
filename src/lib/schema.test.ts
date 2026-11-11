@@ -43,6 +43,7 @@ async function counts(): Promise<Record<string, number>> {
     'contact_children',
     'contact_tags',
     'missions',
+    'tasks',
     'calls',
     'activities',
     'reminders',
@@ -170,7 +171,9 @@ describe('deleting a contact', () => {
     await db.execute('INSERT INTO addresses (contact_id, city, is_home) VALUES ($1, $2, 1)', [contact, 'Cape Town']);
     await db.execute('INSERT INTO contact_children (parent_id, child_id) VALUES ($1, $2)', [contact, child]);
     await db.execute('INSERT INTO contact_tags (contact_id, tag) VALUES ($1, $2)', [contact, 'chess']);
-    await db.execute('INSERT INTO missions (contact_id, description) VALUES ($1, $2)', [contact, 'Send the photos']);
+    const mission = (await db.execute('INSERT INTO missions (contact_id, description) VALUES ($1, $2)', [contact, 'Send the photos']))
+      .lastInsertId;
+    await db.execute('INSERT INTO tasks (mission_id, description, position) VALUES ($1, $2, 1)', [mission, 'Pick photos']);
     await db.execute('INSERT INTO calls (contact_id, called_on, description) VALUES ($1, $2, $3)', [contact, '2026-10-01', 'Chat']);
     await db.execute('INSERT INTO activities (contact_id, category, happened_on, description) VALUES ($1, $2, $3, $4)', [
       contact,
@@ -188,6 +191,7 @@ describe('deleting a contact', () => {
       contact_children: 0,
       contact_tags: 0,
       missions: 0,
+      tasks: 0,
       calls: 0,
       activities: 0,
       reminders: 0,
@@ -298,5 +302,18 @@ describe('the phone migration', () => {
     expect(rows[0].phone).toBe('082 123 4567');
     const tables = await db.select("SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'phone_numbers'");
     expect(tables).toEqual([]);
+  });
+});
+
+describe('deleting a mission', () => {
+  it('deletes its tasks', async () => {
+    const contact = await addContact('Ada');
+    const mission = (await db.execute('INSERT INTO missions (contact_id, description) VALUES ($1, $2)', [contact, 'Send the photos']))
+      .lastInsertId;
+    await db.execute('INSERT INTO tasks (mission_id, description, position) VALUES ($1, $2, 1)', [mission, 'Pick photos']);
+
+    await db.execute('DELETE FROM missions WHERE id = $1', [mission]);
+
+    expect(await db.select('SELECT * FROM tasks')).toEqual([]);
   });
 });
