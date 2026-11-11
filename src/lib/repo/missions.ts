@@ -69,7 +69,7 @@ export async function addTask(db: Db, missionId: number, description: string): P
 }
 
 /** A mission needs something to do. A due date is optional. */
-export function missionIsUsable(description: string): boolean {
+export function hasText(description: string): boolean {
   return description.trim() !== '';
 }
 

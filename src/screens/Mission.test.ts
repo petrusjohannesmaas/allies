@@ -54,3 +54,17 @@ describe('ticking a task', () => {
     await waitFor(async () => expect((await listTasks(await db(), missionId)).map((task) => task.is_done)).toEqual([0, 1]));
   });
 });
+
+describe('the mission details', () => {
+  it('the details show Save only after a change', async () => {
+    await renderMission([]);
+    await screen.findByTestId('mission-details');
+    await fireEvent.click(within(screen.getByTestId('mission-details')).getByTestId('edit-card'));
+
+    expect(screen.queryByTestId('save-mission-details')).toBeNull();
+
+    await fireEvent.input(screen.getByTestId('mission-details-due'), { target: { value: '2026-12-01' } });
+
+    expect(screen.getByTestId('save-mission-details')).toBeTruthy();
+  });
+});

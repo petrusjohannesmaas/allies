@@ -1,6 +1,7 @@
 <script lang="ts">
   import { ArrowDown, ArrowUp, Trash2 } from '@lucide/svelte';
   import EditableCard from '../components/EditableCard.svelte';
+  import MissionForm from '../components/MissionForm.svelte';
   import { db } from '../lib/db';
   import { goBackFromMission, navigation } from '../lib/navigation.svelte';
   import { fullName, getContact, type Contact } from '../lib/repo/contacts';
@@ -10,7 +11,7 @@
     deleteTask,
     listMissions,
     listTasks,
-    missionIsUsable,
+    hasText,
     moveTask,
     renameTask,
     setTaskDone,
@@ -25,8 +26,6 @@
   let missing = $state(false);
   let failure = $state('');
 
-  let detailsDescription = $state('');
-  let detailsDue = $state('');
   let newTask = $state('');
   let confirming = $state(false);
 
@@ -57,16 +56,6 @@
       failure = error instanceof Error ? error.message : String(error);
     }
   }
-
-  // Runs when the editor opens, so the form starts from the saved values.
-  function seed(_form: HTMLElement) {
-    detailsDescription = mission?.description ?? '';
-    detailsDue = mission?.due_date ?? '';
-  }
-
-  const detailsChanged = $derived(
-    mission !== null && (detailsDescription.trim() !== mission.description || detailsDue.trim() !== (mission.due_date ?? '')),
-  );
 </script>
 
 <section class="p-6" data-testid="screen-mission">
@@ -92,35 +81,20 @@
         {/snippet}
 
         {#snippet edit(close)}
-          <form
-            class="grid gap-2 pr-12"
-            use:seed
-            data-testid="mission-details-form"
-            onsubmit={(event) => {
-              event.preventDefault();
-              if (!mission || !missionIsUsable(detailsDescription)) return;
-              const id = mission.id;
-              void run(async () => {
-                await updateMission(await db(), id, detailsDescription, detailsDue);
-                await reload();
-                close();
-              });
-            }}
-          >
-            <label class="grid gap-1 text-sm">
-              Description
-              <input class="input" data-testid="mission-details-description" autocomplete="off" bind:value={detailsDescription} />
-            </label>
-            <label class="grid gap-1 text-sm">
-              Due date
-              <input class="input" type="date" data-testid="mission-details-due" bind:value={detailsDue} />
-            </label>
-            <div>
-              <button type="submit" class="btn btn-primary" data-testid="save-mission-details" disabled={!detailsChanged || !missionIsUsable(detailsDescription)}>
-                Save
-              </button>
-            </div>
-          </form>
+          {#if mission}
+            <MissionForm
+              {mission}
+              oncancel={close}
+              onsave={(description, due) => {
+                const id = mission!.id;
+                return run(async () => {
+                  await updateMission(await db(), id, description, due);
+                  await reload();
+                  close();
+                });
+              }}
+            />
+          {/if}
         {/snippet}
       </EditableCard>
 
@@ -135,7 +109,7 @@
             data-testid="task-form"
             onsubmit={(event) => {
               event.preventDefault();
-              if (!mission || !missionIsUsable(newTask)) return;
+              if (!mission || !hasText(newTask)) return;
               const id = mission.id;
               void run(async () => {
                 await addTask(await db(), id, newTask);
@@ -214,7 +188,7 @@
               onchange={(event) =>
                 run(async () => {
                   const text = event.currentTarget.value;
-                  if (!missionIsUsable(text)) return;
+                  if (!hasText(text)) return;
                   await renameTask(await db(), task.id, text);
                   await reload();
                 })}

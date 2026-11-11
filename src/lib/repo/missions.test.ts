@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { migratedDb } from '../../test/sqlite-db';
 import type { Db } from '../db';
 import { addContact, blankInput } from './contacts';
-import { addMission, deleteMission, listMissions, missionIsUsable, moveTask, addTask, listTasks, setTaskDone, renameTask, deleteTask, updateMission } from './missions';
+import { addMission, deleteMission, listMissions, hasText, moveTask, addTask, listTasks, setTaskDone, renameTask, deleteTask, updateMission } from './missions';
 
 let db: Db;
 let contact: number;
@@ -68,8 +68,8 @@ describe('deleting a mission', () => {
 
 describe('a mission description', () => {
   it('has to hold something other than spaces', () => {
-    expect(missionIsUsable('  ')).toBe(false);
-    expect(missionIsUsable('Send the photos')).toBe(true);
+    expect(hasText('  ')).toBe(false);
+    expect(hasText('Send the photos')).toBe(true);
   });
 });
 

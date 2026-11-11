@@ -2,7 +2,7 @@
   import { Plus } from '@lucide/svelte';
   import { db } from '$lib/db';
   import { openMission } from '$lib/navigation.svelte';
-  import { addMission, listMissions, missionIsUsable, type Mission } from '$lib/repo/missions';
+  import { addMission, listMissions, hasText, type Mission } from '$lib/repo/missions';
 
   let { contactId }: { contactId: number } = $props();
 
@@ -20,7 +20,7 @@
 
   async function save() {
     failure = '';
-    if (!missionIsUsable(description)) return;
+    if (!hasText(description)) return;
     try {
       await addMission(await db(), contactId, description, '');
       description = '';
