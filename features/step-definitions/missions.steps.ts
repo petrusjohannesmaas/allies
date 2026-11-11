@@ -133,12 +133,9 @@ Then('the top task cannot move up and the bottom task cannot move down', async (
   await openCardEditor('mission-tasks');
   const disabled = await browser.execute((selector) => {
     const tasks = [...document.querySelectorAll(`${selector} [data-testid="task"]`)];
-    const flag = (task: Element | undefined, id: string) =>
-      (task?.querySelector(`[data-testid="${id}"]`) as HTMLButtonElement | null)?.disabled;
-    return {
-      topUp: flag(tasks[0], 'move-task-up'),
-      bottomDown: flag(tasks[tasks.length - 1], 'move-task-down'),
-    };
+    const up = tasks[0]?.querySelector('[data-testid="move-task-up"]') as HTMLButtonElement | null;
+    const down = tasks[tasks.length - 1]?.querySelector('[data-testid="move-task-down"]') as HTMLButtonElement | null;
+    return { topUp: up?.disabled, bottomDown: down?.disabled };
   }, TASKS);
   expect(disabled).toEqual({ topUp: true, bottomDown: true });
 });
