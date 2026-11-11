@@ -92,15 +92,6 @@ export async function listTags(db: Db, contactId: number): Promise<string[]> {
   return rows.map((row) => row.tag);
 }
 
-/** Adding a tag twice is refused by the primary key, so a repeat is not an error. */
-export async function addTag(db: Db, contactId: number, tag: string): Promise<void> {
-  await db.execute('INSERT OR IGNORE INTO contact_tags (contact_id, tag) VALUES ($1, $2)', [contactId, tag.trim()]);
-}
-
-export async function removeTag(db: Db, contactId: number, tag: string): Promise<void> {
-  await db.execute('DELETE FROM contact_tags WHERE contact_id = $1 AND tag = $2', [contactId, tag]);
-}
-
 /* About: the significant other, the children and the three text fields on the contact row */
 
 async function getSignificantOther(db: Db, contactId: number): Promise<Child | null> {

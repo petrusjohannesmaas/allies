@@ -82,16 +82,6 @@ export async function selectContact(name: string) {
   await $('[data-testid="screen-contact"] [data-testid="contact-header"]').waitForExist({ timeout: 5_000 });
 }
 
-const HEADER_FORM = '[data-testid="contact-header"] [data-testid="contact-form"]';
-
-/** Opens the header's editor with the pencil, unless it is open already. */
-export async function openHeaderEditor() {
-  if (await $(HEADER_FORM).isExisting()) return;
-  await $('[data-testid="contact-header"] [data-testid="edit-card"]').click();
-  await $(HEADER_FORM).waitForExist({ timeout: 5_000 });
-}
-
-
 /**
  * Opens a card's editor with its pencil, unless it is open already. The pencil
  * says "Discard changes to ..." while its card is in edit mode.

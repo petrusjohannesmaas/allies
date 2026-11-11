@@ -4,14 +4,12 @@ import type { Db } from '../db';
 import { addContact, blankInput } from './contacts';
 import {
   addAddress,
-  addTag,
   addressIsUsable,
   deleteAddress,
   formatAddress,
   getAbout,
   listAddresses,
   listTags,
-  removeTag,
   saveAbout,
   setHomeAddress,
 } from './details';
@@ -99,35 +97,6 @@ describe('addresses', () => {
 describe('tags', () => {
   it('starts with none', async () => {
     expect(await listTags(db, ada)).toEqual([]);
-  });
-
-  it('lists tags in order', async () => {
-    await addTag(db, ada, 'chess');
-    await addTag(db, ada, 'books');
-    await addTag(db, ada, 'cycling');
-
-    expect(await listTags(db, ada)).toEqual(['books', 'chess', 'cycling']);
-  });
-
-  it('trims what the user typed', async () => {
-    await addTag(db, ada, '  chess  ');
-    expect(await listTags(db, ada)).toEqual(['chess']);
-  });
-
-  it('does not add the same tag twice', async () => {
-    await addTag(db, ada, 'chess');
-    await addTag(db, ada, 'chess');
-
-    expect(await listTags(db, ada)).toEqual(['chess']);
-  });
-
-  it('removes one', async () => {
-    await addTag(db, ada, 'chess');
-    await addTag(db, ada, 'books');
-
-    await removeTag(db, ada, 'chess');
-
-    expect(await listTags(db, ada)).toEqual(['books']);
   });
 });
 

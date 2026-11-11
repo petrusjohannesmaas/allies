@@ -1,6 +1,6 @@
 import { Given, Then, When } from '@wdio/cucumber-framework';
 import { CATEGORIES, labelFor } from '../../src/lib/categories';
-import { chooseOption, contactRows, openHeaderEditor, selectContact, setFieldValue, textOf, typeInto } from './helpers';
+import { chooseOption, contactRows, openCardEditor, selectContact, setFieldValue, textOf, typeInto } from './helpers';
 import { contactValue, countRows, insertContact } from './data';
 
 const FORM = '[data-testid="contact-form"]';
@@ -69,7 +69,7 @@ When(/^I edit the contact "([^"]+)"$/, async (name: string) => {
   // The pencil on the contact page is the only way to edit, so a step that
   // starts on the Contacts list first opens the contact.
   if (!(await $('[data-testid="screen-contact"]').isExisting())) await selectContact(name);
-  await openHeaderEditor();
+  await openCardEditor('contact-header');
 });
 
 When(/^I fill in "([^"]*)" as the phone$/, async (value: string) => {
@@ -81,13 +81,13 @@ When(/^I fill in the tags "([^"]*)"$/, async (value: string) => {
 });
 
 When(/^I add the phone number "([^"]+)"$/, async (number: string) => {
-  await openHeaderEditor();
+  await openCardEditor('contact-header');
   await typeInto(`${FORM} [data-testid="contact-phone"]`, number);
   await saveTheContact();
 });
 
 When(/^I add the tag "([^"]+)"$/, async (tag: string) => {
-  await openHeaderEditor();
+  await openCardEditor('contact-header');
   const field = `${FORM} [data-testid="contact-tags"]`;
   const current = (await $(field).getValue()).trim();
   await typeInto(field, current === '' ? tag : `${current}, ${tag}`);
