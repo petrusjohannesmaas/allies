@@ -68,23 +68,3 @@ Feature: The contact page
     Then the note "Met at a conference" is listed
     When I delete the note "Met at a conference"
     Then no notes are listed
-
-  Scenario: Add a mission
-    Given the app has just started
-    And a contact named "Ada Lovelace" exists
-    When I open the contact "Ada Lovelace"
-    And I add the mission "Send the photos" due 2026-11-01
-    Then the mission "Send the photos" is listed
-    And the mission "Send the photos" is due 2026-11-01
-    When I close and reopen the app
-    And I open the contact "Ada Lovelace"
-    Then the mission "Send the photos" is listed
-
-  Scenario: Delete a mission
-    Given the app has just started
-    And a contact named "Ada Lovelace" exists
-    When I open the contact "Ada Lovelace"
-    And I add the mission "Send the photos" due 2026-11-01
-    Then the mission "Send the photos" is listed
-    When I delete the mission "Send the photos"
-    Then no missions are listed

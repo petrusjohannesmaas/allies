@@ -97,7 +97,7 @@ export async function openHeaderEditor() {
  * says "Discard changes to ..." while its card is in edit mode.
  */
 export async function openCardEditor(testid: string) {
-  const pencil = $(`[data-testid="screen-contact"] [data-testid="${testid}"] [data-testid="edit-card"]`);
+  const pencil = $(`[data-testid^="screen-"] [data-testid="${testid}"] [data-testid="edit-card"]`);
   await pencil.waitForExist({ timeout: 5_000 });
   const label = (await pencil.getAttribute('aria-label')) ?? '';
   if (label.startsWith('Discard')) return;

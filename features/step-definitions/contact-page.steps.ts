@@ -1,9 +1,8 @@
 import { Given, Then, When } from '@wdio/cucumber-framework';
 import { contactValue, insertContact } from './data';
-import { openCardEditor, selectContact, setFieldValue, typeInto } from './helpers';
+import { openCardEditor, selectContact, typeInto } from './helpers';
 
 const NOTES = '[data-testid="notes"]';
-const MISSIONS = '[data-testid="missions"]';
 
 /** The notes the page lists, in the order it shows them. */
 async function listedNotes(): Promise<{ body: string; favourite: boolean }[]> {
@@ -13,16 +12,6 @@ async function listedNotes(): Promise<{ body: string; favourite: boolean }[]> {
       favourite: note.getAttribute('data-favourite') === 'true',
     }));
   }, NOTES);
-}
-
-/** The missions the page lists, in the order it shows them. */
-async function listedMissions(): Promise<{ description: string; due: string }[]> {
-  return browser.execute((selector) => {
-    return [...document.querySelectorAll(`${selector} [data-testid="mission"]`)].map((mission) => ({
-      description: mission.querySelector('[data-testid="mission-text"]')?.textContent ?? '',
-      due: mission.querySelector('[data-testid="mission-due"]')?.textContent ?? '',
-    }));
-  }, MISSIONS);
 }
 
 /** Clicks a button inside the note that reads `body`. */
@@ -88,36 +77,6 @@ When(/^I delete the note "([^"]+)"$/, async (body: string) => {
   });
 });
 
-When(/^I add the mission "([^"]+)" due (\d{4}-\d{2}-\d{2})$/, async (description: string, due: string) => {
-  await typeInto(`${MISSIONS} [data-testid="mission-description"]`, description);
-  await setFieldValue(`${MISSIONS} [data-testid="mission-due-date"]`, due);
-  await $(`${MISSIONS} [data-testid="save-mission"]`).click();
-  await browser.waitUntil(async () => (await listedMissions()).some((mission) => mission.description === description), {
-    timeout: 5_000,
-    timeoutMsg: 'The mission never showed up on the page',
-  });
-});
-
-When(/^I delete the mission "([^"]+)"$/, async (description: string) => {
-  const clicked = await browser.execute(
-    (selector, wanted) => {
-      const missions = [...document.querySelectorAll(`${selector} [data-testid="mission"]`)];
-      const mission = missions.find((candidate) => candidate.querySelector('[data-testid="mission-text"]')?.textContent === wanted);
-      if (!mission) return false;
-      (mission.querySelector('[data-testid="delete-mission"]') as HTMLButtonElement).click();
-      return true;
-    },
-    MISSIONS,
-    description,
-  );
-  if (!clicked) throw new Error(`No mission reading "${description}" on the page`);
-
-  await browser.waitUntil(async () => !(await listedMissions()).some((mission) => mission.description === description), {
-    timeout: 5_000,
-    timeoutMsg: 'The mission stayed on the page',
-  });
-});
-
 Then(/^the contact page shows "((?!Born )[^"]+)"$/, async (name: string) => {
   const shown = await browser.execute(() => document.querySelector('[data-testid="contact-name"]')?.textContent?.trim());
   expect(shown).toBe(name);
@@ -162,20 +121,6 @@ Then(/^the note "([^"]+)" is not a favourite$/, async (body: string) => {
 
 Then('no notes are listed', async () => {
   await $(`${NOTES} [data-testid="notes-empty"]`).waitForExist({ timeout: 5_000 });
-});
-
-Then(/^the mission "([^"]+)" is listed$/, async (description: string) => {
-  expect((await listedMissions()).map((mission) => mission.description)).toContain(description);
-});
-
-Then(/^the mission "([^"]+)" is due (\d{4}-\d{2}-\d{2})$/, async (description: string, due: string) => {
-  const mission = (await listedMissions()).find((candidate) => candidate.description === description);
-  if (!mission) throw new Error(`No mission reading "${description}"`);
-  expect(mission.due).toBe(`Due ${due}`);
-});
-
-Then('no missions are listed', async () => {
-  await $(`${MISSIONS} [data-testid="missions-empty"]`).waitForExist({ timeout: 5_000 });
 });
 
 Given(/^a contact named "([^"]+)" exists with the email "([^"]+)"$/, async (name: string, email: string) => {

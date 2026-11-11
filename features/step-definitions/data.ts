@@ -32,6 +32,7 @@ const TABLES = [
   'activities',
   'calls',
   'reminders',
+  'tasks',
   'missions',
   'contact_tags',
   'contact_children',

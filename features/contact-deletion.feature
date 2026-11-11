@@ -18,7 +18,10 @@ Feature: Deleting a contact
     And I record how they met "At a conference in London"
     And I save About
     And I write the note "Worth remembering"
-    And I add the mission "Send the photos" due 2026-12-01
+    And I add the mission "Send the photos"
+    And I open the mission "Send the photos"
+    And I add the task "Pick photos"
+    And I go back to the contact
     And I log a call dated "3 days ago" with the description "Caught up about the conference"
     And I log an activity dated "2 days ago" in the category "did sport together" with the description "We went skiing"
     And I add a reminder dated "in 10 days" with the description "Call for her birthday" and a yearly repeat
@@ -35,6 +38,7 @@ Feature: Deleting a contact
     Then the pictures folder holds 0 files
     And the notes table holds 0 rows
     And the missions table holds 0 rows
+    And the tasks table holds 0 rows
     And the calls table holds 0 rows
     And the activities table holds 0 rows
     And the reminders table holds 0 rows
