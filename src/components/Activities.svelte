@@ -2,7 +2,8 @@
   import EditableCard from './EditableCard.svelte';
   import { db } from '$lib/db';
   import { formatDate, today } from '$lib/dates';
-  import { ACTIVITY_CATEGORIES, labelFor } from '$lib/activity-categories';
+  import { ACTIVITY_CATEGORIES } from '$lib/activity-categories';
+  import { labelFor } from '$lib/categories';
   import { addActivity, deleteActivity, lastActivityTogether, listActivities, type Activity } from '$lib/repo/activities';
 
   let { contactId }: { contactId: number } = $props();

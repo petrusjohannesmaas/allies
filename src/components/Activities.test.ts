@@ -3,7 +3,8 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import Activities from './Activities.svelte';
 import { db } from '$lib/db';
 import { today } from '$lib/dates';
-import { ACTIVITY_CATEGORIES, labelFor } from '$lib/activity-categories';
+import { ACTIVITY_CATEGORIES } from '$lib/activity-categories';
+import { labelFor } from '$lib/categories';
 import { addContact, blankInput } from '$lib/repo/contacts';
 import { addActivity, listActivities } from '$lib/repo/activities';
 
