@@ -1,24 +1,19 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { migratedDb } from '../../test/sqlite-db';
 import type { Db } from '../db';
-import { addContact, blankInput, fullName } from './contacts';
+import { addContact, blankInput } from './contacts';
 import {
   addAddress,
-  addChild,
   addTag,
   addressIsUsable,
   deleteAddress,
   formatAddress,
-  getProfileText,
-  getSignificantOther,
+  getAbout,
   listAddresses,
-  listChildren,
   listTags,
-  removeChild,
   removeTag,
+  saveAbout,
   setHomeAddress,
-  setProfileText,
-  setSignificantOther,
 } from './details';
 
 let db: Db;
@@ -99,49 +94,6 @@ describe('addresses', () => {
   });
 });
 
-/* Children */
-
-describe('children', () => {
-  it('starts with none', async () => {
-    expect(await listChildren(db, ada)).toEqual([]);
-  });
-
-  it('links a child that is an existing contact', async () => {
-    const grace = await addContact(db, { ...blankInput(), firstName: 'Grace', lastName: 'Hopper' });
-
-    await addChild(db, ada, grace);
-
-    expect((await listChildren(db, ada)).map(fullName)).toEqual(['Grace Hopper']);
-  });
-
-  it('does not list a parent as their own child', async () => {
-    await expect(addChild(db, ada, ada)).rejects.toThrow(/CHECK constraint failed/);
-  });
-
-  it('refuses the same child twice', async () => {
-    const grace = await addContact(db, { ...blankInput(), firstName: 'Grace' });
-    await addChild(db, ada, grace);
-
-    await expect(addChild(db, ada, grace)).rejects.toThrow(/UNIQUE constraint failed/);
-  });
-
-  it('does not make the child a parent of the parent', async () => {
-    const grace = await addContact(db, { ...blankInput(), firstName: 'Grace' });
-    await addChild(db, ada, grace);
-
-    expect(await listChildren(db, grace)).toEqual([]);
-  });
-
-  it('removes one', async () => {
-    const grace = await addContact(db, { ...blankInput(), firstName: 'Grace' });
-    await addChild(db, ada, grace);
-
-    await removeChild(db, ada, grace);
-
-    expect(await listChildren(db, ada)).toEqual([]);
-  });
-});
-
 /* Tags */
 
 describe('tags', () => {
@@ -179,66 +131,44 @@ describe('tags', () => {
   });
 });
 
-/* The significant other */
+/* About */
 
-describe('the significant other', () => {
-  it('starts with none', async () => {
-    expect(await getSignificantOther(db, ada)).toBeNull();
-  });
+const emptyAbout = { significantOtherId: null, childIds: [], howMet: '', work: '', foodPreferences: '' };
 
-  it('is picked from the contacts', async () => {
-    const alan = await addContact(db, { ...blankInput(), firstName: 'Alan', lastName: 'Turing' });
+describe('About', () => {
+  it('saving About writes every field and the children', async () => {
+    const ann = await addContact(db, { ...blankInput(), firstName: 'Ann' });
+    const ben = await addContact(db, { ...blankInput(), firstName: 'Ben' });
+    const cal = await addContact(db, { ...blankInput(), firstName: 'Cal' });
+    const dee = await addContact(db, { ...blankInput(), firstName: 'Dee' });
+    await saveAbout(db, ada, { ...emptyAbout, childIds: [ann, ben] });
 
-    await setSignificantOther(db, ada, alan);
-
-    expect(fullName((await getSignificantOther(db, ada))!)).toBe('Alan Turing');
-  });
-
-  it('is removed', async () => {
-    const alan = await addContact(db, { ...blankInput(), firstName: 'Alan' });
-    await setSignificantOther(db, ada, alan);
-
-    await setSignificantOther(db, ada, null);
-
-    expect(await getSignificantOther(db, ada)).toBeNull();
-  });
-
-  it('goes when that contact is deleted, leaving this one', async () => {
-    const alan = await addContact(db, { ...blankInput(), firstName: 'Alan' });
-    await setSignificantOther(db, ada, alan);
-
-    await db.execute('DELETE FROM contacts WHERE id = $1', [alan]);
-
-    expect(await getSignificantOther(db, ada)).toBeNull();
-  });
-});
-
-/* The text on the contact row */
-
-describe('how they met, work and food preferences', () => {
-  it('start empty', async () => {
-    expect(await getProfileText(db, ada)).toEqual({ how_met: null, work: null, food_preferences: null });
-  });
-
-  it('keep what the user typed', async () => {
-    await setProfileText(db, ada, {
-      how_met: 'At a conference in London',
+    await saveAbout(db, ada, {
+      significantOtherId: cal,
+      childIds: [ben, dee],
+      howMet: 'At a conference',
       work: 'Mathematician',
-      food_preferences: 'No shellfish',
+      foodPreferences: 'No shellfish',
     });
 
-    expect(await getProfileText(db, ada)).toEqual({
-      how_met: 'At a conference in London',
-      work: 'Mathematician',
-      food_preferences: 'No shellfish',
-    });
+    const about = await getAbout(db, ada);
+    expect(about.work).toBe('Mathematician');
+    expect(about.how_met).toBe('At a conference');
+    expect(about.food_preferences).toBe('No shellfish');
+    expect(about.significant_other?.id).toBe(cal);
+    expect(about.children.map((child) => child.id).sort()).toEqual([ben, dee].sort());
   });
 
-  it('store a field cleared to empty as null', async () => {
-    await setProfileText(db, ada, { how_met: 'At a conference', work: null, food_preferences: null });
+  it('a failed About save changes nothing', async () => {
+    const ann = await addContact(db, { ...blankInput(), firstName: 'Ann' });
+    await saveAbout(db, ada, { ...emptyAbout, childIds: [ann] });
 
-    await setProfileText(db, ada, { how_met: '', work: null, food_preferences: null });
+    await expect(
+      saveAbout(db, ada, { significantOtherId: null, childIds: [ada], howMet: '', work: 'Changed', foodPreferences: '' }),
+    ).rejects.toThrow(/CHECK constraint failed/);
 
-    expect((await getProfileText(db, ada)).how_met).toBeNull();
+    const about = await getAbout(db, ada);
+    expect(about.children.map((child) => child.id)).toEqual([ann]);
+    expect(about.work).toBeNull();
   });
 });

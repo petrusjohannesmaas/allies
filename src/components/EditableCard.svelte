@@ -30,7 +30,7 @@
 <!-- Escape from any field inside the card closes it. The card is not itself a control. -->
 <!-- svelte-ignore a11y_no_noninteractive_element_interactions, a11y_no_static_element_interactions -->
 <section
-  class="card relative"
+  class="card relative min-h-40"
   data-testid={testid}
   onkeydown={(event) => {
     if (event.key === 'Escape' && editing) close();

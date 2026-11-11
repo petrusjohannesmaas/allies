@@ -90,3 +90,20 @@ export async function openHeaderEditor() {
   await $('[data-testid="contact-header"] [data-testid="edit-card"]').click();
   await $(HEADER_FORM).waitForExist({ timeout: 5_000 });
 }
+
+
+/**
+ * Opens a card's editor with its pencil, unless it is open already. The pencil
+ * says "Discard changes to ..." while its card is in edit mode.
+ */
+export async function openCardEditor(testid: string) {
+  const pencil = $(`[data-testid="screen-contact"] [data-testid="${testid}"] [data-testid="edit-card"]`);
+  await pencil.waitForExist({ timeout: 5_000 });
+  const label = (await pencil.getAttribute('aria-label')) ?? '';
+  if (label.startsWith('Discard')) return;
+  await pencil.click();
+  await browser.waitUntil(async () => ((await pencil.getAttribute('aria-label')) ?? '').startsWith('Discard'), {
+    timeout: 5_000,
+    timeoutMsg: `The ${testid} card never opened its editor`,
+  });
+}

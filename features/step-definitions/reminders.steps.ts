@@ -1,6 +1,6 @@
 import { Then, When } from '@wdio/cucumber-framework';
 import { formatDate } from '../../src/lib/dates';
-import { dayFromNow, setFieldValue, typeInto } from './helpers';
+import { dayFromNow, openCardEditor, setFieldValue, typeInto } from './helpers';
 
 const REMINDERS = '[data-testid="screen-contact"] [data-testid="reminders"]';
 
@@ -22,6 +22,7 @@ const REPEAT_WORDS = { yes: 'Every year', no: 'Once' } as const;
 When(
   /^I add a reminder dated "([^"]+)" with the description "([^"]+)" and (no|a) yearly repeat$/,
   async (day: string, description: string, repeat: string) => {
+    await openCardEditor('reminders');
     await setFieldValue(`${REMINDERS} [data-testid="reminder-date"]`, dayFromNow(day));
     await typeInto(`${REMINDERS} [data-testid="reminder-description"]`, description);
     await browser.execute(
@@ -41,6 +42,7 @@ When(
 );
 
 When(/^I delete the reminder "([^"]+)"$/, async (description: string) => {
+  await openCardEditor('reminders');
   const clicked = await browser.execute(
     (selector, wanted) => {
       const rows = [...document.querySelectorAll(`${selector} [data-testid="reminder"]`)];

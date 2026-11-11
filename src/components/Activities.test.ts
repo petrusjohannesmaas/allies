@@ -18,6 +18,8 @@ beforeEach(async () => {
 async function renderActivities(rows = 0) {
   render(Activities, { props: { contactId } });
   await waitFor(() => expect(screen.queryAllByTestId('activity')).toHaveLength(rows));
+  // The card is read-only until its pencil is clicked.
+  await fireEvent.click(screen.getByTestId('edit-card'));
 }
 
 async function logActivity(date: string, category: string, description: string) {

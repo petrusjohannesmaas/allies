@@ -16,12 +16,14 @@ Feature: Deleting a contact
     And I add the address "12 Kei Road" in "Cape Town"
     And I add the tag "chess"
     And I record how they met "At a conference in London"
+    And I save About
     And I write the note "Worth remembering"
     And I add the mission "Send the photos" due 2026-12-01
     And I log a call dated "3 days ago" with the description "Caught up about the conference"
     And I log an activity dated "2 days ago" in the category "did sport together" with the description "We went skiing"
     And I add a reminder dated "in 10 days" with the description "Call for her birthday" and a yearly repeat
     And I add "Grace Hopper" as a child
+    And I save About
     Then the pictures folder holds 1 file
     When I open the "Journal" screen
     Then the journal has a row reading "Caught up about the conference"
@@ -55,6 +57,7 @@ Feature: Deleting a contact
     When I open the contact "Ada Lovelace"
     And I add "Grace Hopper" as a child
     And I choose "Grace Hopper" as the significant other
+    And I save About
     Then the child "Grace Hopper" is listed
     And the significant other is "Grace Hopper"
     And the contact_children table holds 1 row

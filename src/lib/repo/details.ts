@@ -72,7 +72,7 @@ export function formatAddress(address: Address): string {
 
 /* Children */
 
-export async function listChildren(db: Db, contactId: number): Promise<Child[]> {
+async function listChildren(db: Db, contactId: number): Promise<Child[]> {
   return db.select<Child>(
     `SELECT c.id, c.first_name, c.last_name
      FROM contact_children link
@@ -81,14 +81,6 @@ export async function listChildren(db: Db, contactId: number): Promise<Child[]> 
      ORDER BY c.first_name COLLATE NOCASE, c.last_name COLLATE NOCASE`,
     [contactId],
   );
-}
-
-export async function addChild(db: Db, parentId: number, childId: number): Promise<void> {
-  await db.execute('INSERT INTO contact_children (parent_id, child_id) VALUES ($1, $2)', [parentId, childId]);
-}
-
-export async function removeChild(db: Db, parentId: number, childId: number): Promise<void> {
-  await db.execute('DELETE FROM contact_children WHERE parent_id = $1 AND child_id = $2', [parentId, childId]);
 }
 
 /* Tags */
@@ -109,9 +101,9 @@ export async function removeTag(db: Db, contactId: number, tag: string): Promise
   await db.execute('DELETE FROM contact_tags WHERE contact_id = $1 AND tag = $2', [contactId, tag]);
 }
 
-/* The significant other and the three text fields on the contact row */
+/* About: the significant other, the children and the three text fields on the contact row */
 
-export async function getSignificantOther(db: Db, contactId: number): Promise<Child | null> {
+async function getSignificantOther(db: Db, contactId: number): Promise<Child | null> {
   const rows = await db.select<Child>(
     `SELECT c.id, c.first_name, c.last_name
      FROM contacts parent
@@ -122,17 +114,13 @@ export async function getSignificantOther(db: Db, contactId: number): Promise<Ch
   return rows[0] ?? null;
 }
 
-export async function setSignificantOther(db: Db, contactId: number, otherId: number | null): Promise<void> {
-  await db.execute('UPDATE contacts SET significant_other_id = $1 WHERE id = $2', [otherId, contactId]);
-}
-
-export interface ProfileText {
+interface ProfileText {
   how_met: string | null;
   work: string | null;
   food_preferences: string | null;
 }
 
-export async function getProfileText(db: Db, contactId: number): Promise<ProfileText> {
+async function getProfileText(db: Db, contactId: number): Promise<ProfileText> {
   const rows = await db.select<ProfileText>(
     'SELECT how_met, work, food_preferences FROM contacts WHERE id = $1',
     [contactId],
@@ -140,13 +128,46 @@ export async function getProfileText(db: Db, contactId: number): Promise<Profile
   return rows[0] ?? { how_met: null, work: null, food_preferences: null };
 }
 
-export async function setProfileText(db: Db, contactId: number, text: ProfileText): Promise<void> {
-  await db.execute('UPDATE contacts SET how_met = $1, work = $2, food_preferences = $3 WHERE id = $4', [
-    blank(text.how_met ?? ''),
-    blank(text.work ?? ''),
-    blank(text.food_preferences ?? ''),
-    contactId,
-  ]);
+export interface About {
+  significant_other: Child | null;
+  children: Child[];
+  how_met: string | null;
+  work: string | null;
+  food_preferences: string | null;
+}
+
+export interface AboutInput {
+  significantOtherId: number | null;
+  childIds: number[];
+  howMet: string;
+  work: string;
+  foodPreferences: string;
+}
+
+export async function getAbout(db: Db, contactId: number): Promise<About> {
+  const text = await getProfileText(db, contactId);
+  return {
+    significant_other: await getSignificantOther(db, contactId),
+    children: await listChildren(db, contactId),
+    ...text,
+  };
+}
+
+/** Saves the significant other, the children and the three text fields in one statement. */
+export async function saveAbout(db: Db, contactId: number, input: AboutInput): Promise<void> {
+  await db.execute(
+    `UPDATE contact_about
+        SET significant_other_id = $1, how_met = $2, work = $3, food_preferences = $4, children = $5
+      WHERE id = $6`,
+    [
+      input.significantOtherId,
+      blank(input.howMet),
+      blank(input.work),
+      blank(input.foodPreferences),
+      JSON.stringify([...new Set(input.childIds)]),
+      contactId,
+    ],
+  );
 }
 
 function blank(value: string): string | null {

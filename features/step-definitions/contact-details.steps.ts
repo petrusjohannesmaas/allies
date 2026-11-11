@@ -1,5 +1,5 @@
 import { Then, When } from '@wdio/cucumber-framework';
-import { chooseOption, setFieldValue, typeInto } from './helpers';
+import { chooseOption, openCardEditor, setFieldValue, typeInto } from './helpers';
 
 const PAGE = '[data-testid="screen-contact"]';
 
@@ -27,6 +27,7 @@ async function sectionText(section: string, testId: string): Promise<string> {
 }
 
 When(/^I add the address "([^"]+)" in "([^"]+)"$/, async (street: string, city: string) => {
+  await openCardEditor('addresses');
   await typeInto(`${PAGE} [data-testid="addresses"] [data-testid="address-street"]`, street);
   await typeInto(`${PAGE} [data-testid="addresses"] [data-testid="address-city"]`, city);
   await $(`${PAGE} [data-testid="addresses"] [data-testid="save-address"]`).click();
@@ -36,6 +37,7 @@ When(/^I add the address "([^"]+)" in "([^"]+)"$/, async (street: string, city: 
 });
 
 When(/^I make "([^"]+)" the home address$/, async (street: string) => {
+  await openCardEditor('addresses');
   const clicked = await browser.execute(
     (root, wanted) => {
       const row = [...document.querySelectorAll(`${root} [data-testid="address"]`)].find(
@@ -83,31 +85,50 @@ async function homeStreets(): Promise<string[]> {
   );
 }
 
+const ABOUT = `${PAGE} [data-testid="about"]`;
+
 When(/^I add "([^"]+)" as a child$/, async (name: string) => {
-  await chooseOption(`${PAGE} [data-testid="children"] [data-testid="child-picker"]`, name);
-  await $(`${PAGE} [data-testid="children"] [data-testid="save-child"]`).click();
-  await $(`[data-testid="child"][data-child-name="${name}"]`).waitForExist({ timeout: 5_000 });
+  await openCardEditor('about');
+  await chooseOption(`${ABOUT} [data-testid="child-picker"]`, name);
+  await $(`${ABOUT} [data-testid="add-child"]`).click();
+  await $(`${ABOUT} [data-testid="child"][data-child-name="${name}"]`).waitForExist({ timeout: 5_000 });
 });
 
 Then(/^the child "([^"]+)" is listed$/, async (name: string) => {
-  await $(`[data-testid="child"][data-child-name="${name}"]`).waitForExist({ timeout: 5_000 });
+  await $(`${ABOUT} [data-testid="child"][data-child-name="${name}"]`).waitForExist({ timeout: 5_000 });
 });
 
 When(/^I choose "([^"]+)" as the significant other$/, async (name: string) => {
-  await chooseOption(`${PAGE} [data-testid="significant-other"] [data-testid="partner-picker"]`, name);
-  await $('[data-testid="significant-other"] [data-testid="open-partner"]').waitForExist({ timeout: 5_000 });
+  await openCardEditor('about');
+  await chooseOption(`${ABOUT} [data-testid="partner-picker"]`, name);
+});
+
+When('I save About', async () => {
+  await $(`${ABOUT} [data-testid="save-profile"]`).click();
+  // Saving closes the editor, so the form goes and the reading comes back.
+  await $(`${ABOUT} [data-testid="profile-form"]`).waitForExist({ timeout: 5_000, reverse: true });
 });
 
 Then('no children are listed', async () => {
-  await $('[data-testid="children"] [data-testid="children-empty"]').waitForExist({ timeout: 5_000 });
+  await browser.waitUntil(async () => (await sectionText('about', 'children')).includes('Children not set'), { timeout: 5_000 });
 });
 
 Then('no significant other is listed', async () => {
-  await $('[data-testid="significant-other"] [data-testid="significant-other-empty"]').waitForExist({ timeout: 5_000 });
+  await browser.waitUntil(async () => (await sectionText('about', 'significant-other')).includes('Significant other not set'), {
+    timeout: 5_000,
+  });
+});
+
+Then(/^About reads "([^"]+)"$/, async (text: string) => {
+  await browser.waitUntil(async () => ((await $(ABOUT).getText()) ?? '').includes(text), {
+    timeout: 5_000,
+    timeoutMsg: `About never read "${text}"`,
+  });
 });
 
 Then(/^the significant other is "([^"]+)"$/, async (name: string) => {
-  const shown = await sectionText('significant-other', 'open-partner');
+  await $(`${ABOUT} [data-testid="open-partner"]`).waitForExist({ timeout: 5_000 });
+  const shown = await sectionText('about', 'open-partner');
   if (shown !== name) throw new Error(`The significant other reads "${shown}"`);
 });
 
@@ -118,21 +139,16 @@ const PROFILE_FIELDS = [
 ];
 
 for (const field of PROFILE_FIELDS) {
-  // The about section saves as a whole, so each field the user fills is saved
-  // before the next one is typed.
+  // The fields fill in About's form. Nothing is saved until "I save About".
   When(field.step, async (value: string) => {
-    await setFieldValue(`${PAGE} [data-testid="profile"] [data-testid="${field.testId}"]`, value);
-    await $(`${PAGE} [data-testid="profile"] [data-testid="save-profile"]`).click();
+    await openCardEditor('about');
+    await setFieldValue(`${ABOUT} [data-testid="${field.testId}-input"]`, value);
   });
 
   Then(new RegExp(`^${field.reads} "([^"]*)"$`), async (value: string) => {
-    const shown = await browser.execute(
-      (root, wanted) =>
-        (document.querySelector(`${root} [data-testid="profile"] [data-testid="${wanted}"]`) as HTMLTextAreaElement | null)
-          ?.value ?? '',
-      PAGE,
-      field.testId,
-    );
+    const selector = `${ABOUT} [data-testid="${field.testId}"]`;
+    await $(selector).waitForExist({ timeout: 5_000 });
+    const shown = await sectionText('about', field.testId);
     if (shown !== value) throw new Error(`The page reads "${shown}"`);
   });
 }
