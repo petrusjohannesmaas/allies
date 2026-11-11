@@ -1,4 +1,5 @@
 import { Then, When } from '@wdio/cucumber-framework';
+import { withDatabase } from './data';
 import { openCardEditor, setFieldValue, typeInto } from './helpers';
 
 const BOX = '[data-testid="missions"]';
@@ -79,10 +80,12 @@ When(/^I move the task "([^"]+)" up$/, async (text: string) => {
 
 When(/^I tick the task "([^"]+)"$/, async (text: string) => {
   await $(`${TASKS} [data-testid="task"][data-task-text="${text}"] [data-testid="task-done"]`).click();
-  await browser.waitUntil(async () => (await listedTasks()).find((task) => task.text === text)?.done === true, {
-    timeout: 5_000,
-    timeoutMsg: 'The task never showed as ticked',
-  });
+  // The box flips as soon as it is clicked, so wait until the database has the tick too.
+  await browser.waitUntil(
+    async () =>
+      withDatabase((db) => (db.prepare('SELECT is_done FROM tasks WHERE description = $text').get({ $text: text }) as { is_done: number } | undefined)?.is_done === 1),
+    { timeout: 5_000, timeoutMsg: 'The tick never reached the database' },
+  );
 });
 
 When(/^I change the mission to "([^"]+)" due (\d{4}-\d{2}-\d{2})$/, async (description: string, due: string) => {
