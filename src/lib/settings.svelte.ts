@@ -26,7 +26,7 @@ function apply() {
 // A system-theme change applies while the app is open. The listener is made
 // once, on load.
 function watchSystem() {
-  if (watched || typeof window === 'undefined' || !window.matchMedia) return;
+  if (watched) return;
   watched = true;
   const media = window.matchMedia('(prefers-color-scheme: dark)');
   systemPrefersDark = media.matches;
@@ -42,8 +42,8 @@ function describe(error: unknown): string {
 }
 
 // Saves run one after another, so two quick changes cannot interleave their
-// store writes. A failure sets saveError for the page to show, and still
-// rejects so a caller that waits can react. `data-settings-saving` on the root
+// store writes. A failure sets saveError for the page to show and the promise
+// still resolves. `data-settings-saving` on the root
 // element is true while a save is pending, which lets an end-to-end test wait
 // for the write before it restarts the app.
 let saving: Promise<void> = Promise.resolve();
@@ -58,24 +58,16 @@ function save() {
   saveError = '';
   pending += 1;
   markSaving();
-  saving = saving.catch(() => {});
   saving = saving
     .then(() => saveSettings(values))
     .catch((error: unknown) => {
       saveError = `Could not save your settings. ${describe(error)}`;
-      throw new Error(saveError);
     })
     .finally(() => {
       pending -= 1;
       markSaving();
     });
   return saving;
-}
-
-// For callers that have no page code waiting on the result: the failure is
-// already in saveError.
-function saveQuietly() {
-  return save().catch(() => {});
 }
 
 export const settings = {
@@ -115,12 +107,12 @@ export const settings = {
   setTheme(id: ThemePreference) {
     theme = id;
     apply();
-    return saveQuietly();
+    return save();
   },
 
   setAccent(id: AccentId) {
     accent = id;
     apply();
-    return saveQuietly();
+    return save();
   },
 };
