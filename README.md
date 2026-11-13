@@ -9,8 +9,10 @@ server and has no login.
 
 ## What it does
 
-Five screens sit under one top bar, with a search box that reaches every one of
-them.
+Six screens sit behind one sidebar, which has a search box that reaches every
+one of them. The sidebar links to Dashboard, Contacts and Journal, and its
+footer has Appearance and a button that switches between the light and dark
+theme.
 
 **Dashboard.** Every birthday and reminder from today to the same date three
 months on, soonest first and grouped by month. A birthday needs no reminder
@@ -50,6 +52,10 @@ run of rows. Rate a day once with one of three faces. Every call and activity
 you log appears here as well, marked as created automatically and naming the
 contact it was with, and goes away with the call or activity itself. There is
 no way to delete one of those rows from the journal.
+
+**Appearance.** Opens from the sidebar footer. Choose System, Light or Dark, and
+pick one of nine accent colours, which fills the sidebar. The choice is saved
+and kept when the app restarts.
 
 ## Install it
 
