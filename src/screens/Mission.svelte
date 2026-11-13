@@ -60,7 +60,7 @@
 
 <section class="p-6" data-testid="screen-mission">
   {#if missing}
-    <p class="text-sm text-muted" data-testid="mission-missing">That mission is gone.</p>
+    <p class="text-sm text-muted-foreground" data-testid="mission-missing">That mission is gone.</p>
     <button type="button" class="btn mt-4" data-testid="back-to-contact" onclick={goBackFromMission}>Back</button>
   {:else if mission && contact}
     <button type="button" class="btn mb-4" data-testid="back-to-contact" onclick={goBackFromMission}>
@@ -74,7 +74,7 @@
         {#snippet view()}
           <div class="pr-12">
             <h1 class="text-xl font-semibold" data-testid="mission-title">{mission?.description}</h1>
-            <p class="text-sm text-muted" data-testid="mission-due">
+            <p class="text-sm text-muted-foreground" data-testid="mission-due">
               {#if mission?.due_date}Due {mission.due_date}{:else}No due date{/if}
             </p>
           </div>
@@ -159,7 +159,7 @@
 
 {#snippet list(editing: boolean)}
   {#if tasks.length === 0}
-    <p class="mt-3 text-sm text-muted" data-testid="tasks-empty">No tasks yet.</p>
+    <p class="mt-3 text-sm text-muted-foreground" data-testid="tasks-empty">No tasks yet.</p>
   {:else}
     <ol class="mt-3 grid gap-2" data-testid="task-list">
       {#each tasks as task, index (task.id)}
@@ -223,7 +223,7 @@
               <Trash2 class="size-4" aria-hidden="true" />
             </button>
           {:else}
-            <span class="text-sm" class:line-through={task.is_done === 1} class:text-muted={task.is_done === 1} data-testid="task-text">
+            <span class="text-sm" class:line-through={task.is_done === 1} class:text-muted-foreground={task.is_done === 1} data-testid="task-text">
               {task.description}
             </span>
           {/if}

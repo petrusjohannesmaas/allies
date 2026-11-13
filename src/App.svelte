@@ -12,7 +12,7 @@
 
 <!-- The search box stays on every screen, so a contact is always one keystroke
      away from wherever the user is. -->
-<header class="flex items-center gap-3 border-b border-line bg-surface px-4 py-3" data-testid="top-bar">
+<header class="flex items-center gap-3 border-b border-border bg-card px-4 py-3" data-testid="top-bar">
   <img src={logo} alt="Allies" class="size-7 shrink-0" />
 
   <SearchBox />

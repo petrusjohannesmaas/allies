@@ -44,7 +44,7 @@
 
 <section class="p-6" data-testid="screen-contact">
   {#if missing}
-    <p class="text-sm text-muted" data-testid="contact-missing">That contact is gone.</p>
+    <p class="text-sm text-muted-foreground" data-testid="contact-missing">That contact is gone.</p>
   {:else if contact}
     <button type="button" class="btn mb-4" data-testid="back-to-contacts" onclick={goBackFromContact}>All contacts</button>
 

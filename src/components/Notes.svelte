@@ -80,17 +80,15 @@
 
 {#snippet list(editable: boolean)}
   {#if notes.length === 0}
-    <p class="mt-3 text-sm text-muted" data-testid="notes-empty">No notes yet.</p>
+    <p class="mt-3 text-sm text-muted-foreground" data-testid="notes-empty">No notes yet.</p>
   {:else}
     <ul class="mt-3 grid gap-2" data-testid="note-list">
       {#each notes as note (note.id)}
-        <li class="border-line flex items-start gap-2 border-t pt-2" data-testid="note" data-favourite={note.is_favourite === 1}>
+        <li class="border-border flex items-start gap-2 border-t pt-2" data-testid="note" data-favourite={note.is_favourite === 1}>
           {#if editable}
             <button
               type="button"
-              class="mt-0.5 shrink-0"
-              class:text-accent={note.is_favourite === 1}
-              class:text-muted={note.is_favourite === 0}
+              class="mt-0.5 shrink-0 {note.is_favourite === 1 ? 'text-[var(--accent-text)]' : 'text-muted-foreground'}"
               aria-pressed={note.is_favourite === 1}
               aria-label={note.is_favourite === 1 ? `Remove the favourite mark from this note` : `Mark this note as a favourite`}
               data-testid="favourite-note"
@@ -99,7 +97,7 @@
               <Star class="size-4" fill={note.is_favourite === 1 ? 'currentColor' : 'none'} aria-hidden="true" />
             </button>
           {:else if note.is_favourite === 1}
-            <span class="text-accent mt-0.5 shrink-0" role="img" aria-label="Favourite note"><Star class="size-4" fill="currentColor" aria-hidden="true" /></span>
+            <span class="text-[var(--accent-text)] mt-0.5 shrink-0" role="img" aria-label="Favourite note"><Star class="size-4" fill="currentColor" aria-hidden="true" /></span>
           {/if}
 
           <div class="min-w-0 flex-1">

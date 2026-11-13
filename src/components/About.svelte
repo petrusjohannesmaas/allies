@@ -43,7 +43,7 @@
                 {fullName(about.significant_other)}
               </button>
             {:else}
-              <span class="text-muted">Significant other not set</span>
+              <span class="text-muted-foreground">Significant other not set</span>
             {/if}
           </dd>
         </div>
@@ -51,7 +51,7 @@
           <dt class="field-label">Children</dt>
           <dd data-testid="children">
             {#if about.children.length === 0}
-              <span class="text-muted">Children not set</span>
+              <span class="text-muted-foreground">Children not set</span>
             {:else}
               <ul class="flex flex-wrap gap-2" data-testid="child-list">
                 {#each about.children as child (child.id)}
@@ -67,15 +67,15 @@
         </div>
         <div>
           <dt class="field-label">How you met</dt>
-          <dd class="whitespace-pre-wrap" class:text-muted={!about.how_met} data-testid="how-met">{about.how_met ?? 'How you met not set'}</dd>
+          <dd class="whitespace-pre-wrap" class:text-muted-foreground={!about.how_met} data-testid="how-met">{about.how_met ?? 'How you met not set'}</dd>
         </div>
         <div>
           <dt class="field-label">Work</dt>
-          <dd class="whitespace-pre-wrap" class:text-muted={!about.work} data-testid="work">{about.work ?? 'Work not set'}</dd>
+          <dd class="whitespace-pre-wrap" class:text-muted-foreground={!about.work} data-testid="work">{about.work ?? 'Work not set'}</dd>
         </div>
         <div>
           <dt class="field-label">Food preferences</dt>
-          <dd class="whitespace-pre-wrap" class:text-muted={!about.food_preferences} data-testid="food-preferences">
+          <dd class="whitespace-pre-wrap" class:text-muted-foreground={!about.food_preferences} data-testid="food-preferences">
             {about.food_preferences ?? 'Food preferences not set'}
           </dd>
         </div>

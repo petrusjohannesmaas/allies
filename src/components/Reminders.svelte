@@ -70,14 +70,14 @@
 
 {#snippet list(editable: boolean)}
   {#if reminders.length === 0}
-    <p class="mt-3 text-sm text-muted" data-testid="reminders-empty">No reminders yet.</p>
+    <p class="mt-3 text-sm text-muted-foreground" data-testid="reminders-empty">No reminders yet.</p>
   {:else}
     <ul class="mt-3 grid gap-2" data-testid="reminder-list">
       {#each reminders as reminder (reminder.id)}
-        <li class="border-line flex items-center gap-3 border-t pt-2" data-testid="reminder" data-date={reminder.remind_on}>
+        <li class="border-border flex items-center gap-3 border-t pt-2" data-testid="reminder" data-date={reminder.remind_on}>
           <div class="min-w-0 flex-1">
             <p class="text-sm" data-testid="reminder-description-value">{reminder.description}</p>
-            <p class="text-xs text-muted">
+            <p class="text-xs text-muted-foreground">
               <span data-testid="reminder-date-value">{formatDate(reminder.remind_on)}</span>
               <span data-testid="reminder-repeats-value">{reminder.repeats_yearly === 1 ? 'Every year' : 'Once'}</span>
             </p>

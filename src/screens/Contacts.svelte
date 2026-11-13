@@ -74,7 +74,7 @@
   {/if}
 
   {#if contacts.length === 0}
-    <p class="text-sm text-muted" data-testid="contacts-empty">No contacts yet. Add the first one.</p>
+    <p class="text-sm text-muted-foreground" data-testid="contacts-empty">No contacts yet. Add the first one.</p>
   {:else}
     <ul class="grid gap-2" data-testid="contacts-list">
       {#each contacts as contact (contact.id)}
@@ -88,7 +88,7 @@
             <Avatar picture={contact.picture} name={fullName(contact)} size={40} />
             <span class="min-w-0">
               <span class="block truncate text-sm font-medium">{fullName(contact)}</span>
-              <span class="block text-xs text-muted">{labelFor(contact.category)}</span>
+              <span class="block text-xs text-muted-foreground">{labelFor(contact.category)}</span>
             </span>
           </button>
 

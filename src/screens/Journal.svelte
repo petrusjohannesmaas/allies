@@ -43,7 +43,7 @@
 
 <section class="p-6" data-testid="screen-journal">
   <h1 class="text-xl font-semibold">Journal</h1>
-  <p class="mt-2 text-sm text-muted">Your days, newest first.</p>
+  <p class="mt-2 text-sm text-muted-foreground">Your days, newest first.</p>
 
   <div class="mt-4 grid gap-4">
     <DayRating day={today()} onRated={reload} />
@@ -68,7 +68,7 @@
     </section>
 
     {#if rows.length === 0}
-      <p class="text-sm text-muted" data-testid="journal-empty">Nothing in the journal yet.</p>
+      <p class="text-sm text-muted-foreground" data-testid="journal-empty">Nothing in the journal yet.</p>
     {:else}
       <ul class="card" data-testid="journal-list">
         {#each rows as row, index (row.kind + row.day + (row.source_id ?? ''))}

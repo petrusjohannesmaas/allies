@@ -37,24 +37,24 @@
   {#if failure}<p class="error" data-testid="missions-failure">{failure}</p>{/if}
 
   {#if missions.length === 0}
-    <p class="mt-2 text-sm text-muted" data-testid="missions-empty">No missions yet.</p>
+    <p class="mt-2 text-sm text-muted-foreground" data-testid="missions-empty">No missions yet.</p>
   {:else}
     <ul class="mt-2 grid gap-1" data-testid="mission-list">
       {#each missions as mission (mission.id)}
         <li data-testid="mission">
           <button
             type="button"
-            class="border-line hover:bg-bg flex w-full items-center gap-3 rounded border px-2 py-1 text-left"
+            class="border-border hover:bg-background flex w-full items-center gap-3 rounded border px-2 py-1 text-left"
             data-testid="open-mission"
             onclick={() => openMission(contactId, mission.id)}
           >
             <span class="min-w-0 flex-1">
               <span class="block truncate text-sm" data-testid="mission-text">{mission.description}</span>
-              <span class="block text-xs text-muted" data-testid="mission-due">
+              <span class="block text-xs text-muted-foreground" data-testid="mission-due">
                 {#if mission.due_date}Due {mission.due_date}{:else}No due date{/if}
               </span>
             </span>
-            <span class="shrink-0 text-xs text-muted" data-testid="mission-progress">{mission.done} of {mission.total}</span>
+            <span class="shrink-0 text-xs text-muted-foreground" data-testid="mission-progress">{mission.done} of {mission.total}</span>
           </button>
         </li>
       {/each}

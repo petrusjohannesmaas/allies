@@ -64,12 +64,12 @@
 
 {#snippet list(editable: boolean)}
   {#if addresses.length === 0}
-    <p class="mt-3 text-sm text-muted" data-testid="addresses-empty">No addresses yet.</p>
+    <p class="mt-3 text-sm text-muted-foreground" data-testid="addresses-empty">No addresses yet.</p>
   {:else}
     <ul class="mt-3 grid gap-2" data-testid="address-list">
       {#each addresses as address (address.id)}
         <li
-          class="border-line flex items-center gap-3 border-t pt-2"
+          class="border-border flex items-center gap-3 border-t pt-2"
           data-testid="address"
           data-home={address.is_home === 1}
           data-street={address.street ?? ''}
@@ -77,9 +77,7 @@
           {#if editable}
             <button
               type="button"
-              class="shrink-0"
-              class:text-accent={address.is_home === 1}
-              class:text-muted={address.is_home === 0}
+              class="shrink-0 {address.is_home === 1 ? 'text-[var(--accent-text)]' : 'text-muted-foreground'}"
               aria-pressed={address.is_home === 1}
               aria-label={address.is_home === 1 ? `${formatAddress(address)} is the home address` : `Make this the home address`}
               data-testid="home-address"
@@ -93,7 +91,7 @@
           {/if}
           <span class="flex-1 text-sm" data-testid="address-text">{formatAddress(address)}</span>
           {#if address.is_home === 1}
-            <span class="text-xs text-muted" data-testid="home-address-label">Home</span>
+            <span class="text-xs text-muted-foreground" data-testid="home-address-label">Home</span>
           {/if}
           {#if editable}
             <button type="button" class="btn btn-danger shrink-0" data-testid="delete-address" onclick={() => run(async () => {

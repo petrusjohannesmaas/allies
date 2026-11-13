@@ -18,14 +18,14 @@
 </script>
 
 <li
-  class="border-line flex items-start gap-3 border-t py-3"
+  class="border-border flex items-start gap-3 border-t py-3"
   data-testid="journal-row"
   data-kind={row.kind}
   data-day={row.day}
   data-source-id={row.source_id ?? ''}
 >
   <div class="min-w-0 flex-1">
-    <p class="text-xs text-muted" data-testid="journal-row-kind">{KIND_LABELS[row.kind]}</p>
+    <p class="text-xs text-muted-foreground" data-testid="journal-row-kind">{KIND_LABELS[row.kind]}</p>
     {#if face}
       <p class="mt-1 flex items-center gap-2 text-sm" data-testid="journal-row-body">
         You rated your day: {face.name}
@@ -34,10 +34,10 @@
     {:else}
       <p class="mt-1 text-sm" data-testid="journal-row-body">{row.body}</p>
     {/if}
-    <p class="mt-1 text-xs text-muted" data-testid="journal-row-date">{formatDate(row.day)}</p>
+    <p class="mt-1 text-xs text-muted-foreground" data-testid="journal-row-date">{formatDate(row.day)}</p>
   </div>
 
-  <span class="flex shrink-0 items-center gap-2 text-xs text-muted">
+  <span class="flex shrink-0 items-center gap-2 text-xs text-muted-foreground">
     {#if row.kind === 'entry' && onDelete}
       <button type="button" class="btn btn-danger" data-testid="delete-entry" onclick={onDelete}>Delete</button>
     {:else if row.kind === 'activity' || row.kind === 'call'}
