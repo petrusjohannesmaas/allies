@@ -20,7 +20,7 @@ async function waitForSave() {
 }
 
 async function openAppearance() {
-  await $(`${SIDEBAR} button[aria-label="Appearance"]`).click();
+  await $(`${SIDEBAR} [data-testid="sidebar-footer"] button=Appearance`).click();
   await $('[data-testid="screen-appearance"]').waitForExist({ timeout: 5_000 });
 }
 
