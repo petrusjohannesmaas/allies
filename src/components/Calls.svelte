@@ -1,4 +1,8 @@
 <script lang="ts">
+  import IconButton from './IconButton.svelte';
+  import { Plus, Trash2, Phone } from '@lucide/svelte';
+  import { Button } from '$lib/components/ui/button';
+  import { Input } from '$lib/components/ui/input';
   import EditableCard from './EditableCard.svelte';
   import { db } from '$lib/db';
   import { formatDate, today } from '$lib/dates';
@@ -40,14 +44,14 @@
   }
 </script>
 
-<EditableCard label="phone calls" title="Phone calls" testid="calls">
+<EditableCard label="phone calls" title="Phone calls" icon={Phone} testid="calls">
   {#snippet view()}
-    <p class="mt-1 text-sm text-muted" data-testid="last-called">Last called: {last === null ? 'never' : formatDate(last)}</p>
+    <p class="mt-1 text-sm text-muted-foreground" data-testid="last-called">Last called: {last === null ? 'never' : formatDate(last)}</p>
     {@render list(false)}
   {/snippet}
 
   {#snippet edit()}
-    <p class="mt-1 text-sm text-muted" data-testid="last-called">Last called: {last === null ? 'never' : formatDate(last)}</p>
+    <p class="mt-1 text-sm text-muted-foreground" data-testid="last-called">Last called: {last === null ? 'never' : formatDate(last)}</p>
 
     {#if failure}<p class="error" data-testid="calls-failure">{failure}</p>{/if}
 
@@ -59,9 +63,9 @@
         void run(save);
       }}
     >
-      <input class="input w-40" type="date" data-testid="call-date" bind:value={calledOn} />
-      <input class="input flex-1" data-testid="call-description" placeholder="Caught up about the conference" autocomplete="off" bind:value={description} />
-      <button type="submit" class="btn btn-primary" data-testid="save-call">Log call</button>
+      <Input class="w-40" type="date" data-testid="call-date" bind:value={calledOn} />
+      <Input class="flex-1" data-testid="call-description" placeholder="Caught up about the conference" autocomplete="off" bind:value={description} />
+      <Button type="submit" data-testid="save-call"><Plus aria-hidden="true" />Log call</Button>
     </form>
 
     {@render list(true)}
@@ -70,22 +74,27 @@
 
 {#snippet list(editable: boolean)}
   {#if calls.length === 0}
-    <p class="mt-3 text-sm text-muted" data-testid="calls-empty">No calls yet.</p>
+    <p class="mt-3 text-sm text-muted-foreground" data-testid="calls-empty">No calls yet.</p>
   {:else}
     <ul class="mt-3 grid gap-2" data-testid="call-list">
       {#each calls as call (call.id)}
-        <li class="border-line flex items-center gap-3 border-t pt-2" data-testid="call" data-date={call.called_on}>
+        <li class="border-border flex items-center gap-3 border-t pt-2" data-testid="call" data-date={call.called_on}>
           <div class="min-w-0 flex-1">
             <p class="text-sm" data-testid="call-description-value">{call.description}</p>
-            <p class="text-xs text-muted" data-testid="call-date-value">{formatDate(call.called_on)}</p>
+            <p class="text-xs text-muted-foreground" data-testid="call-date-value">{formatDate(call.called_on)}</p>
           </div>
           {#if editable}
-            <button type="button" class="btn btn-danger shrink-0" data-testid="delete-call" onclick={() => run(async () => {
+            <IconButton
+              class="shrink-0 text-destructive hover:text-destructive"
+              label="Delete this call"
+              data-testid="delete-call"
+              onclick={() => run(async () => {
                 await deleteCall(await db(), call.id);
                 await reload(contactId);
-              })}>
-              Delete
-            </button>
+              })}
+            >
+              <Trash2 aria-hidden="true" />
+            </IconButton>
           {/if}
         </li>
       {/each}

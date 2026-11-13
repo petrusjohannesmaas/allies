@@ -68,3 +68,22 @@ describe('the mission details', () => {
     expect(screen.getByTestId('save-mission-details')).toBeTruthy();
   });
 });
+
+describe('the mission page controls', () => {
+  it('every button on a mission page has a name and every icon-only button a tooltip', async () => {
+    await renderMission(['A', 'B']);
+    for (const pencil of screen.getAllByTestId('edit-card')) await fireEvent.click(pencil);
+
+    const buttons = screen.getAllByRole('button');
+    expect(buttons.length).toBeGreaterThan(6);
+    for (const button of buttons) {
+      const text = (button.textContent ?? '').trim();
+      const name = button.getAttribute('aria-label') ?? text;
+      expect(name, button.outerHTML).not.toBe('');
+      if (text === '') {
+        const hasTooltip = button.hasAttribute('title') || button.getAttribute('data-slot') === 'tooltip-trigger';
+        expect(hasTooltip, `no tooltip on ${button.outerHTML}`).toBe(true);
+      }
+    }
+  });
+});

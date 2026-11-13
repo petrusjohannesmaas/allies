@@ -16,9 +16,14 @@ OUT OF SCOPE
 - 10 November 2026 | #19 | Marking a whole mission as done. | The issue lists it as out of scope.
 - 10 November 2026 | #19 | Dragging tasks to reorder them. | Up and down buttons instead, see the issue's decisions.
 - 10 November 2026 | #19 | Dashboard and journal changes beyond the capitalisation fix. | The issue lists it as out of scope.
+- 13 November 2026 | #26 | A Taskflow-style Settings screen. | The issue lists it as out of scope. Appearance is its own screen.
+- 13 November 2026 | #26 | Terracotta, or accents beyond Zaimu's nine. | The issue lists it as out of scope.
+- 13 November 2026 | #26 | Themes other than Light and Dark. | The issue lists it as out of scope.
+- 13 November 2026 | #26 | Changes to screens or features beyond the sidebar, colours, hover, icons, button sizes and spacing. | The issue lists it as out of scope.
 DECISIONS
 - 17 October 2026 | #1 | Contact search stays at 8 results. | Outcome 18 says matching contacts are listed. The user chose to keep the cap, since more letters narrow the list.
 - 17 October 2026 | #1 | Only LOGOS.png stays tracked. The Monica screenshots and MONICA-FEATURES.md are untracked and stay on the user's disk. | The user decided this before the pull request. The files remain in the branch's earlier commits.
+- 13 November 2026 | #26 | The Appearance screen replaces the 16 October 2026 out-of-scope entry "A settings screen". | The user asked for theme and accent choice on its own screen.
 NOTES
 - 16 October 2026 | #1 | Monica 1.6.0 is the reference. | The three screenshots the user keeps outside git are Monica 1.6.0, taken from contact.webp's version marker. Where a detail was not visible there, the rule the user set on 16 October 2026 applies: match Monica.
 - 16 October 2026 | #1 | The admin password in create_ally.html stays in the git history of a public repository after the file is deleted. | Rotate the PocketBase admin password.
