@@ -62,7 +62,7 @@
     >
       <Input class="w-40" type="date" data-testid="reminder-date" bind:value={remindOn} />
       <Input class="flex-1" data-testid="reminder-description" placeholder="Send the photos" autocomplete="off" bind:value={description} />
-      <Label class="flex cursor-pointer items-center gap-2 text-sm hover:text-primary">
+      <Label class="flex cursor-pointer items-center gap-2 text-sm hover:text-[var(--accent-text)]">
         <input type="checkbox" data-testid="reminder-repeats" bind:checked={repeats} />
         Every year
       </Label>
