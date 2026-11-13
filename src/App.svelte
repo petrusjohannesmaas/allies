@@ -7,6 +7,7 @@
   import Contacts from './screens/Contacts.svelte';
   import Dashboard from './screens/Dashboard.svelte';
   import Journal from './screens/Journal.svelte';
+  import Mission from './screens/Mission.svelte';
 </script>
 
 <!-- The search box stays on every screen, so a contact is always one keystroke
@@ -38,6 +39,8 @@
     <Contacts />
   {:else if navigation.screen === 'contact'}
     <Contact />
+  {:else if navigation.screen === 'mission'}
+    <Mission />
   {:else}
     <Journal />
   {/if}

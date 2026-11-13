@@ -10,6 +10,8 @@ let contactId: number;
 async function renderAddresses(rows = 0) {
   render(Addresses, { props: { contactId } });
   await waitFor(() => expect(screen.queryAllByTestId('address')).toHaveLength(rows));
+  // The card is read-only until its pencil is clicked.
+  await fireEvent.click(screen.getByTestId('edit-card'));
 }
 
 function homes(): string[] {

@@ -1,6 +1,7 @@
 import { Then, When } from '@wdio/cucumber-framework';
+import { labelFor } from '../../src/lib/categories';
 import { formatDate } from '../../src/lib/dates';
-import { dayFromNow, setFieldValue, typeInto } from './helpers';
+import { dayFromNow, openCardEditor, setFieldValue, typeInto } from './helpers';
 
 const PAGE = '[data-testid="screen-contact"]';
 const CALLS = `${PAGE} [data-testid="calls"]`;
@@ -80,6 +81,7 @@ async function deleteRow(
 }
 
 When(/^I log a call dated "([^"]+)" with the description "([^"]+)"$/, async (day: string, description: string) => {
+  await openCardEditor('calls');
   await setFieldValue(`${CALLS} [data-testid="call-date"]`, dayFromNow(day));
   await typeInto(`${CALLS} [data-testid="call-description"]`, description);
   await $(`${CALLS} [data-testid="save-call"]`).click();
@@ -92,6 +94,7 @@ When(/^I log a call dated "([^"]+)" with the description "([^"]+)"$/, async (day
 When(
   /^I log an activity dated "([^"]+)" in the category "([^"]+)" with the description "([^"]+)"$/,
   async (day: string, category: string, description: string) => {
+    await openCardEditor('activities');
     await setFieldValue(`${ACTIVITIES} [data-testid="activity-date"]`, dayFromNow(day));
     await browser.execute(
       (selector, wanted) => {
@@ -112,10 +115,12 @@ When(
 );
 
 When(/^I delete the call "([^"]+)"$/, async (description: string) => {
+  await openCardEditor('calls');
   await deleteRow(CALLS, 'call', 'call-description-value', 'delete-call', description);
 });
 
 When(/^I delete the activity "([^"]+)"$/, async (description: string) => {
+  await openCardEditor('activities');
   await deleteRow(ACTIVITIES, 'activity', 'activity-description-value', 'delete-activity', description);
 });
 
@@ -135,7 +140,7 @@ Then(/^the call "([^"]+)" reads the date "([^"]+)"$/, async (description: string
 
 Then(/^the activity "([^"]+)" is listed as "([^"]+)"$/, async (description: string, category: string) => {
   expect((await listedActivities()).map((row) => `${row.category}|${row.description}`)).toContain(
-    `${category}|${description}`,
+    `${labelFor(category)}|${description}`,
   );
 });
 

@@ -88,6 +88,7 @@ describe('the contact form', () => {
       first_name: 'Ada',
       last_name: 'Lovelace',
       email: 'ada@example.com',
+      phone: null,
       birthday: '1815-12-10',
       picture: null,
       last_viewed_at: null,

@@ -9,7 +9,7 @@ server and has no login.
 
 ## What it does
 
-Four screens sit under one top bar, with a search box that reaches every one of
+Five screens sit under one top bar, with a search box that reaches every one of
 them.
 
 **Dashboard.** Every birthday and reminder from today to the same date three
@@ -18,23 +18,32 @@ added by hand, and one that has passed this year comes round on its next date.
 The eight contacts you opened most recently are there, and a count of your
 contacts and of every call and activity you logged.
 
-**Contacts.** Add, edit and delete a contact with a category, names, an email, a
-birthday and a picture. Type part of a name in the search box to find one.
+**Contacts.** Add and delete a contact with a picture, a category, names, an
+email, a phone number, a birthday and tags. You edit a contact on their own
+page. Type part of a name in the search box to find one.
 
-**A contact.** Everything about one person on one page:
+**A contact.** Everything about one person on one page. A header holds the
+picture, name, category, email, phone number, birthday and tags, with the
+missions on the right. Cards below it hold:
 
-- notes, some of them marked as favourites
-- missions, each with a description and a due date
-- phone numbers, addresses and the one you call home
 - a significant other and children, both picked from your contacts
 - how you met, their work and their food preferences
-- tags
+- notes, some of them marked as favourites
+- addresses and the one you call home
 - reminders, each with a date and an optional yearly repeat, shown inside the
   app and nowhere else
 - phone calls and activities you logged, with the date each happened and when
   you last spoke or did something together
 
+Each block is read-only until you click its pencil. A Save button appears once
+you change something, and leaving the block discards unsaved changes.
+
 Deleting a contact takes everything it owns with it, its picture file included.
+
+**A mission.** Opens from the Missions box on a contact's page. A mission has a
+description, an optional due date and an ordered list of tasks. Tick a task to
+cross it out, and move tasks up and down to reorder them. The Missions box
+lists missions soonest due first, with progress such as "2 of 5".
 
 **Journal.** What you wrote, newest first, with the month and year above each
 run of rows. Rate a day once with one of three faces. Every call and activity

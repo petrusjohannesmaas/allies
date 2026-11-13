@@ -26,6 +26,10 @@ export function configDir(): string {
 // How often the waits below re-check their condition.
 const POLL_INTERVAL_MS = 100;
 
+// How long a relaunched app gets to start its WebDriver server. On runner the
+// app takes 20 to 31 s under xvfb-run.
+const LAUNCH_TIMEOUT_MS = 60_000;
+
 async function serverUp(): Promise<boolean> {
   try {
     const response = await fetch(`http://127.0.0.1:${EMBEDDED_PORT}/status`);
@@ -82,7 +86,7 @@ export async function launchApp() {
   });
   child.unref();
   appendFileSync(RELAUNCHED_PIDS, `${child.pid}\n`);
-  await waitFor(serverUp, 'the relaunched app');
+  await waitFor(serverUp, 'the relaunched app', LAUNCH_TIMEOUT_MS);
   await browser.reloadSession();
   await $('header[data-testid="top-bar"]').waitForExist({ timeout: 20_000 });
 }

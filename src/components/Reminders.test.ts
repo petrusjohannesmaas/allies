@@ -17,6 +17,8 @@ beforeEach(async () => {
 async function renderReminders(rows = 0) {
   render(Reminders, { props: { contactId } });
   await waitFor(() => expect(screen.queryAllByTestId('reminder')).toHaveLength(rows));
+  // The card is read-only until its pencil is clicked.
+  await fireEvent.click(screen.getByTestId('edit-card'));
 }
 
 async function add(date: string, description: string, repeats: boolean) {

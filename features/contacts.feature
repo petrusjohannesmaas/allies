@@ -16,12 +16,18 @@ Feature: Contacts
     And I fill in the last name "Lovelace"
     And I choose "colleague" as the category
     And I fill in "ada@example.com" as the email
+    And I fill in "082 123 4567" as the phone
     And I set the birthday to 1815-12-10
+    And I fill in the tags "chess"
     And I save the contact
     Then the contacts list shows "Ada Lovelace"
+    And the contacts list has no Edit button
     And the contact "Ada Lovelace" has the category "colleague"
     And the contact "Ada Lovelace" has the email "ada@example.com"
     And the contact "Ada Lovelace" has the birthday 1815-12-10
+    When I select the contact "Ada Lovelace"
+    Then the contact page shows the phone "082 123 4567"
+    And the contact page shows the tag "chess"
 
   Scenario: The first name is required
     Given the app has just started
@@ -54,12 +60,18 @@ Feature: Contacts
     And I edit the contact "Ada Lovelace"
     And I fill in the last name "Byron"
     And I choose "mentor" as the category
+    And I fill in "082 123 4567" as the phone
+    And I fill in the tags "chess, books"
     And I save the contact
-    Then the contacts list shows "Ada Byron"
+    Then the contact page shows "Ada Byron"
     When I close and reopen the app
     And I open the "Contacts" screen
     Then the contacts list shows "Ada Byron"
     And the contact "Ada Byron" has the category "mentor"
+    When I select the contact "Ada Byron"
+    Then the contact page shows the phone "082 123 4567"
+    And the contact page shows the tag "chess"
+    And the contact page shows the tag "books"
 
   Scenario: Delete a contact
     Given the app has just started
