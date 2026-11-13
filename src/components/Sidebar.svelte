@@ -57,6 +57,7 @@
       type="button"
       class="{item} {navigation.screen === 'appearance' ? current : ''}"
       aria-current={navigation.screen === 'appearance' ? 'page' : undefined}
+      data-testid="sidebar-appearance"
       onclick={() => open('appearance')}
     >
       <Palette size={20} strokeWidth={1.8} aria-hidden="true" />
