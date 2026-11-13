@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Label } from '$lib/components/ui/label';
   import IconButton from './IconButton.svelte';
-  import { Plus, Trash2 } from '@lucide/svelte';
+  import { Plus, Trash2, Bell } from '@lucide/svelte';
   import { Button } from '$lib/components/ui/button';
   import { Input } from '$lib/components/ui/input';
   import EditableCard from './EditableCard.svelte';
@@ -44,7 +44,7 @@
   }
 </script>
 
-<EditableCard label="reminders" title="Reminders" testid="reminders">
+<EditableCard label="reminders" title="Reminders" icon={Bell} testid="reminders">
   {#snippet view()}
     {@render list(false)}
   {/snippet}
@@ -62,7 +62,7 @@
     >
       <Input class="w-40" type="date" data-testid="reminder-date" bind:value={remindOn} />
       <Input class="flex-1" data-testid="reminder-description" placeholder="Send the photos" autocomplete="off" bind:value={description} />
-      <Label class="field-label flex items-center gap-2">
+      <Label class="flex items-center gap-2 text-sm">
         <input type="checkbox" data-testid="reminder-repeats" bind:checked={repeats} />
         Every year
       </Label>

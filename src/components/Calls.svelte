@@ -1,6 +1,6 @@
 <script lang="ts">
   import IconButton from './IconButton.svelte';
-  import { Plus, Trash2 } from '@lucide/svelte';
+  import { Plus, Trash2, Phone } from '@lucide/svelte';
   import { Button } from '$lib/components/ui/button';
   import { Input } from '$lib/components/ui/input';
   import EditableCard from './EditableCard.svelte';
@@ -44,7 +44,7 @@
   }
 </script>
 
-<EditableCard label="phone calls" title="Phone calls" testid="calls">
+<EditableCard label="phone calls" title="Phone calls" icon={Phone} testid="calls">
   {#snippet view()}
     <p class="mt-1 text-sm text-muted-foreground" data-testid="last-called">Last called: {last === null ? 'never' : formatDate(last)}</p>
     {@render list(false)}

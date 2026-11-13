@@ -2,7 +2,7 @@
   import IconButton from './IconButton.svelte';
   import { Button } from '$lib/components/ui/button';
   import { Input } from '$lib/components/ui/input';
-  import { Home, Plus, Trash2 } from '@lucide/svelte';
+  import { House, Plus, Trash2, MapPin } from '@lucide/svelte';
   import EditableCard from './EditableCard.svelte';
   import { db } from '$lib/db';
   import { addAddress, addressIsUsable, deleteAddress, formatAddress, listAddresses, setHomeAddress, type Address } from '$lib/repo/details';
@@ -38,7 +38,7 @@
   }
 </script>
 
-<EditableCard label="address" title="Address" testid="addresses">
+<EditableCard label="address" title="Address" icon={MapPin} testid="addresses">
   {#snippet view()}
     {@render list(false)}
   {/snippet}
@@ -88,12 +88,12 @@
                 await reload(contactId);
               })}
             >
-              <Home fill={address.is_home === 1 ? 'currentColor' : 'none'} aria-hidden="true" />
+              <House fill={address.is_home === 1 ? 'currentColor' : 'none'} aria-hidden="true" />
             </IconButton>
           {/if}
           <span class="flex-1 text-sm" data-testid="address-text">{formatAddress(address)}</span>
           {#if address.is_home === 1}
-            <span class="text-xs text-muted-foreground" data-testid="home-address-label">Home</span>
+            <span class="flex items-center gap-1 text-xs text-muted-foreground" data-testid="home-address-label"><House class="size-3.5" aria-hidden="true" />Home</span>
           {/if}
           {#if editable}
             <IconButton

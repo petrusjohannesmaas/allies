@@ -1,9 +1,10 @@
 <script lang="ts">
   import { Button } from '$lib/components/ui/button';
   import { Input } from '$lib/components/ui/input';
-  import { ArrowDown, ArrowLeft, ArrowUp, Plus, Trash2, X } from '@lucide/svelte';
+  import { AlignLeft, ArrowDown, ArrowLeft, ArrowUp, CalendarDays, ListChecks, Plus, Trash2, X } from '@lucide/svelte';
   import * as Card from '$lib/components/ui/card';
   import EditableCard from '../components/EditableCard.svelte';
+  import FieldLabel from '../components/FieldLabel.svelte';
   import IconButton from '../components/IconButton.svelte';
   import MissionForm from '../components/MissionForm.svelte';
   import { db } from '../lib/db';
@@ -76,12 +77,20 @@
     <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
       <EditableCard label="mission details" testid="mission-details">
         {#snippet view()}
-          <div class="pr-12">
-            <h1 class="text-xl font-semibold" data-testid="mission-title">{mission?.description}</h1>
-            <p class="text-sm text-muted-foreground" data-testid="mission-due">
-              {#if mission?.due_date}Due {mission.due_date}{:else}No due date{/if}
-            </p>
-          </div>
+          <dl class="grid gap-4 pr-12">
+            <div>
+              <FieldLabel icon={AlignLeft}>Description</FieldLabel>
+              <dd><h1 class="text-xl font-semibold" data-testid="mission-title">{mission?.description}</h1></dd>
+            </div>
+            <div>
+              <FieldLabel icon={CalendarDays}>Due date</FieldLabel>
+              <dd>
+                <p class="text-sm {mission?.due_date ? 'text-foreground' : 'italic text-muted-foreground'}" data-testid="mission-due">
+                  {#if mission?.due_date}Due {mission.due_date}{:else}No due date{/if}
+                </p>
+              </dd>
+            </div>
+          </dl>
         {/snippet}
 
         {#snippet edit(close)}
@@ -102,7 +111,7 @@
         {/snippet}
       </EditableCard>
 
-      <EditableCard label="tasks" title="Tasks" testid="mission-tasks">
+      <EditableCard label="tasks" title="Tasks" icon={ListChecks} testid="mission-tasks">
         {#snippet view()}
           {@render list(false)}
         {/snippet}

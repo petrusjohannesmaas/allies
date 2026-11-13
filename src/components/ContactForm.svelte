@@ -2,7 +2,8 @@
   import { Label } from '$lib/components/ui/label';
   import { fieldClass } from '$lib/field';
   import { cn } from '$lib/utils';
-  import { Save, X } from '@lucide/svelte';
+  import { Cake, Mail, Phone, Save, Tag, X } from '@lucide/svelte';
+  import FieldLabel from './FieldLabel.svelte';
   import { Button } from '$lib/components/ui/button';
   import { Input } from '$lib/components/ui/input';
   import Avatar from './Avatar.svelte';
@@ -106,14 +107,14 @@
       {#if preview}<img src={preview} alt="" class="absolute inset-0 size-14 rounded-full object-cover" data-testid="picture-preview" />{/if}
     </div>
     <Label class="block flex-1">
-      <span class="field-label">Profile picture</span>
+      <FieldLabel as="span">Profile picture</FieldLabel>
       <input type="file" class={cn(fieldClass, 'file:text-foreground file:mr-2 file:inline-flex file:h-6 file:border-0 file:bg-transparent file:text-sm file:font-medium')} accept={ACCEPTED_TYPES.join(',')} data-testid="contact-picture" onchange={pick} />
       {#if pictureError}<p class="error" data-testid="error-picture">{pictureError}</p>{/if}
     </Label>
   </div>
 
   <Label class="block">
-    <span class="field-label">Category</span>
+    <FieldLabel as="span">Category</FieldLabel>
     <select class={cn(fieldClass, '')} data-testid="contact-category" bind:value={input.category}>
       {#each CATEGORIES as category (category)}
         <option value={category}>{labelFor(category)}</option>
@@ -122,34 +123,34 @@
   </Label>
 
   <Label class="block">
-    <span class="field-label">First name</span>
+    <FieldLabel as="span">First name</FieldLabel>
     <Input data-testid="contact-first-name" autocomplete="off" bind:value={input.firstName} />
     {#if errors.firstName}<p class="error" data-testid="error-first-name">{errors.firstName}</p>{/if}
   </Label>
 
   <Label class="block">
-    <span class="field-label">Last name</span>
+    <FieldLabel as="span">Last name</FieldLabel>
     <Input data-testid="contact-last-name" autocomplete="off" bind:value={input.lastName} />
   </Label>
 
   <Label class="block">
-    <span class="field-label">Email</span>
+    <FieldLabel as="span" icon={Mail}>Email</FieldLabel>
     <Input data-testid="contact-email" autocomplete="off" bind:value={input.email} />
     {#if errors.email}<p class="error" data-testid="error-email">{errors.email}</p>{/if}
   </Label>
 
   <Label class="block">
-    <span class="field-label">Phone</span>
+    <FieldLabel as="span" icon={Phone}>Phone</FieldLabel>
     <Input data-testid="contact-phone" autocomplete="off" placeholder="082 123 4567" bind:value={input.phone} />
   </Label>
 
   <Label class="block">
-    <span class="field-label">Birthday</span>
+    <FieldLabel as="span" icon={Cake}>Birthday</FieldLabel>
     <Input type="date" data-testid="contact-birthday" bind:value={input.birthday} />
   </Label>
 
   <Label class="block">
-    <span class="field-label">Tags, separated by commas</span>
+    <FieldLabel as="span" icon={Tag}>Tags, separated by commas</FieldLabel>
     <Input data-testid="contact-tags" autocomplete="off" placeholder="chess, books" bind:value={tagsText} />
   </Label>
 

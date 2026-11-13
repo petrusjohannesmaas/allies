@@ -1,7 +1,9 @@
 <script lang="ts">
+  import { Briefcase, Baby, Handshake, Heart, UserRound, Utensils } from '@lucide/svelte';
   import { Button } from '$lib/components/ui/button';
   import AboutForm from './AboutForm.svelte';
   import EditableCard from './EditableCard.svelte';
+  import FieldLabel from './FieldLabel.svelte';
   import { db } from '$lib/db';
   import { openContact } from '$lib/navigation.svelte';
   import { fullName } from '$lib/repo/contacts';
@@ -32,27 +34,27 @@
   }
 </script>
 
-<EditableCard label="About" title="About" testid="about">
+<EditableCard label="About" title="About" icon={UserRound} testid="about">
   {#snippet view()}
     {#if about}
-      <dl class="mt-3 grid gap-2 text-sm">
+      <dl class="mt-3 grid gap-4 text-sm">
         <div>
-          <dt class="field-label">Significant other</dt>
+          <FieldLabel icon={Heart}>Significant other</FieldLabel>
           <dd data-testid="significant-other">
             {#if about.significant_other}
               <Button variant="outline" size="sm" data-testid="open-partner" onclick={() => openContact(about!.significant_other!.id)}>
                 {fullName(about.significant_other)}
               </Button>
             {:else}
-              <span class="text-muted-foreground">Significant other not set</span>
+              <span class="italic text-muted-foreground">Significant other not set</span>
             {/if}
           </dd>
         </div>
         <div>
-          <dt class="field-label">Children</dt>
+          <FieldLabel icon={Baby}>Children</FieldLabel>
           <dd data-testid="children">
             {#if about.children.length === 0}
-              <span class="text-muted-foreground">Children not set</span>
+              <span class="italic text-muted-foreground">Children not set</span>
             {:else}
               <ul class="flex flex-wrap gap-2" data-testid="child-list">
                 {#each about.children as child (child.id)}
@@ -67,16 +69,16 @@
           </dd>
         </div>
         <div>
-          <dt class="field-label">How you met</dt>
-          <dd class="whitespace-pre-wrap" class:text-muted-foreground={!about.how_met} data-testid="how-met">{about.how_met ?? 'How you met not set'}</dd>
+          <FieldLabel icon={Handshake}>How you met</FieldLabel>
+          <dd class="whitespace-pre-wrap" class:italic={!about.how_met} class:text-muted-foreground={!about.how_met} data-testid="how-met">{about.how_met ?? 'How you met not set'}</dd>
         </div>
         <div>
-          <dt class="field-label">Work</dt>
-          <dd class="whitespace-pre-wrap" class:text-muted-foreground={!about.work} data-testid="work">{about.work ?? 'Work not set'}</dd>
+          <FieldLabel icon={Briefcase}>Work</FieldLabel>
+          <dd class="whitespace-pre-wrap" class:italic={!about.work} class:text-muted-foreground={!about.work} data-testid="work">{about.work ?? 'Work not set'}</dd>
         </div>
         <div>
-          <dt class="field-label">Food preferences</dt>
-          <dd class="whitespace-pre-wrap" class:text-muted-foreground={!about.food_preferences} data-testid="food-preferences">
+          <FieldLabel icon={Utensils}>Food preferences</FieldLabel>
+          <dd class="whitespace-pre-wrap" class:italic={!about.food_preferences} class:text-muted-foreground={!about.food_preferences} data-testid="food-preferences">
             {about.food_preferences ?? 'Food preferences not set'}
           </dd>
         </div>

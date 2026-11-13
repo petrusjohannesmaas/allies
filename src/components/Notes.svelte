@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Check, Pencil, Save, Star, Trash2, X } from '@lucide/svelte';
+  import { Check, Pencil, Save, Star, Trash2, X, NotebookPen } from '@lucide/svelte';
   import EditableCard from './EditableCard.svelte';
   import IconButton from './IconButton.svelte';
   import { Button } from '$lib/components/ui/button';
@@ -46,7 +46,7 @@
   }
 </script>
 
-<EditableCard label="notes" title="Notes" testid="notes">
+<EditableCard label="notes" title="Notes" icon={NotebookPen} testid="notes">
   {#snippet view()}
     {@render list(false)}
   {/snippet}

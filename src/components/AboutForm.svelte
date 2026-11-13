@@ -4,7 +4,8 @@
   import { Label } from '$lib/components/ui/label';
   import { fieldClass } from '$lib/field';
   import { cn } from '$lib/utils';
-  import { Plus, Save, Trash2, X } from '@lucide/svelte';
+  import { Baby, Briefcase, Handshake, Heart, Plus, Save, Trash2, Utensils, X } from '@lucide/svelte';
+  import FieldLabel from './FieldLabel.svelte';
   import { Button } from '$lib/components/ui/button';
   import { db } from '$lib/db';
   import { fullName, listContacts, type Contact } from '$lib/repo/contacts';
@@ -71,7 +72,7 @@
   }}
 >
   <Label class="block">
-    <span class="field-label">Significant other</span>
+    <FieldLabel as="span" icon={Heart}>Significant other</FieldLabel>
     <select class={cn(fieldClass, '')} data-testid="partner-picker" bind:value={partner}>
       <option value="">Not set</option>
       {#each contacts as contact (contact.id)}
@@ -81,7 +82,7 @@
   </Label>
 
   <div>
-    <span class="field-label">Children</span>
+    <FieldLabel as="span" icon={Baby}>Children</FieldLabel>
     <ul class="grid gap-2" data-testid="child-list">
       {#each draft.childIds as id (id)}
         <li class="flex items-center gap-3" data-testid="child" data-child-name={nameOf(id)}>
@@ -111,15 +112,15 @@
   </div>
 
   <Label class="block">
-    <span class="field-label">How you met</span>
+    <FieldLabel as="span" icon={Handshake}>How you met</FieldLabel>
     <Textarea rows={2} data-testid="how-met-input" bind:value={draft.howMet} />
   </Label>
   <Label class="block">
-    <span class="field-label">Work</span>
+    <FieldLabel as="span" icon={Briefcase}>Work</FieldLabel>
     <Textarea rows={2} data-testid="work-input" bind:value={draft.work} />
   </Label>
   <Label class="block">
-    <span class="field-label">Food preferences</span>
+    <FieldLabel as="span" icon={Utensils}>Food preferences</FieldLabel>
     <Textarea rows={2} data-testid="food-preferences-input" bind:value={draft.foodPreferences} />
   </Label>
 

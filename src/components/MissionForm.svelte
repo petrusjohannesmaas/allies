@@ -1,6 +1,7 @@
 <script lang="ts">
+  import FieldLabel from './FieldLabel.svelte';
   import { Label } from '$lib/components/ui/label';
-  import { Save, X } from '@lucide/svelte';
+  import { AlignLeft, CalendarDays, Save, X } from '@lucide/svelte';
   import { Button } from '$lib/components/ui/button';
   import { Input } from '$lib/components/ui/input';
   import { hasText, type Mission } from '$lib/repo/missions';
@@ -37,12 +38,12 @@
     void onsave(description, due);
   }}
 >
-  <Label class="grid gap-1 text-sm">
-    Description
+  <Label class="block text-sm">
+    <FieldLabel as="span" icon={AlignLeft}>Description</FieldLabel>
     <Input data-testid="mission-details-description" autocomplete="off" bind:value={description} />
   </Label>
-  <Label class="grid gap-1 text-sm">
-    Due date
+  <Label class="block text-sm">
+    <FieldLabel as="span" icon={CalendarDays}>Due date</FieldLabel>
     <Input type="date" data-testid="mission-details-due" bind:value={due} />
   </Label>
   <div class="flex gap-2">

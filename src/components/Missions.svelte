@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Button } from '$lib/components/ui/button';
   import { Input } from '$lib/components/ui/input';
-  import { Plus } from '@lucide/svelte';
+  import { Plus, Target } from '@lucide/svelte';
   import { db } from '$lib/db';
   import { openMission } from '$lib/navigation.svelte';
   import { addMission, listMissions, hasText, type Mission } from '$lib/repo/missions';
@@ -34,7 +34,9 @@
 </script>
 
 <section class="min-w-0 md:ml-auto md:w-80" data-testid="missions">
-  <h3 class="section-title">Missions</h3>
+  <h3 class="flex items-center gap-2 text-base font-semibold text-foreground">
+    <Target class="size-4 shrink-0" aria-hidden="true" />Missions
+  </h3>
 
   {#if failure}<p class="error" data-testid="missions-failure">{failure}</p>{/if}
 

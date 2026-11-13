@@ -2,7 +2,7 @@
   import IconButton from './IconButton.svelte';
   import { fieldClass } from '$lib/field';
   import { cn } from '$lib/utils';
-  import { Plus, Trash2 } from '@lucide/svelte';
+  import { Plus, Trash2, Activity as ActivityIcon } from '@lucide/svelte';
   import { Button } from '$lib/components/ui/button';
   import { Input } from '$lib/components/ui/input';
   import EditableCard from './EditableCard.svelte';
@@ -49,7 +49,7 @@
   }
 </script>
 
-<EditableCard label="activities" title="Activities" testid="activities">
+<EditableCard label="activities" title="Activities" icon={ActivityIcon} testid="activities">
   {#snippet view()}
     <p class="mt-1 text-sm text-muted-foreground" data-testid="last-activity">Last activity together: {last === null ? 'never' : formatDate(last)}</p>
     {@render list(false)}

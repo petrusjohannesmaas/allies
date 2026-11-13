@@ -66,20 +66,13 @@
 }
 
 @layer components {
-  /* A section heading on the dashboard, a contact page and the journal. */
+  /* A section heading on the dashboard and the journal, outside cards. */
   .section-title {
     font-size: 0.75rem;
     text-transform: uppercase;
     letter-spacing: 0.06em;
     color: var(--muted-foreground);
     font-weight: 600;
-  }
-
-  .field-label {
-    display: block;
-    font-size: 0.8125rem;
-    color: var(--muted-foreground);
-    margin-bottom: 0.25rem;
   }
 
   .error {
