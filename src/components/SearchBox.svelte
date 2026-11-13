@@ -38,11 +38,11 @@
   }
 </script>
 
-<div class="relative flex-1">
+<div class="relative w-full">
   <Search class="pointer-events-none absolute top-1/2 left-2 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
   <input
     type="search"
-    class="input pl-8"
+    class="input w-full pl-8"
     placeholder="Search contacts"
     aria-label="Search contacts"
     aria-controls="search-results"
@@ -54,7 +54,7 @@
   {#if searched}
     <div
       id="search-results"
-      class="border-border absolute top-full right-0 left-0 z-10 mt-1 max-h-80 overflow-auto rounded-[var(--radius)] border bg-card shadow-lg"
+      class="border-border absolute top-full left-0 z-30 mt-1 min-w-64 max-h-80 overflow-auto rounded-[var(--radius)] border bg-card shadow-lg"
       data-testid="search-results"
     >
       {#if results.length === 0}

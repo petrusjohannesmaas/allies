@@ -1,8 +1,8 @@
 <script lang="ts">
-  // The CSP has no data: in img-src, so the logo must stay a file and not inline.
-  import logo from './assets/logo.png?no-inline';
-  import SearchBox from './components/SearchBox.svelte';
-  import { navigation, open, screens } from './lib/navigation.svelte';
+  import Sidebar from './components/Sidebar.svelte';
+  import { navigation } from './lib/navigation.svelte';
+  import { settings } from './lib/settings.svelte';
+  import Appearance from './screens/Appearance.svelte';
   import Contact from './screens/Contact.svelte';
   import Contacts from './screens/Contacts.svelte';
   import Dashboard from './screens/Dashboard.svelte';
@@ -10,38 +10,34 @@
   import Mission from './screens/Mission.svelte';
 </script>
 
-<!-- The search box stays on every screen, so a contact is always one keystroke
-     away from wherever the user is. -->
-<header class="flex items-center gap-3 border-b border-border bg-card px-4 py-3" data-testid="top-bar">
-  <img src={logo} alt="Allies" class="size-7 shrink-0" />
+<!-- The search box stays on every screen, at the top of the sidebar, so a
+     contact is always one keystroke away from wherever the user is. -->
+<div class="flex h-screen w-screen overflow-hidden bg-[var(--accent-bg)]" data-testid="app-shell">
+  <Sidebar />
 
-  <SearchBox />
+  <main class="relative z-10 -ml-6 flex min-w-0 flex-1">
+    <div class="@container h-full w-full overflow-y-auto rounded-l-[28px] bg-background shadow-xl" data-testid="content-panel">
+      {#if settings.loadError}
+        <p class="m-4 text-sm text-destructive" role="alert" data-testid="settings-load-error">
+          {settings.loadError}
+        </p>
+      {/if}
 
-  <nav class="flex gap-1" aria-label="Screens">
-    {#each screens as item (item.screen)}
-      <button
-        type="button"
-        class="btn"
-        class:btn-primary={navigation.screen === item.screen}
-        aria-current={navigation.screen === item.screen ? 'page' : undefined}
-        onclick={() => open(item.screen)}
-      >
-        {item.label}
-      </button>
-    {/each}
-  </nav>
-</header>
-
-<main data-testid="open-screen">
-  {#if navigation.screen === 'dashboard'}
-    <Dashboard />
-  {:else if navigation.screen === 'contacts'}
-    <Contacts />
-  {:else if navigation.screen === 'contact'}
-    <Contact />
-  {:else if navigation.screen === 'mission'}
-    <Mission />
-  {:else}
-    <Journal />
-  {/if}
-</main>
+      <div data-testid="open-screen">
+        {#if navigation.screen === 'dashboard'}
+          <Dashboard />
+        {:else if navigation.screen === 'contacts'}
+          <Contacts />
+        {:else if navigation.screen === 'contact'}
+          <Contact />
+        {:else if navigation.screen === 'mission'}
+          <Mission />
+        {:else if navigation.screen === 'appearance'}
+          <Appearance />
+        {:else}
+          <Journal />
+        {/if}
+      </div>
+    </div>
+  </main>
+</div>

@@ -37,7 +37,7 @@ When(/^I select the contact "([^"]+)"$/, async (name: string) => {
 });
 
 Given(/^I open the contact "([^"]+)"$/, async (name: string) => {
-  await $('[data-testid="top-bar"] nav[aria-label="Screens"] button:nth-child(2)').click();
+  await $('aside[data-testid="sidebar"] nav[aria-label="Screens"] button:nth-child(2)').click();
   await selectContact(name);
 });
 
