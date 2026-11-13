@@ -1,4 +1,11 @@
 <script lang="ts">
+  import IconButton from './IconButton.svelte';
+  import { Textarea } from '$lib/components/ui/textarea';
+  import { Label } from '$lib/components/ui/label';
+  import { fieldClass } from '$lib/field';
+  import { cn } from '$lib/utils';
+  import { Plus, Save, Trash2, X } from '@lucide/svelte';
+  import { Button } from '$lib/components/ui/button';
   import { db } from '$lib/db';
   import { fullName, listContacts, type Contact } from '$lib/repo/contacts';
   import type { About, AboutInput } from '$lib/repo/details';
@@ -63,15 +70,15 @@
     void onsave({ ...draft, significantOtherId: partner === '' ? null : Number(partner) });
   }}
 >
-  <label class="block">
+  <Label class="block">
     <span class="field-label">Significant other</span>
-    <select class="input" data-testid="partner-picker" bind:value={partner}>
+    <select class={cn(fieldClass, '')} data-testid="partner-picker" bind:value={partner}>
       <option value="">Not set</option>
       {#each contacts as contact (contact.id)}
         <option value={String(contact.id)}>{fullName(contact)}</option>
       {/each}
     </select>
-  </label>
+  </Label>
 
   <div>
     <span class="field-label">Children</span>
@@ -79,47 +86,47 @@
       {#each draft.childIds as id (id)}
         <li class="flex items-center gap-3" data-testid="child" data-child-name={nameOf(id)}>
           <span class="flex-1 text-sm">{nameOf(id)}</span>
-          <button
-            type="button"
-            class="btn btn-danger shrink-0"
+          <IconButton
+            class="shrink-0 text-destructive hover:text-destructive"
+            label="Remove {nameOf(id)}"
             data-testid="remove-child"
             onclick={() => (draft.childIds = draft.childIds.filter((childId) => childId !== id))}
           >
-            Remove
-          </button>
+            <Trash2 aria-hidden="true" />
+          </IconButton>
         </li>
       {/each}
     </ul>
     {#if childChoices.length > 0}
       <div class="mt-2 flex gap-2">
-        <select class="input" aria-label="Add a child from the contacts" data-testid="child-picker" bind:value={chosenChild}>
+        <select class={cn(fieldClass, '')} aria-label="Add a child from the contacts" data-testid="child-picker" bind:value={chosenChild}>
           <option value="">Choose a contact</option>
           {#each childChoices as contact (contact.id)}
             <option value={String(contact.id)}>{fullName(contact)}</option>
           {/each}
         </select>
-        <button type="button" class="btn" data-testid="add-child" onclick={addChild}>Add child</button>
+        <Button variant="outline" data-testid="add-child" onclick={addChild}><Plus aria-hidden="true" />Add child</Button>
       </div>
     {/if}
   </div>
 
-  <label class="block">
+  <Label class="block">
     <span class="field-label">How you met</span>
-    <textarea class="input" rows="2" data-testid="how-met-input" bind:value={draft.howMet}></textarea>
-  </label>
-  <label class="block">
+    <Textarea rows={2} data-testid="how-met-input" bind:value={draft.howMet} />
+  </Label>
+  <Label class="block">
     <span class="field-label">Work</span>
-    <textarea class="input" rows="2" data-testid="work-input" bind:value={draft.work}></textarea>
-  </label>
-  <label class="block">
+    <Textarea rows={2} data-testid="work-input" bind:value={draft.work} />
+  </Label>
+  <Label class="block">
     <span class="field-label">Food preferences</span>
-    <textarea class="input" rows="2" data-testid="food-preferences-input" bind:value={draft.foodPreferences}></textarea>
-  </label>
+    <Textarea rows={2} data-testid="food-preferences-input" bind:value={draft.foodPreferences} />
+  </Label>
 
   <div class="flex gap-2">
     {#if changed}
-      <button type="submit" class="btn btn-primary" data-testid="save-profile">Save</button>
+      <Button type="submit" data-testid="save-profile"><Save aria-hidden="true" />Save</Button>
     {/if}
-    <button type="button" class="btn" data-testid="cancel-profile" onclick={oncancel}>Cancel</button>
+    <Button variant="outline" data-testid="cancel-profile" onclick={oncancel}><X aria-hidden="true" />Cancel</Button>
   </div>
 </form>

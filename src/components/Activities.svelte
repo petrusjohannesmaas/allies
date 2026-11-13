@@ -1,4 +1,10 @@
 <script lang="ts">
+  import IconButton from './IconButton.svelte';
+  import { fieldClass } from '$lib/field';
+  import { cn } from '$lib/utils';
+  import { Plus, Trash2 } from '@lucide/svelte';
+  import { Button } from '$lib/components/ui/button';
+  import { Input } from '$lib/components/ui/input';
   import EditableCard from './EditableCard.svelte';
   import { db } from '$lib/db';
   import { formatDate, today } from '$lib/dates';
@@ -62,14 +68,14 @@
         void run(save);
       }}
     >
-      <select class="input sm:col-span-2" data-testid="activity-category" bind:value={category}>
+      <select class={cn(fieldClass, 'sm:col-span-2')} data-testid="activity-category" bind:value={category}>
         {#each ACTIVITY_CATEGORIES as option (option)}
           <option value={option}>{labelFor(option)}</option>
         {/each}
       </select>
-      <input class="input" type="date" data-testid="activity-date" bind:value={happenedOn} />
-      <input class="input" data-testid="activity-description" placeholder="We went skiing" autocomplete="off" bind:value={description} />
-      <button type="submit" class="btn btn-primary sm:col-span-2 justify-self-start" data-testid="save-activity">Log activity</button>
+      <Input type="date" data-testid="activity-date" bind:value={happenedOn} />
+      <Input data-testid="activity-description" placeholder="We went skiing" autocomplete="off" bind:value={description} />
+      <Button type="submit" class="sm:col-span-2 justify-self-start" data-testid="save-activity"><Plus aria-hidden="true" />Log activity</Button>
     </form>
 
     {@render list(true)}
@@ -89,12 +95,17 @@
             <p class="text-xs text-muted-foreground" data-testid="activity-date-value">{formatDate(activity.happened_on)}</p>
           </div>
           {#if editable}
-            <button type="button" class="btn btn-danger shrink-0" data-testid="delete-activity" onclick={() => run(async () => {
+            <IconButton
+              class="shrink-0 text-destructive hover:text-destructive"
+              label="Delete this activity"
+              data-testid="delete-activity"
+              onclick={() => run(async () => {
                 await deleteActivity(await db(), activity.id);
                 await reload(contactId);
-              })}>
-              Delete
-            </button>
+              })}
+            >
+              <Trash2 aria-hidden="true" />
+            </IconButton>
           {/if}
         </li>
       {/each}

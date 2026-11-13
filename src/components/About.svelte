@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { Button } from '$lib/components/ui/button';
   import AboutForm from './AboutForm.svelte';
   import EditableCard from './EditableCard.svelte';
   import { db } from '$lib/db';
@@ -39,9 +40,9 @@
           <dt class="field-label">Significant other</dt>
           <dd data-testid="significant-other">
             {#if about.significant_other}
-              <button type="button" class="btn" data-testid="open-partner" onclick={() => openContact(about!.significant_other!.id)}>
+              <Button variant="outline" size="sm" data-testid="open-partner" onclick={() => openContact(about!.significant_other!.id)}>
                 {fullName(about.significant_other)}
-              </button>
+              </Button>
             {:else}
               <span class="text-muted-foreground">Significant other not set</span>
             {/if}
@@ -56,9 +57,9 @@
               <ul class="flex flex-wrap gap-2" data-testid="child-list">
                 {#each about.children as child (child.id)}
                   <li data-testid="child" data-child-name={fullName(child)}>
-                    <button type="button" class="btn" data-testid="open-child" onclick={() => openContact(child.id)}>
+                    <Button variant="outline" size="sm" data-testid="open-child" onclick={() => openContact(child.id)}>
                       {fullName(child)}
-                    </button>
+                    </Button>
                   </li>
                 {/each}
               </ul>

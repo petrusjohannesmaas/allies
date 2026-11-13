@@ -66,57 +66,6 @@
 }
 
 @layer components {
-  /* Every text field and textarea in the app, so they look the same. */
-  .input {
-    background-color: var(--card);
-    color: var(--foreground);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 0.375rem 0.625rem;
-    font-size: 0.875rem;
-    width: 100%;
-  }
-
-  .input:disabled {
-    opacity: 0.5;
-  }
-
-  .btn {
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 0.375rem 0.75rem;
-    font-size: 0.875rem;
-    background-color: var(--card);
-    color: var(--foreground);
-    cursor: pointer;
-  }
-
-  .btn:hover {
-    background-color: var(--background);
-  }
-
-  .btn-primary {
-    background-color: var(--primary);
-    color: var(--primary-foreground);
-    border-color: var(--primary);
-  }
-
-  .btn-primary:hover {
-    background-color: var(--primary);
-    filter: brightness(0.93);
-  }
-
-  .btn-danger {
-    color: var(--destructive);
-  }
-
-  .card {
-    background-color: var(--card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 1rem;
-  }
-
   /* A section heading on the dashboard, a contact page and the journal. */
   .section-title {
     font-size: 0.75rem;

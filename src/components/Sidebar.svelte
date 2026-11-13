@@ -14,7 +14,7 @@
   };
 
   const item =
-    'flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm text-primary-foreground/85 transition-colors hover:bg-white/15 hover:text-primary-foreground focus-visible:outline-2 focus-visible:outline-white';
+    'flex w-full cursor-pointer items-center gap-3 rounded-xl px-3 py-2 text-sm text-primary-foreground/85 transition-colors hover:bg-white/15 hover:text-primary-foreground focus-visible:outline-2 focus-visible:outline-white';
   const current = 'bg-white/20 text-primary-foreground';
 
   function toggleTheme() {

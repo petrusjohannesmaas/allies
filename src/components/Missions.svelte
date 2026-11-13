@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { Button } from '$lib/components/ui/button';
+  import { Input } from '$lib/components/ui/input';
   import { Plus } from '@lucide/svelte';
   import { db } from '$lib/db';
   import { openMission } from '$lib/navigation.svelte';
@@ -44,7 +46,7 @@
         <li data-testid="mission">
           <button
             type="button"
-            class="border-border hover:bg-background flex w-full items-center gap-3 rounded border px-2 py-1 text-left"
+            class="border-border hover:bg-accent flex w-full cursor-pointer items-center gap-3 rounded-lg border px-2 py-1 text-left transition-colors"
             data-testid="open-mission"
             onclick={() => openMission(contactId, mission.id)}
           >
@@ -69,9 +71,7 @@
       void save();
     }}
   >
-    <input class="input" data-testid="mission-description" placeholder="Send the photos" aria-label="New mission" autocomplete="off" bind:value={description} />
-    <button type="submit" class="btn btn-primary" aria-label="Add mission" data-testid="add-mission">
-      <Plus class="size-4" aria-hidden="true" />
-    </button>
+    <Input data-testid="mission-description" placeholder="Send the photos" aria-label="New mission" autocomplete="off" bind:value={description} />
+    <Button type="submit" data-testid="add-mission"><Plus aria-hidden="true" />Add mission</Button>
   </form>
 </section>

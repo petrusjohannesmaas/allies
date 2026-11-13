@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { ArrowLeft } from '@lucide/svelte';
+  import { Button } from '$lib/components/ui/button';
   import About from '../components/About.svelte';
   import Activities from '../components/Activities.svelte';
   import Addresses from '../components/Addresses.svelte';
@@ -46,7 +48,7 @@
   {#if missing}
     <p class="text-sm text-muted-foreground" data-testid="contact-missing">That contact is gone.</p>
   {:else if contact}
-    <button type="button" class="btn mb-4" data-testid="back-to-contacts" onclick={goBackFromContact}>All contacts</button>
+    <Button variant="outline" class="mb-4" data-testid="back-to-contacts" onclick={goBackFromContact}><ArrowLeft aria-hidden="true" />All contacts</Button>
 
     <div class="mb-4">
       <ContactHeader {contact} {tags} onsave={saveHeader} />

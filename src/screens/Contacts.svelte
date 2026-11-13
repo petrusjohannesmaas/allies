@@ -1,4 +1,8 @@
 <script lang="ts">
+  import { Plus, Trash2, X } from '@lucide/svelte';
+  import IconButton from '../components/IconButton.svelte';
+  import { Button } from '$lib/components/ui/button';
+  import * as Card from '$lib/components/ui/card';
   import Avatar from '../components/Avatar.svelte';
   import ContactForm from '../components/ContactForm.svelte';
   import { labelFor } from '../lib/categories';
@@ -57,7 +61,7 @@
   <div class="mb-4 flex items-center justify-between">
     <h1 class="text-xl font-semibold">Contacts</h1>
     {#if mode === 'list'}
-      <button type="button" class="btn btn-primary" data-testid="add-contact" onclick={() => (mode = 'add')}>New contact</button>
+      <Button data-testid="add-contact" onclick={() => (mode = 'add')}><Plus aria-hidden="true" />New contact</Button>
     {/if}
   </div>
 
@@ -78,10 +82,11 @@
   {:else}
     <ul class="grid gap-2" data-testid="contacts-list">
       {#each contacts as contact (contact.id)}
-        <li class="card flex items-center gap-3" data-testid="contact-row" data-contact-name={fullName(contact)}>
+        <li data-testid="contact-row" data-contact-name={fullName(contact)}>
+         <Card.Root class="flex-row items-center gap-3 px-4 py-3">
           <button
             type="button"
-            class="flex min-w-0 flex-1 items-center gap-3 text-left"
+            class="hover:bg-accent -m-1 flex min-w-0 flex-1 cursor-pointer items-center gap-3 rounded-lg p-1 text-left transition-colors"
             data-testid="open-contact"
             onclick={() => openContact(contact.id)}
           >
@@ -94,20 +99,19 @@
 
           {#if confirming === contact.id}
             <span class="text-sm">Delete {fullName(contact)}?</span>
-            <button type="button" class="btn btn-danger" data-testid="confirm-delete" onclick={() => run(() => remove(contact.id))}>
-              Delete
-            </button>
-            <button type="button" class="btn" data-testid="cancel-delete" onclick={() => (confirming = null)}>Cancel</button>
+            <Button variant="destructive" data-testid="confirm-delete" onclick={() => run(() => remove(contact.id))}><Trash2 aria-hidden="true" />Delete</Button>
+            <Button variant="outline" data-testid="cancel-delete" onclick={() => (confirming = null)}><X aria-hidden="true" />Cancel</Button>
           {:else}
-            <button
-              type="button"
-              class="btn btn-danger"
+            <IconButton
+              class="text-destructive hover:text-destructive"
+              label="Delete {fullName(contact)}"
               data-testid="delete-contact"
               onclick={() => (confirming = contact.id)}
             >
-              Delete
-            </button>
+              <Trash2 aria-hidden="true" />
+            </IconButton>
           {/if}
+         </Card.Root>
         </li>
       {/each}
     </ul>

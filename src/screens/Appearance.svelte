@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { Label } from '$lib/components/ui/label';
   import { Check } from '@lucide/svelte';
   import { accentFillHex, accents } from '$lib/accents';
   import { settings } from '$lib/settings.svelte';
@@ -12,7 +13,7 @@
     <legend class="text-sm font-medium">Theme</legend>
     <div class="mt-2 flex flex-col gap-2">
       {#each themes as theme (theme.id)}
-        <label class="flex items-center gap-2 text-sm">
+        <Label class="flex items-center gap-2 text-sm">
           <input
             type="radio"
             name="theme"
@@ -22,7 +23,7 @@
             onchange={() => settings.setTheme(theme.id)}
           />
           {theme.name}
-        </label>
+        </Label>
       {/each}
     </div>
   </fieldset>
@@ -33,7 +34,7 @@
       {#each accents as accent (accent.id)}
         <button
           type="button"
-          class="flex size-10 items-center justify-center rounded-full text-primary-foreground ring-offset-2 ring-offset-background focus-visible:outline-2 focus-visible:outline-ring {settings.accent === accent.id ? 'ring-2 ring-foreground' : ''}"
+          class="flex size-10 cursor-pointer items-center justify-center rounded-full text-primary-foreground transition-shadow hover:ring-2 hover:ring-foreground/50 ring-offset-2 ring-offset-background focus-visible:outline-2 focus-visible:outline-ring {settings.accent === accent.id ? 'ring-2 ring-foreground' : ''}"
           style:background-color={accentFillHex(accent.id)}
           aria-label={accent.name}
           aria-pressed={settings.accent === accent.id}

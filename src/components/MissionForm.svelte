@@ -1,4 +1,8 @@
 <script lang="ts">
+  import { Label } from '$lib/components/ui/label';
+  import { Save, X } from '@lucide/svelte';
+  import { Button } from '$lib/components/ui/button';
+  import { Input } from '$lib/components/ui/input';
   import { hasText, type Mission } from '$lib/repo/missions';
 
   let {
@@ -33,18 +37,18 @@
     void onsave(description, due);
   }}
 >
-  <label class="grid gap-1 text-sm">
+  <Label class="grid gap-1 text-sm">
     Description
-    <input class="input" data-testid="mission-details-description" autocomplete="off" bind:value={description} />
-  </label>
-  <label class="grid gap-1 text-sm">
+    <Input data-testid="mission-details-description" autocomplete="off" bind:value={description} />
+  </Label>
+  <Label class="grid gap-1 text-sm">
     Due date
-    <input class="input" type="date" data-testid="mission-details-due" bind:value={due} />
-  </label>
+    <Input type="date" data-testid="mission-details-due" bind:value={due} />
+  </Label>
   <div class="flex gap-2">
     {#if changed && hasText(description)}
-      <button type="submit" class="btn btn-primary" data-testid="save-mission-details">Save</button>
+      <Button type="submit" data-testid="save-mission-details"><Save aria-hidden="true" />Save</Button>
     {/if}
-    <button type="button" class="btn" data-testid="cancel-mission-details" onclick={oncancel}>Cancel</button>
+    <Button variant="outline" data-testid="cancel-mission-details" onclick={oncancel}><X aria-hidden="true" />Cancel</Button>
   </div>
 </form>

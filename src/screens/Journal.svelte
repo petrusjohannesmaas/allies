@@ -1,4 +1,9 @@
 <script lang="ts">
+  import { Plus } from '@lucide/svelte';
+  import { Button } from '$lib/components/ui/button';
+  import * as Card from '$lib/components/ui/card';
+  import { Input } from '$lib/components/ui/input';
+  import { Textarea } from '$lib/components/ui/textarea';
   import DayRating from '../components/DayRating.svelte';
   import JournalRow from '../components/JournalRow.svelte';
   import { db } from '$lib/db';
@@ -48,7 +53,7 @@
   <div class="mt-4 grid gap-4">
     <DayRating day={today()} onRated={reload} />
 
-    <section class="card">
+    <Card.Root class="px-4">
       <h2 class="section-title">Add a journal entry</h2>
 
       {#if failure}<p class="error mt-2" data-testid="journal-failure">{failure}</p>{/if}
@@ -61,16 +66,17 @@
           void run(save);
         }}
       >
-        <input class="input w-40" type="date" data-testid="entry-date" bind:value={entryDate} />
-        <textarea class="input flex-1" rows="2" data-testid="entry-body" placeholder="How was your day?" bind:value={body}></textarea>
-        <button type="submit" class="btn btn-primary" data-testid="save-entry">Add</button>
+        <Input class="w-40" type="date" data-testid="entry-date" bind:value={entryDate} />
+        <Textarea class="flex-1" rows={2} data-testid="entry-body" placeholder="How was your day?" bind:value={body} />
+        <Button type="submit" data-testid="save-entry"><Plus aria-hidden="true" />Add</Button>
       </form>
-    </section>
+    </Card.Root>
 
     {#if rows.length === 0}
       <p class="text-sm text-muted-foreground" data-testid="journal-empty">Nothing in the journal yet.</p>
     {:else}
-      <ul class="card" data-testid="journal-list">
+      <Card.Root class="px-4">
+      <ul data-testid="journal-list">
         {#each rows as row, index (row.kind + row.day + (row.source_id ?? ''))}
           {#if index === 0 || monthOf(rows[index - 1].day) !== monthOf(row.day)}
             <li class="text-sm font-semibold" data-testid="journal-month">{formatMonth(monthOf(row.day))}</li>
@@ -78,6 +84,7 @@
           <JournalRow {row} onDelete={row.kind === 'entry' && row.source_id !== null ? () => run(() => remove(row.source_id!)) : undefined} />
         {/each}
       </ul>
+      </Card.Root>
     {/if}
   </div>
 </section>

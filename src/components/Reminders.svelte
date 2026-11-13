@@ -1,4 +1,9 @@
 <script lang="ts">
+  import { Label } from '$lib/components/ui/label';
+  import IconButton from './IconButton.svelte';
+  import { Plus, Trash2 } from '@lucide/svelte';
+  import { Button } from '$lib/components/ui/button';
+  import { Input } from '$lib/components/ui/input';
   import EditableCard from './EditableCard.svelte';
   import { db } from '$lib/db';
   import { formatDate, today } from '$lib/dates';
@@ -55,13 +60,13 @@
         void run(save);
       }}
     >
-      <input class="input w-40" type="date" data-testid="reminder-date" bind:value={remindOn} />
-      <input class="input flex-1" data-testid="reminder-description" placeholder="Send the photos" autocomplete="off" bind:value={description} />
-      <label class="field-label flex items-center gap-2">
+      <Input class="w-40" type="date" data-testid="reminder-date" bind:value={remindOn} />
+      <Input class="flex-1" data-testid="reminder-description" placeholder="Send the photos" autocomplete="off" bind:value={description} />
+      <Label class="field-label flex items-center gap-2">
         <input type="checkbox" data-testid="reminder-repeats" bind:checked={repeats} />
         Every year
-      </label>
-      <button type="submit" class="btn btn-primary" data-testid="save-reminder">Add</button>
+      </Label>
+      <Button type="submit" data-testid="save-reminder"><Plus aria-hidden="true" />Add</Button>
     </form>
 
     {@render list(true)}
@@ -83,12 +88,17 @@
             </p>
           </div>
           {#if editable}
-            <button type="button" class="btn btn-danger shrink-0" data-testid="delete-reminder" onclick={() => run(async () => {
+            <IconButton
+              class="shrink-0 text-destructive hover:text-destructive"
+              label="Delete this reminder"
+              data-testid="delete-reminder"
+              onclick={() => run(async () => {
                 await deleteReminder(await db(), reminder.id);
                 await reload(contactId);
-              })}>
-              Delete
-            </button>
+              })}
+            >
+              <Trash2 aria-hidden="true" />
+            </IconButton>
           {/if}
         </li>
       {/each}

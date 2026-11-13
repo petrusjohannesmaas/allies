@@ -1,4 +1,10 @@
 <script lang="ts">
+  import { Label } from '$lib/components/ui/label';
+  import { fieldClass } from '$lib/field';
+  import { cn } from '$lib/utils';
+  import { Save, X } from '@lucide/svelte';
+  import { Button } from '$lib/components/ui/button';
+  import { Input } from '$lib/components/ui/input';
   import Avatar from './Avatar.svelte';
   import { CATEGORIES, labelFor } from '$lib/categories';
   import { validateContact, type ContactErrors } from '$lib/contact-validation';
@@ -99,58 +105,58 @@
       <Avatar picture={null} {name} size={56} />
       {#if preview}<img src={preview} alt="" class="absolute inset-0 size-14 rounded-full object-cover" data-testid="picture-preview" />{/if}
     </div>
-    <label class="block flex-1">
+    <Label class="block flex-1">
       <span class="field-label">Profile picture</span>
-      <input class="input" type="file" accept={ACCEPTED_TYPES.join(',')} data-testid="contact-picture" onchange={pick} />
+      <input type="file" class={cn(fieldClass, 'file:text-foreground file:mr-2 file:inline-flex file:h-6 file:border-0 file:bg-transparent file:text-sm file:font-medium')} accept={ACCEPTED_TYPES.join(',')} data-testid="contact-picture" onchange={pick} />
       {#if pictureError}<p class="error" data-testid="error-picture">{pictureError}</p>{/if}
-    </label>
+    </Label>
   </div>
 
-  <label class="block">
+  <Label class="block">
     <span class="field-label">Category</span>
-    <select class="input" data-testid="contact-category" bind:value={input.category}>
+    <select class={cn(fieldClass, '')} data-testid="contact-category" bind:value={input.category}>
       {#each CATEGORIES as category (category)}
         <option value={category}>{labelFor(category)}</option>
       {/each}
     </select>
-  </label>
+  </Label>
 
-  <label class="block">
+  <Label class="block">
     <span class="field-label">First name</span>
-    <input class="input" data-testid="contact-first-name" autocomplete="off" bind:value={input.firstName} />
+    <Input data-testid="contact-first-name" autocomplete="off" bind:value={input.firstName} />
     {#if errors.firstName}<p class="error" data-testid="error-first-name">{errors.firstName}</p>{/if}
-  </label>
+  </Label>
 
-  <label class="block">
+  <Label class="block">
     <span class="field-label">Last name</span>
-    <input class="input" data-testid="contact-last-name" autocomplete="off" bind:value={input.lastName} />
-  </label>
+    <Input data-testid="contact-last-name" autocomplete="off" bind:value={input.lastName} />
+  </Label>
 
-  <label class="block">
+  <Label class="block">
     <span class="field-label">Email</span>
-    <input class="input" data-testid="contact-email" autocomplete="off" bind:value={input.email} />
+    <Input data-testid="contact-email" autocomplete="off" bind:value={input.email} />
     {#if errors.email}<p class="error" data-testid="error-email">{errors.email}</p>{/if}
-  </label>
+  </Label>
 
-  <label class="block">
+  <Label class="block">
     <span class="field-label">Phone</span>
-    <input class="input" data-testid="contact-phone" autocomplete="off" placeholder="082 123 4567" bind:value={input.phone} />
-  </label>
+    <Input data-testid="contact-phone" autocomplete="off" placeholder="082 123 4567" bind:value={input.phone} />
+  </Label>
 
-  <label class="block">
+  <Label class="block">
     <span class="field-label">Birthday</span>
-    <input class="input" type="date" data-testid="contact-birthday" bind:value={input.birthday} />
-  </label>
+    <Input type="date" data-testid="contact-birthday" bind:value={input.birthday} />
+  </Label>
 
-  <label class="block">
+  <Label class="block">
     <span class="field-label">Tags, separated by commas</span>
-    <input class="input" data-testid="contact-tags" autocomplete="off" placeholder="chess, books" bind:value={tagsText} />
-  </label>
+    <Input data-testid="contact-tags" autocomplete="off" placeholder="chess, books" bind:value={tagsText} />
+  </Label>
 
   <div class="flex gap-2">
     {#if !contact || changed}
-      <button type="submit" class="btn btn-primary" data-testid="save-contact">Save</button>
+      <Button type="submit" data-testid="save-contact"><Save aria-hidden="true" />Save</Button>
     {/if}
-    <button type="button" class="btn" data-testid="cancel-contact" onclick={oncancel}>Cancel</button>
+    <Button variant="outline" data-testid="cancel-contact" onclick={oncancel}><X aria-hidden="true" />Cancel</Button>
   </div>
 </form>

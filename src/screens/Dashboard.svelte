@@ -1,5 +1,7 @@
 <script lang="ts">
   import { Cake, CalendarCheck, Users } from '@lucide/svelte';
+  import { Button } from '$lib/components/ui/button';
+  import * as Card from '$lib/components/ui/card';
   import { db } from '$lib/db';
   import { formatDate, today, upcoming, type UpcomingMonth } from '$lib/dates';
   import { openContact } from '$lib/navigation.svelte';
@@ -39,17 +41,17 @@
   {#if failure}<p class="error mt-2" data-testid="dashboard-failure">{failure}</p>{/if}
 
   <div class="mt-4 flex flex-wrap gap-3">
-    <p class="card flex items-center gap-2 text-sm" data-testid="count-contacts">
+    <Card.Root class="flex-row items-center gap-2 px-4 py-3" data-testid="count-contacts">
       <Users class="size-4 text-muted-foreground" aria-hidden="true" />
       <span><strong>{counts.contacts}</strong> Contacts</span>
-    </p>
-    <p class="card flex items-center gap-2 text-sm" data-testid="count-interactions">
+    </Card.Root>
+    <Card.Root class="flex-row items-center gap-2 px-4 py-3" data-testid="count-interactions">
       <CalendarCheck class="size-4 text-muted-foreground" aria-hidden="true" />
       <span><strong>{counts.interactions}</strong> Calls and activities</span>
-    </p>
+    </Card.Root>
   </div>
 
-  <section class="card mt-4" data-testid="upcoming">
+  <Card.Root class="mt-4 px-4" data-testid="upcoming">
     <h2 class="section-title">Next three months</h2>
 
     {#if months.length === 0}
@@ -70,9 +72,9 @@
               <span class="w-24 shrink-0 truncate text-xs text-muted-foreground" data-testid="upcoming-date-kind">
                 {date.kind === 'birthday' ? 'Birthday' : 'Reminder'}
               </span>
-              <button type="button" class="btn flex-1 text-left" data-testid="open-upcoming-contact" onclick={() => openContact(date.contactId)}>
+              <Button variant="ghost" class="flex-1 justify-start" data-testid="open-upcoming-contact" onclick={() => openContact(date.contactId)}>
                 {date.contactName}
-              </button>
+              </Button>
               {#if date.description}
                 <span class="min-w-0 flex-1 truncate text-xs text-muted-foreground" data-testid="upcoming-date-description">{date.description}</span>
               {/if}
@@ -84,9 +86,9 @@
         </ul>
       {/each}
     {/if}
-  </section>
+  </Card.Root>
 
-  <section class="card mt-4" data-testid="recent">
+  <Card.Root class="mt-4 px-4" data-testid="recent">
     <h2 class="section-title">Recently viewed</h2>
 
     {#if recent.length === 0}
@@ -95,12 +97,12 @@
       <ul class="mt-3 flex flex-wrap gap-2">
         {#each recent as contact (contact.id)}
           <li data-testid="recent-contact" data-contact-name={contact.name}>
-            <button type="button" class="btn" data-testid="open-recent-contact" onclick={() => openContact(contact.id)}>
+            <Button variant="outline" data-testid="open-recent-contact" onclick={() => openContact(contact.id)}>
               {contact.name}
-            </button>
+            </Button>
           </li>
         {/each}
       </ul>
     {/if}
-  </section>
+  </Card.Root>
 </section>

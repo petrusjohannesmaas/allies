@@ -1,4 +1,8 @@
 <script lang="ts">
+  import IconButton from './IconButton.svelte';
+  import { Plus, Trash2 } from '@lucide/svelte';
+  import { Button } from '$lib/components/ui/button';
+  import { Input } from '$lib/components/ui/input';
   import EditableCard from './EditableCard.svelte';
   import { db } from '$lib/db';
   import { formatDate, today } from '$lib/dates';
@@ -59,9 +63,9 @@
         void run(save);
       }}
     >
-      <input class="input w-40" type="date" data-testid="call-date" bind:value={calledOn} />
-      <input class="input flex-1" data-testid="call-description" placeholder="Caught up about the conference" autocomplete="off" bind:value={description} />
-      <button type="submit" class="btn btn-primary" data-testid="save-call">Log call</button>
+      <Input class="w-40" type="date" data-testid="call-date" bind:value={calledOn} />
+      <Input class="flex-1" data-testid="call-description" placeholder="Caught up about the conference" autocomplete="off" bind:value={description} />
+      <Button type="submit" data-testid="save-call"><Plus aria-hidden="true" />Log call</Button>
     </form>
 
     {@render list(true)}
@@ -80,12 +84,17 @@
             <p class="text-xs text-muted-foreground" data-testid="call-date-value">{formatDate(call.called_on)}</p>
           </div>
           {#if editable}
-            <button type="button" class="btn btn-danger shrink-0" data-testid="delete-call" onclick={() => run(async () => {
+            <IconButton
+              class="shrink-0 text-destructive hover:text-destructive"
+              label="Delete this call"
+              data-testid="delete-call"
+              onclick={() => run(async () => {
                 await deleteCall(await db(), call.id);
                 await reload(contactId);
-              })}>
-              Delete
-            </button>
+              })}
+            >
+              <Trash2 aria-hidden="true" />
+            </IconButton>
           {/if}
         </li>
       {/each}

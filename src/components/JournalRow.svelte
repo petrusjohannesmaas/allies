@@ -1,5 +1,7 @@
 <script lang="ts">
-  import { Frown, Meh, Smile } from '@lucide/svelte';
+  import { Button } from '$lib/components/ui/button';
+  import { Frown, Meh, Smile, Trash2 } from '@lucide/svelte';
+  import IconButton from './IconButton.svelte';
   import { formatDate } from '$lib/dates';
   import { openContact } from '$lib/navigation.svelte';
   import type { JournalRow } from '$lib/repo/journal';
@@ -39,13 +41,15 @@
 
   <span class="flex shrink-0 items-center gap-2 text-xs text-muted-foreground">
     {#if row.kind === 'entry' && onDelete}
-      <button type="button" class="btn btn-danger" data-testid="delete-entry" onclick={onDelete}>Delete</button>
+      <IconButton class="text-destructive hover:text-destructive" label="Delete this entry" data-testid="delete-entry" onclick={onDelete}>
+        <Trash2 aria-hidden="true" />
+      </IconButton>
     {:else if row.kind === 'activity' || row.kind === 'call'}
       <span data-testid="journal-row-automatic">Created automatically</span>
       {#if row.contact_id !== null && row.contact_name}
-        <button type="button" class="btn" data-testid="open-journal-contact" onclick={() => openContact(row.contact_id!)}>
+        <Button variant="outline" size="sm" data-testid="open-journal-contact" onclick={() => openContact(row.contact_id!)}>
           <span data-testid="journal-row-contact">with {row.contact_name}</span>
-        </button>
+        </Button>
       {/if}
     {/if}
   </span>

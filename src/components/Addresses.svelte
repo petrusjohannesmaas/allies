@@ -1,5 +1,8 @@
 <script lang="ts">
-  import { Home } from '@lucide/svelte';
+  import IconButton from './IconButton.svelte';
+  import { Button } from '$lib/components/ui/button';
+  import { Input } from '$lib/components/ui/input';
+  import { Home, Plus, Trash2 } from '@lucide/svelte';
   import EditableCard from './EditableCard.svelte';
   import { db } from '$lib/db';
   import { addAddress, addressIsUsable, deleteAddress, formatAddress, listAddresses, setHomeAddress, type Address } from '$lib/repo/details';
@@ -51,11 +54,11 @@
         void run(save);
       }}
     >
-      <input class="input sm:col-span-2" data-testid="address-street" placeholder="Street" autocomplete="off" bind:value={draft.street} />
-      <input class="input" data-testid="address-city" placeholder="City" autocomplete="off" bind:value={draft.city} />
-      <input class="input" data-testid="address-postal-code" placeholder="Postal code" autocomplete="off" bind:value={draft.postalCode} />
-      <input class="input sm:col-span-2" data-testid="address-country" placeholder="Country" autocomplete="off" bind:value={draft.country} />
-      <button type="submit" class="btn btn-primary" data-testid="save-address">Add address</button>
+      <Input class="sm:col-span-2" data-testid="address-street" placeholder="Street" autocomplete="off" bind:value={draft.street} />
+      <Input data-testid="address-city" placeholder="City" autocomplete="off" bind:value={draft.city} />
+      <Input data-testid="address-postal-code" placeholder="Postal code" autocomplete="off" bind:value={draft.postalCode} />
+      <Input class="sm:col-span-2" data-testid="address-country" placeholder="Country" autocomplete="off" bind:value={draft.country} />
+      <Button type="submit" data-testid="save-address"><Plus aria-hidden="true" />Add address</Button>
     </form>
 
     {@render list(true)}
@@ -75,31 +78,35 @@
           data-street={address.street ?? ''}
         >
           {#if editable}
-            <button
-              type="button"
+            <IconButton
               class="shrink-0 {address.is_home === 1 ? 'text-[var(--accent-text)]' : 'text-muted-foreground'}"
               aria-pressed={address.is_home === 1}
-              aria-label={address.is_home === 1 ? `${formatAddress(address)} is the home address` : `Make this the home address`}
+              label={address.is_home === 1 ? `${formatAddress(address)} is the home address` : `Make this the home address`}
               data-testid="home-address"
               onclick={() => run(async () => {
                 await setHomeAddress(await db(), contactId, address.id);
                 await reload(contactId);
               })}
             >
-              <Home class="size-4" fill={address.is_home === 1 ? 'currentColor' : 'none'} aria-hidden="true" />
-            </button>
+              <Home fill={address.is_home === 1 ? 'currentColor' : 'none'} aria-hidden="true" />
+            </IconButton>
           {/if}
           <span class="flex-1 text-sm" data-testid="address-text">{formatAddress(address)}</span>
           {#if address.is_home === 1}
             <span class="text-xs text-muted-foreground" data-testid="home-address-label">Home</span>
           {/if}
           {#if editable}
-            <button type="button" class="btn btn-danger shrink-0" data-testid="delete-address" onclick={() => run(async () => {
+            <IconButton
+              class="shrink-0 text-destructive hover:text-destructive"
+              label="Delete this address"
+              data-testid="delete-address"
+              onclick={() => run(async () => {
                 await deleteAddress(await db(), address.id);
                 await reload(contactId);
-              })}>
-              Delete
-            </button>
+              })}
+            >
+              <Trash2 aria-hidden="true" />
+            </IconButton>
           {/if}
         </li>
       {/each}
