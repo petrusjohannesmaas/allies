@@ -13,7 +13,7 @@
     <legend class="text-sm font-medium">Theme</legend>
     <div class="mt-2 flex flex-col gap-2">
       {#each themes as theme (theme.id)}
-        <Label class="flex items-center gap-2 text-sm">
+        <Label class="flex cursor-pointer items-center gap-2 text-sm hover:text-primary">
           <input
             type="radio"
             name="theme"

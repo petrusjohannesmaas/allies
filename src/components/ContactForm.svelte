@@ -4,6 +4,7 @@
   import { cn } from '$lib/utils';
   import { Cake, Mail, Phone, Save, Tag, X } from '@lucide/svelte';
   import FieldLabel from './FieldLabel.svelte';
+  import * as Card from '$lib/components/ui/card';
   import { Button } from '$lib/components/ui/button';
   import { Input } from '$lib/components/ui/input';
   import Avatar from './Avatar.svelte';
@@ -98,7 +99,8 @@
   }
 </script>
 
-<form class={embedded ? 'grid gap-3' : 'card grid gap-3'} data-testid="contact-form" onsubmit={submit}>
+{#snippet contactForm()}
+<form class="grid gap-3" data-testid="contact-form" onsubmit={submit}>
   {#if !embedded}<h2 class="text-base font-semibold">{heading}</h2>{/if}
 
   <div class="flex items-start gap-3">
@@ -115,7 +117,7 @@
 
   <Label class="block">
     <FieldLabel as="span">Category</FieldLabel>
-    <select class={cn(fieldClass, '')} data-testid="contact-category" bind:value={input.category}>
+    <select class={fieldClass} data-testid="contact-category" bind:value={input.category}>
       {#each CATEGORIES as category (category)}
         <option value={category}>{labelFor(category)}</option>
       {/each}
@@ -161,3 +163,12 @@
     <Button variant="outline" data-testid="cancel-contact" onclick={oncancel}><X aria-hidden="true" />Cancel</Button>
   </div>
 </form>
+{/snippet}
+
+{#if embedded}
+  {@render contactForm()}
+{:else}
+  <Card.Root class="px-4">
+    {@render contactForm()}
+  </Card.Root>
+{/if}
