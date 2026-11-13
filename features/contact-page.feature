@@ -19,9 +19,6 @@ Feature: The contact page
     When I open the contact "Ada Lovelace"
     And the window is 1280 px wide
     Then the cards are in the order About, Notes, Phone calls, Activities, Address, Reminders, two to a row
-    When the window is 700 px wide
-    Then the cards are in the order About, Notes, Phone calls, Activities, Address, Reminders, one to a row
-    When the window is 1280 px wide
     Then the Missions box is at the right of the header
 
   Scenario: Leaving the page discards unsaved changes

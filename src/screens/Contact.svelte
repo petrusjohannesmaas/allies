@@ -52,8 +52,8 @@
       <ContactHeader {contact} {tags} onsave={saveHeader} />
     </div>
 
-    <!-- The sketch's order, two cards to a row when the content panel is 768 px wide or more, and one column below that. -->
-    <div class="grid grid-cols-1 gap-4 @3xl:grid-cols-2" data-testid="contact-grid">
+    <!-- The sketch's order, two cards to a row. The window is at least 1024 px wide, so there is no one-column layout. -->
+    <div class="grid grid-cols-2 gap-4" data-testid="contact-grid">
       <About contactId={contact.id} />
       <Notes contactId={contact.id} />
       <Calls contactId={contact.id} />
