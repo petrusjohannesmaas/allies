@@ -73,3 +73,27 @@ export function dayFromNow(phrase: string): string {
   else if (phrase !== 'today') throw new Error(`No step reads the date "${phrase}"`);
   return when.toLocaleDateString('en-CA');
 }
+
+/** Opens a contact from the Contacts list and waits for its page. */
+export async function selectContact(name: string) {
+  const row = $(`[data-testid="contact-row"][data-contact-name="${name}"] [data-testid="open-contact"]`);
+  await row.waitForExist({ timeout: 5_000 });
+  await row.click();
+  await $('[data-testid="screen-contact"] [data-testid="contact-header"]').waitForExist({ timeout: 5_000 });
+}
+
+/**
+ * Opens a card's editor with its pencil, unless it is open already. The pencil
+ * says "Discard changes to ..." while its card is in edit mode.
+ */
+export async function openCardEditor(testid: string) {
+  const pencil = $(`[data-testid^="screen-"] [data-testid="${testid}"] [data-testid="edit-card"]`);
+  await pencil.waitForExist({ timeout: 5_000 });
+  const label = (await pencil.getAttribute('aria-label')) ?? '';
+  if (label.startsWith('Discard')) return;
+  await pencil.click();
+  await browser.waitUntil(async () => ((await pencil.getAttribute('aria-label')) ?? '').startsWith('Discard'), {
+    timeout: 5_000,
+    timeoutMsg: `The ${testid} card never opened its editor`,
+  });
+}

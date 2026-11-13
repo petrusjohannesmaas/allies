@@ -16,6 +16,8 @@ async function renderNotes() {
   // settles on the next task.
   render(Notes, { props: { contactId } });
   await new Promise((done) => setTimeout(done, 0));
+  // The card is read-only until its pencil is clicked.
+  await fireEvent.click(screen.getByTestId('edit-card'));
 }
 
 async function write(body: string) {

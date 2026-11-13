@@ -32,6 +32,16 @@ export function migratedDb(): Db {
   return db;
 }
 
+/**
+ * A database that applies the migration files one at a time, so a test can put
+ * data in the old schema before the migration that changes it runs.
+ */
+export function steppedDb(): { db: Db; applyMigration: (index: number) => void } {
+  const { database, db } = connect();
+  const files = migrationFiles();
+  return { db, applyMigration: (index) => database.exec(files[index]) };
+}
+
 function connect(): { database: DatabaseSync; db: Db } {
   const database = new DatabaseSync(':memory:');
   // sqlx turns foreign keys on by default, so the cascades and the rules these

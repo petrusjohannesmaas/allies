@@ -1,4 +1,5 @@
 <script lang="ts">
+  import EditableCard from './EditableCard.svelte';
   import { db } from '$lib/db';
   import { formatDate, today } from '$lib/dates';
   import { addReminder, deleteReminder, listReminders, type Reminder } from '$lib/repo/reminders';
@@ -38,28 +39,36 @@
   }
 </script>
 
-<section class="card" data-testid="reminders">
-  <h3 class="section-title">Reminders</h3>
+<EditableCard label="reminders" title="Reminders" testid="reminders">
+  {#snippet view()}
+    {@render list(false)}
+  {/snippet}
 
-  {#if failure}<p class="error" data-testid="reminders-failure">{failure}</p>{/if}
+  {#snippet edit()}
+    {#if failure}<p class="error" data-testid="reminders-failure">{failure}</p>{/if}
 
-  <form
-    class="mt-3 flex flex-wrap gap-2"
-    data-testid="reminder-form"
-    onsubmit={(event) => {
-      event.preventDefault();
-      void run(save);
-    }}
-  >
-    <input class="input w-40" type="date" data-testid="reminder-date" bind:value={remindOn} />
-    <input class="input flex-1" data-testid="reminder-description" placeholder="Send the photos" autocomplete="off" bind:value={description} />
-    <label class="field-label flex items-center gap-2">
-      <input type="checkbox" data-testid="reminder-repeats" bind:checked={repeats} />
-      Every year
-    </label>
-    <button type="submit" class="btn btn-primary" data-testid="save-reminder">Add</button>
-  </form>
+    <form
+      class="mt-3 flex flex-wrap gap-2"
+      data-testid="reminder-form"
+      onsubmit={(event) => {
+        event.preventDefault();
+        void run(save);
+      }}
+    >
+      <input class="input w-40" type="date" data-testid="reminder-date" bind:value={remindOn} />
+      <input class="input flex-1" data-testid="reminder-description" placeholder="Send the photos" autocomplete="off" bind:value={description} />
+      <label class="field-label flex items-center gap-2">
+        <input type="checkbox" data-testid="reminder-repeats" bind:checked={repeats} />
+        Every year
+      </label>
+      <button type="submit" class="btn btn-primary" data-testid="save-reminder">Add</button>
+    </form>
 
+    {@render list(true)}
+  {/snippet}
+</EditableCard>
+
+{#snippet list(editable: boolean)}
   {#if reminders.length === 0}
     <p class="mt-3 text-sm text-muted" data-testid="reminders-empty">No reminders yet.</p>
   {:else}
@@ -73,14 +82,16 @@
               <span data-testid="reminder-repeats-value">{reminder.repeats_yearly === 1 ? 'Every year' : 'Once'}</span>
             </p>
           </div>
-          <button type="button" class="btn btn-danger shrink-0" data-testid="delete-reminder" onclick={() => run(async () => {
-              await deleteReminder(await db(), reminder.id);
-              await reload(contactId);
-            })}>
-            Delete
-          </button>
+          {#if editable}
+            <button type="button" class="btn btn-danger shrink-0" data-testid="delete-reminder" onclick={() => run(async () => {
+                await deleteReminder(await db(), reminder.id);
+                await reload(contactId);
+              })}>
+              Delete
+            </button>
+          {/if}
         </li>
       {/each}
     </ul>
   {/if}
-</section>
+{/snippet}

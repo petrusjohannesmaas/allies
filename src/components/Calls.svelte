@@ -1,4 +1,5 @@
 <script lang="ts">
+  import EditableCard from './EditableCard.svelte';
   import { db } from '$lib/db';
   import { formatDate, today } from '$lib/dates';
   import { addCall, deleteCall, lastCalled, listCalls, type Call } from '$lib/repo/calls';
@@ -39,25 +40,35 @@
   }
 </script>
 
-<section class="card" data-testid="calls">
-  <h3 class="section-title">Phone calls</h3>
-  <p class="mt-1 text-sm text-muted" data-testid="last-called">Last called: {last === null ? 'never' : formatDate(last)}</p>
+<EditableCard label="phone calls" title="Phone calls" testid="calls">
+  {#snippet view()}
+    <p class="mt-1 text-sm text-muted" data-testid="last-called">Last called: {last === null ? 'never' : formatDate(last)}</p>
+    {@render list(false)}
+  {/snippet}
 
-  {#if failure}<p class="error" data-testid="calls-failure">{failure}</p>{/if}
+  {#snippet edit()}
+    <p class="mt-1 text-sm text-muted" data-testid="last-called">Last called: {last === null ? 'never' : formatDate(last)}</p>
 
-  <form
-    class="mt-3 flex gap-2"
-    data-testid="call-form"
-    onsubmit={(event) => {
-      event.preventDefault();
-      void run(save);
-    }}
-  >
-    <input class="input w-40" type="date" data-testid="call-date" bind:value={calledOn} />
-    <input class="input flex-1" data-testid="call-description" placeholder="Caught up about the conference" autocomplete="off" bind:value={description} />
-    <button type="submit" class="btn btn-primary" data-testid="save-call">Log call</button>
-  </form>
+    {#if failure}<p class="error" data-testid="calls-failure">{failure}</p>{/if}
 
+    <form
+      class="mt-3 flex gap-2"
+      data-testid="call-form"
+      onsubmit={(event) => {
+        event.preventDefault();
+        void run(save);
+      }}
+    >
+      <input class="input w-40" type="date" data-testid="call-date" bind:value={calledOn} />
+      <input class="input flex-1" data-testid="call-description" placeholder="Caught up about the conference" autocomplete="off" bind:value={description} />
+      <button type="submit" class="btn btn-primary" data-testid="save-call">Log call</button>
+    </form>
+
+    {@render list(true)}
+  {/snippet}
+</EditableCard>
+
+{#snippet list(editable: boolean)}
   {#if calls.length === 0}
     <p class="mt-3 text-sm text-muted" data-testid="calls-empty">No calls yet.</p>
   {:else}
@@ -68,14 +79,16 @@
             <p class="text-sm" data-testid="call-description-value">{call.description}</p>
             <p class="text-xs text-muted" data-testid="call-date-value">{formatDate(call.called_on)}</p>
           </div>
-          <button type="button" class="btn btn-danger shrink-0" data-testid="delete-call" onclick={() => run(async () => {
-              await deleteCall(await db(), call.id);
-              await reload(contactId);
-            })}>
-            Delete
-          </button>
+          {#if editable}
+            <button type="button" class="btn btn-danger shrink-0" data-testid="delete-call" onclick={() => run(async () => {
+                await deleteCall(await db(), call.id);
+                await reload(contactId);
+              })}>
+              Delete
+            </button>
+          {/if}
         </li>
       {/each}
     </ul>
   {/if}
-</section>
+{/snippet}

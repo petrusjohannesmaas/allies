@@ -1,16 +1,29 @@
 import { Given, Then, When } from '@wdio/cucumber-framework';
-import { configDir, restartApp } from './app';
+import { appIsClosed, configDir, launchApp, restartApp } from './app';
 
 const TOP_BAR = 'header[data-testid="top-bar"]';
 
 // The reload gives the app a clean start without the cost of relaunching it,
 // which the WebDriver server inside the app makes impossible. The marker tells
 // the old page from the new one.
-Given('the app has just started', async () => {
-  await browser.execute(() => {
-    (window as unknown as { __alliesOldPage?: boolean }).__alliesOldPage = true;
-    setTimeout(() => location.reload(), 0);
-  });
+// The step recovers when an earlier scenario left no working session: it
+// relaunches an app that is gone and reloads the session of one that is up.
+Given('the app has just started', { timeout: 180_000 }, async () => {
+  if (await appIsClosed()) {
+    await launchApp();
+  }
+  const markOldPage = () =>
+    browser.execute(() => {
+      (window as unknown as { __alliesOldPage?: boolean }).__alliesOldPage = true;
+      setTimeout(() => location.reload(), 0);
+    });
+  try {
+    await markOldPage();
+  } catch (error) {
+    if (!String(error).includes('invalid session id')) throw error;
+    await browser.reloadSession();
+    await markOldPage();
+  }
   await browser.waitUntil(
     async () => {
       try {
@@ -76,6 +89,6 @@ Then('the app is pointed at a temporary config folder', async () => {
   expect(folder).not.toContain(`${process.env.HOME}/.config`);
 });
 
-When('I close and reopen the app', async () => {
+When('I close and reopen the app', { timeout: 120_000 }, async () => {
   await restartApp();
 });

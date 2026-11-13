@@ -10,6 +10,11 @@ export const CATEGORIES = [
   'online',
 ] as const;
 
+/** The text shown for a stored category: the same words with a capital first letter. */
+export function labelFor(value: string): string {
+  return value.charAt(0).toUpperCase() + value.slice(1);
+}
+
 export type Category = (typeof CATEGORIES)[number];
 
 export function isCategory(value: string): value is Category {

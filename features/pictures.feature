@@ -11,7 +11,8 @@ Feature: Profile pictures
     And I choose the portrait fixture as the picture
     And I save the contact
     Then the pictures folder holds 1 file
-    And the contact "Ada Lovelace" has a picture
+    When I open the "Contacts" screen
+    Then the contact "Ada Lovelace" has a picture
     And the contact "Ada Lovelace" shows the picture
 
   Scenario: A replaced picture is removed
@@ -36,7 +37,8 @@ Feature: Profile pictures
     And I choose the portrait fixture as the picture
     And I save the contact
     Then the pictures folder holds 1 file
-    When I delete the contact "Ada Lovelace"
+    When I open the "Contacts" screen
+    And I delete the contact "Ada Lovelace"
     And I confirm the deletion
     Then the pictures folder holds 0 files
 

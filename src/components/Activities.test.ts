@@ -4,6 +4,7 @@ import Activities from './Activities.svelte';
 import { db } from '$lib/db';
 import { today } from '$lib/dates';
 import { ACTIVITY_CATEGORIES } from '$lib/activity-categories';
+import { labelFor } from '$lib/categories';
 import { addContact, blankInput } from '$lib/repo/contacts';
 import { addActivity, listActivities } from '$lib/repo/activities';
 
@@ -18,6 +19,8 @@ beforeEach(async () => {
 async function renderActivities(rows = 0) {
   render(Activities, { props: { contactId } });
   await waitFor(() => expect(screen.queryAllByTestId('activity')).toHaveLength(rows));
+  // The card is read-only until its pencil is clicked.
+  await fireEvent.click(screen.getByTestId('edit-card'));
 }
 
 async function logActivity(date: string, category: string, description: string) {
@@ -40,7 +43,7 @@ describe('the activities section', () => {
       (option) => option.textContent?.trim(),
     );
 
-    expect(offered).toEqual([...ACTIVITY_CATEGORIES]);
+    expect(offered).toEqual(ACTIVITY_CATEGORIES.map(labelFor));
   });
 
   it('starts the date at today', async () => {
@@ -54,7 +57,7 @@ describe('the activities section', () => {
     await logActivity('2026-10-14', 'did sport together', 'We went skiing');
 
     await waitFor(() => expect(screen.getByTestId('activity-description-value').textContent).toBe('We went skiing'));
-    expect(screen.getByTestId('activity-category-value').textContent).toBe('did sport together');
+    expect(screen.getByTestId('activity-category-value').textContent).toBe('Did sport together');
     expect(screen.getByTestId('activity-date-value').textContent).toBe('14 October 2026');
     expect((await listActivities(await db(), contactId))[0].happened_on).toBe('2026-10-14');
   });

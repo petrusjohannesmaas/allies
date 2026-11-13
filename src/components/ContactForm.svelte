@@ -1,9 +1,10 @@
 <script lang="ts">
   import Avatar from './Avatar.svelte';
-  import { CATEGORIES } from '$lib/categories';
+  import { CATEGORIES, labelFor } from '$lib/categories';
   import { validateContact, type ContactErrors } from '$lib/contact-validation';
   import {
     blankInput,
+    parseTags,
     toInput,
     type Contact,
     type ContactFormResult,
@@ -13,11 +14,17 @@
 
   let {
     contact = null,
+    tags = [],
+    embedded = false,
     onsave,
     oncancel = () => {},
     title,
   }: {
     contact?: Contact | null;
+    /** The contact's tags, which live in their own table. */
+    tags?: string[];
+    /** Inside a card that has its own frame and title, so the form adds neither. */
+    embedded?: boolean;
     onsave: (result: ContactFormResult) => void | Promise<void>;
     oncancel?: () => void;
     title?: string;
@@ -27,12 +34,18 @@
   // form on the contact it edits, so a different contact is a new form rather
   // than a reset of this one's edits.
   // svelte-ignore state_referenced_locally
-  let input = $state<ContactInput>(contact ? toInput(contact) : blankInput());
+  let input = $state<ContactInput>(contact ? toInput(contact, tags) : blankInput());
+  // svelte-ignore state_referenced_locally
+  let tagsText = $state(input.tags.join(', '));
+  // svelte-ignore state_referenced_locally
+  const start = JSON.stringify(current());
   let errors = $state<ContactErrors>({});
   let chosen = $state<ChosenFile | null>(null);
   let pictureError = $state('');
   let preview = $state<string | null>(null);
 
+  // An existing contact saves only once something differs from what it opened with.
+  const changed = $derived(chosen !== null || JSON.stringify(current()) !== start);
   const heading = $derived(title ?? (contact ? 'Edit contact' : 'Add contact'));
   const name = $derived([input.firstName, input.lastName].filter(Boolean).join(' '));
 
@@ -64,16 +77,22 @@
     chosen = { name: file.name, type, bytes };
   }
 
+  /** The input as it would be saved, with the tags field read as a comma-separated list. */
+  function current(): ContactInput {
+    return { ...input, tags: parseTags(tagsText.split(',')) };
+  }
+
   async function submit(event: SubmitEvent) {
     event.preventDefault();
-    errors = validateContact(input);
+    const result = current();
+    errors = validateContact(result);
     if (Object.keys(errors).length > 0) return;
-    await onsave({ input, picture: chosen });
+    await onsave({ input: result, picture: chosen });
   }
 </script>
 
-<form class="card grid gap-3" data-testid="contact-form" onsubmit={submit}>
-  <h2 class="text-base font-semibold">{heading}</h2>
+<form class={embedded ? 'grid gap-3' : 'card grid gap-3'} data-testid="contact-form" onsubmit={submit}>
+  {#if !embedded}<h2 class="text-base font-semibold">{heading}</h2>{/if}
 
   <div class="flex items-start gap-3">
     <div class="relative">
@@ -91,7 +110,7 @@
     <span class="field-label">Category</span>
     <select class="input" data-testid="contact-category" bind:value={input.category}>
       {#each CATEGORIES as category (category)}
-        <option value={category}>{category}</option>
+        <option value={category}>{labelFor(category)}</option>
       {/each}
     </select>
   </label>
@@ -114,12 +133,24 @@
   </label>
 
   <label class="block">
+    <span class="field-label">Phone</span>
+    <input class="input" data-testid="contact-phone" autocomplete="off" placeholder="082 123 4567" bind:value={input.phone} />
+  </label>
+
+  <label class="block">
     <span class="field-label">Birthday</span>
     <input class="input" type="date" data-testid="contact-birthday" bind:value={input.birthday} />
   </label>
 
+  <label class="block">
+    <span class="field-label">Tags, separated by commas</span>
+    <input class="input" data-testid="contact-tags" autocomplete="off" placeholder="chess, books" bind:value={tagsText} />
+  </label>
+
   <div class="flex gap-2">
-    <button type="submit" class="btn btn-primary" data-testid="save-contact">Save</button>
+    {#if !contact || changed}
+      <button type="submit" class="btn btn-primary" data-testid="save-contact">Save</button>
+    {/if}
     <button type="button" class="btn" data-testid="cancel-contact" onclick={oncancel}>Cancel</button>
   </div>
 </form>

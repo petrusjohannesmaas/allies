@@ -12,6 +12,10 @@ OUT OF SCOPE
 - 16 October 2026 | #1 | Monica's pets section on a contact. | Outcome 6 does not list pets among what a contact records.
 - 16 October 2026 | #1 | Monica's journal templates and sections. | Monica v4 gives journal posts a template with named sections. Outcome 13 asks for a flat list of entries.
 - 16 October 2026 | #1 | Monica's multiple vaults, users and permissions. | The issue is for one person on one machine.
+- 10 November 2026 | #19 | Due dates on tasks. | The issue lists it as out of scope.
+- 10 November 2026 | #19 | Marking a whole mission as done. | The issue lists it as out of scope.
+- 10 November 2026 | #19 | Dragging tasks to reorder them. | Up and down buttons instead, see the issue's decisions.
+- 10 November 2026 | #19 | Dashboard and journal changes beyond the capitalisation fix. | The issue lists it as out of scope.
 DECISIONS
 - 17 October 2026 | #1 | Contact search stays at 8 results. | Outcome 18 says matching contacts are listed. The user chose to keep the cap, since more letters narrow the list.
 - 17 October 2026 | #1 | Only LOGOS.png stays tracked. The Monica screenshots and MONICA-FEATURES.md are untracked and stay on the user's disk. | The user decided this before the pull request. The files remain in the branch's earlier commits.
