@@ -25,14 +25,15 @@ src/
   lib/settings.svelte.ts  the theme and accent, applied to <html> and saved through platform.ts
   lib/accents.ts          the nine accents and the colours worked out from them
   lib/utils.ts            `cn`, used by the shadcn-svelte components
+  lib/field.ts            the Input classes for controls that stay native, such as <select>
   lib/components/ui/      the shadcn-svelte components
   lib/categories.ts       the eight contact categories
   lib/activity-categories.ts  the activity categories
   lib/contact-validation.ts  the contact form rules
   lib/repo/               one module per table group: contacts, notes, calls and so on
   screens/                Dashboard, Contacts, Contact, Mission, Journal, Appearance
-  components/             shared pieces, including Sidebar
-  test/                   Vitest setup, the node:sqlite Db used by data tests
+  components/             shared pieces, including Sidebar, IconButton and FieldLabel
+  test/                   Vitest setup, the node:sqlite Db used by data tests, and fake-store.ts, which answers the store plugin's IPC calls
 features/                 Gherkin files, with step definitions in features/step-definitions/
 scripts/install-desktop.sh  npm run desktop:install
 vite.config.ts            Vite, the Tailwind and Svelte plugins, and the Vitest settings
@@ -70,8 +71,8 @@ Contact and activity categories are stored in lower case and shown through `labe
 
 - Buttons, text fields, text areas, labels, cards, tooltips and separators are shadcn-svelte components in `src/lib/components/ui/`. Native `<select>` elements take the Input classes.
 - Buttons come in two sizes and an icon-only size. Every clickable element shows a pointer cursor and changes colour on hover. Disabled controls do not.
-- Primary actions show an icon and their text. Row controls (delete, move up, move down) show only an icon, with an `aria-label` and a tooltip.
-- Card titles are normal-case headings with a Lucide icon. Field labels are small and muted, with a Lucide icon in front. A placeholder for an empty field is muted and italic.
+- Primary actions show an icon and their text. Row controls (delete, move up, move down) show only an icon through `IconButton.svelte`, which gives the button its `aria-label` and a tooltip from one `label`.
+- Card titles are normal-case headings with a Lucide icon. Field labels are `FieldLabel.svelte`: small and muted, with a Lucide icon in front. A placeholder for an empty field is muted and italic.
 
 ## Data
 
@@ -127,7 +128,7 @@ The contact form reads the chosen file from an `<input type="file">` and writes 
 | Types | `npm run check` |
 | End to end | `npm run test:e2e`. WebdriverIO with `@wdio/tauri-service` and Cucumber against a debug build, headless under `xvfb-run -a`. Restart scenarios relaunch the app themselves through `launchApp()` and wait up to 60 s for it. |
 
-Scenario dates are computed from today in the step definitions, so no scenario needs a fake clock. WebdriverIO packages stay on 9.x.
+Scenario dates are computed from today in the step definitions, so no scenario needs a fake clock. `data-settings-saving` on `<html>` is `true` while a settings save is pending; the Appearance steps wait for it before they restart the app, so the restart never races the write. WebdriverIO packages stay on 9.x.
 
 ## Decisions
 
