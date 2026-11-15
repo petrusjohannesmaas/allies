@@ -1,6 +1,6 @@
 Feature: Contact search
 
-  The search box sits at the top of every screen, so a contact is one
+  The search box sits at the top of the sidebar, on every screen, so a contact is one
   keystroke away from wherever the user is.
 
   Scenario: Search by part of a first name

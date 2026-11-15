@@ -4,8 +4,8 @@ Allies is a desktop app for one person on one machine. It keeps contacts, what t
 
 ## Stack
 
-- Tauri 2 with a plain Vite and Svelte 5 frontend (runes only, no SvelteKit), Tailwind 4, `@lucide/svelte` and Geist bundled through `@fontsource-variable/geist`. Target is Debian 13.
-- SQLite through `tauri-plugin-sql` (sqlx). Profile pictures go through `tauri-plugin-fs`. The app has no settings, so it does not use `tauri-plugin-store`.
+- Tauri 2 with a plain Vite and Svelte 5 frontend (runes only, no SvelteKit), Tailwind 4, shadcn-svelte components (bits-ui, tailwind-variants), `@lucide/svelte` and Geist bundled through `@fontsource-variable/geist`. Target is Debian 13.
+- SQLite through `tauri-plugin-sql` (sqlx). Profile pictures go through `tauri-plugin-fs`. The theme and accent go through `tauri-plugin-store`.
 - The app makes no network request. `tauri.conf.json` sets a content security policy that allows only the app's own origin, `blob:` images and Tauri's IPC. It also allows inline styles, because the avatar sets its size in a `style` attribute.
 - Package and binary name `allies`, product name Allies, identifier `privatelink.allies`. The identifier never changes, because the data folder follows it.
 
@@ -13,21 +13,27 @@ Allies is a desktop app for one person on one machine. It keeps contacts, what t
 
 ```
 src/
-  main.ts                 mounts App
-  App.svelte              top bar with the logo and the search box, and the open screen
-  assets/logo.png         the logo shown in the top bar, cropped from LOGOS.png
-  app.css                 Tailwind, colour variables, focus ring
+  main.ts                 loads the settings, then mounts App
+  App.svelte              the sidebar and the content panel with the open screen
+  assets/logo.png         the logo shown in the sidebar, cropped from LOGOS.png
+  app.css                 Tailwind, the colour variables mapped to Tailwind, the focus ring
+  themes/                 light.css, dark.css and index.ts
   lib/platform.ts         the only file that imports @tauri-apps/*
   lib/db.ts               the Db interface (select, execute) and the plugin-backed Db
   lib/dates.ts            date strings, adding months, the upcoming-dates function
   lib/navigation.svelte.ts  the open screen and the open contact
+  lib/settings.svelte.ts  the theme and accent, applied to <html> and saved through platform.ts
+  lib/accents.ts          the nine accents and the colours worked out from them
+  lib/utils.ts            `cn`, used by the shadcn-svelte components
+  lib/field.ts            the Input classes for controls that stay native, such as <select>
+  lib/components/ui/      the shadcn-svelte components
   lib/categories.ts       the eight contact categories
   lib/activity-categories.ts  the activity categories
   lib/contact-validation.ts  the contact form rules
   lib/repo/               one module per table group: contacts, notes, calls and so on
-  screens/                Dashboard, Contacts, Contact, Mission, Journal
-  components/             shared pieces
-  test/                   Vitest setup, the node:sqlite Db used by data tests
+  screens/                Dashboard, Contacts, Contact, Mission, Journal, Appearance
+  components/             shared pieces, including Sidebar, IconButton and FieldLabel
+  test/                   Vitest setup, the node:sqlite Db used by data tests, and fake-store.ts, which answers the store plugin's IPC calls
 features/                 Gherkin files, with step definitions in features/step-definitions/
 scripts/install-desktop.sh  npm run desktop:install
 vite.config.ts            Vite, the Tailwind and Svelte plugins, and the Vitest settings
@@ -44,13 +50,29 @@ src-tauri/
 
 ## Screens
 
-The window has a top bar with the logo and a search box, and five screens: dashboard, contacts, contact, mission and journal. The top bar has buttons for dashboard, contacts and journal. A contact opens from the contacts list, search or the dashboard, and a mission opens from its contact's page. `navigation.svelte.ts` holds the open screen, the open contact id and the open mission id. There is no router and no settings screen.
+The window has a sidebar on the left and a content panel with six screens: dashboard, contacts, contact, mission, journal and appearance. The sidebar is about 240 px wide and filled with the accent. From the top it holds the logo and the name Allies, the search box, the Dashboard, Contacts and Journal items, and at the bottom Appearance and the light/dark button. Search results open under the search box, over the content panel. The content panel has rounded left corners where it meets the sidebar. A contact opens from the contacts list, search or the dashboard, and a mission opens from its contact's page. `navigation.svelte.ts` holds the open screen, the open contact id and the open mission id. There is no router. The window is at least 1024 px wide.
 
-The contact page follows the sketch in `preview.webp`. A header holds the picture, name, category, email, phone, birthday and tags, with the Missions box on its right. Below it a grid of cards, two columns from 768 px wide and one below, holds About, Notes, Phone calls, Activities, Address and Reminders in that order. About holds significant other, children, how they met, work and food preferences.
+The contact page follows the sketch in `preview.webp`. A header holds the picture, name, category, email, phone, birthday and tags, with the Missions box on its right. Below it a grid of cards, always two to a row, holds About, Notes, Phone calls, Activities, Address and Reminders in that order. About holds significant other, children, how they met, work and food preferences.
 
 Every block on the contact and mission screens uses `EditableCard.svelte`. It is read-only until its pencil is clicked. A field block (the header, About, the mission details) shows Save only once a value differs, and the pencil again, Cancel, Escape or leaving the page discards the draft without asking. A list card in edit mode shows its add form and row controls, and each of those saves at once. The tick box on a task works without edit mode.
 
 Contact and activity categories are stored in lower case and shown through `labelFor()` in `lib/categories.ts`, which capitalises the first letter.
+
+## Theming
+
+- `src/themes/light.css` and `dark.css` set shadcn-svelte's colour variables (`--background`, `--foreground`, `--card`, `--primary`, `--muted-foreground`, `--border` and the rest) on `:root[data-theme="<id>"]`. These are the app's only colour variables, and `app.css` maps them to Tailwind colours, so screens use `bg-background`, `text-muted-foreground` and so on. Dark's background is `#1e1e1e`. Light is Zaimu's neutral light palette.
+- `app.css` declares `@custom-variant dark (&:is([data-theme='dark'] *))`, so `dark:` classes follow `data-theme`.
+- The theme setting is `system`, `light` or `dark`, default `system`. For `system`, the app follows `prefers-color-scheme` and switches when the system does. `data-theme` on `<html>` always holds the theme in use, `light` or `dark`.
+- The accent is one of the nine libadwaita colours Zaimu uses (blue, teal, green, yellow, orange, red, pink, purple, slate), default blue. The settings code sets `--accent-bg` on `<html>` to the accent's fill, and `--primary` and `--ring` take it, so the sidebar, primary buttons, focus rings and the Appearance swatches use it. The fill (`accentFillHex` in `lib/accents.ts`) is the accent with its OKLab lightness lowered in steps of 0.005 until white text reaches 4.5:1, or the accent itself when white already does. `--primary-foreground` is always white. `--accent-text` is the accent made darker in Light and lighter in Dark, for accent-coloured text and icons. shadcn's own `--accent` is a hover background, not the user's accent.
+- A change applies at once and is then saved. Saves run one after another. A failed save keeps the change for the session and shows a message on the Appearance screen. A failed load at start-up uses the defaults and shows a message above the content.
+- `main.ts` loads the settings before it mounts the app, so the first frame has the right theme and accent.
+
+## Controls
+
+- Buttons, text fields, text areas, labels, cards, tooltips and separators are shadcn-svelte components in `src/lib/components/ui/`. Native `<select>` elements take the Input classes.
+- Buttons come in two sizes and an icon-only size. Every clickable element shows a pointer cursor and changes colour on hover. Disabled controls do not.
+- Primary actions show an icon and their text. Row controls (delete, move up, move down) show only an icon through `IconButton.svelte`, which gives the button its `aria-label` and a tooltip from one `label`.
+- Card titles are normal-case headings with a Lucide icon. Field labels are `FieldLabel.svelte`: small and muted, with a Lucide icon in front. A placeholder for an empty field is muted and italic.
 
 ## Data
 
@@ -83,7 +105,7 @@ A migration that has run on the user's machine is never edited. A change is a ne
 
 ## Data location
 
-The plugin resolves a SQLite path against the app's config folder, not the data folder. Everything therefore lives in `~/.config/privatelink.allies/`: `allies.db` and the `pictures/` folder. `scripts/install-desktop.sh` backs up that folder. End-to-end builds set `XDG_CONFIG_HOME` to a temporary folder, so a test run never touches the real data.
+The plugin resolves a SQLite path against the app's config folder, not the data folder. Everything therefore lives in `~/.config/privatelink.allies/`: `allies.db`, the `pictures/` folder and `settings.json`. The store plugin resolves a path against the data folder, so `platform.ts` passes it the absolute path of `settings.json` in the config folder, which replaces the data folder in Tauri's path join. `scripts/install-desktop.sh` backs up that folder. End-to-end builds set `XDG_CONFIG_HOME` to a temporary folder, so a test run never touches the real data.
 
 ## Dates
 
@@ -106,7 +128,7 @@ The contact form reads the chosen file from an `<input type="file">` and writes 
 | Types | `npm run check` |
 | End to end | `npm run test:e2e`. WebdriverIO with `@wdio/tauri-service` and Cucumber against a debug build, headless under `xvfb-run -a`. Restart scenarios relaunch the app themselves through `launchApp()` and wait up to 60 s for it. |
 
-Scenario dates are computed from today in the step definitions, so no scenario needs a fake clock. WebdriverIO packages stay on 9.x.
+Scenario dates are computed from today in the step definitions, so no scenario needs a fake clock. `data-settings-saving` on `<html>` is `true` while a settings save is pending; the Appearance steps wait for it before they restart the app, so the restart never races the write. WebdriverIO packages stay on 9.x.
 
 ## Decisions
 
@@ -122,3 +144,7 @@ Scenario dates are computed from today in the step definitions, so no scenario n
 - 10 November 2026. A save that writes more than one table goes through a view with an `INSTEAD OF UPDATE` trigger, so it stays one statement under the pooled-connection rule.
 - 10 November 2026. Tasks move with up and down buttons, not drag and drop. `moveTask` swaps positions with the neighbour in one `UPDATE`.
 - 11 November 2026. Creating a contact with tags is two statements: the `INSERT` into `contacts`, then the save through `contact_header`, the same way a new contact's picture is already saved after its row. The tags need the new contact's id, and SQLite's `last_insert_rowid()` reverts to its old value once an `INSTEAD OF INSERT` trigger on a view ends, so a single insert through the view cannot hand that id back. If the second statement fails, the contact is saved without its tags and the user can add them from the header.
+- 13 November 2026. The theme and accent are saved in `settings.json` through `tauri-plugin-store`, as in Zaimu, but in the config folder through an absolute path. The install script's backup then covers it, and end-to-end runs, which set `XDG_CONFIG_HOME` to a temporary folder, never touch the real file.
+- 13 November 2026. Allies uses shadcn-svelte and shadcn's colour variable names, as Zaimu and Taskflow do, so the three apps' controls and themes match.
+- 13 November 2026. Text on the accent is always white, and the accent fill is darkened just enough for 4.5:1. No single text colour reaches 4.5:1 on all nine of Zaimu's accents: `#1e1e1e` fails on six of them and black fails on purple. Zaimu's accent hex values stay unchanged.
+- 13 November 2026. The contact page's cards are always two to a row. The 1024 px minimum window width leaves the content panel at about 784 px or more, so the one-column layout from #19 could no longer be reached.

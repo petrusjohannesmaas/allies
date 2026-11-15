@@ -8,6 +8,7 @@
   "permissions": [
     "core:default",
     "sql:default",
+    "store:default",
     "sql:allow-execute",
     {
       "identifier": "fs:allow-mkdir",

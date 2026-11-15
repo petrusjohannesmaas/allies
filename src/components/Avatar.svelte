@@ -52,7 +52,7 @@
   <img src={url} alt={name} class="rounded-full object-cover" style="width: {size}px; height: {size}px" data-testid="avatar-picture" />
 {:else}
   <span
-    class="bg-accent/15 text-accent flex items-center justify-center rounded-full text-sm font-semibold"
+    class="bg-primary/15 text-[var(--accent-text)] flex items-center justify-center rounded-full text-sm font-semibold"
     style="width: {size}px; height: {size}px"
     data-testid="avatar-initials"
     aria-hidden="true"

@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { Button } from '$lib/components/ui/button';
+  import * as Card from '$lib/components/ui/card';
   import { Frown, Meh, Smile } from '@lucide/svelte';
   import { db } from '$lib/db';
   import { getRating, rateDay } from '$lib/repo/journal';
@@ -50,22 +52,21 @@
   }
 </script>
 
-<section class="card" data-testid="day-rating" data-rated={chosen}>
+<Card.Root class="px-4" data-testid="day-rating" data-rated={chosen}>
   <h2 class="section-title">How was your day? You can rate it once a day.</h2>
 
   <div class="mt-3 flex items-center gap-2" role="group" aria-label="Rate your day">
     {#each FACES as option (option.face)}
-      <button
-        type="button"
-        class="btn p-2"
-        class:btn-primary={chosen === option.face}
+      <Button
+        variant={chosen === option.face ? 'default' : 'outline'}
+        size="icon"
         aria-label={option.name}
         aria-pressed={chosen === option.face}
         data-testid={`rate-${option.name.toLowerCase()}`}
         onclick={() => void choose(option.face)}
       >
-        <option.Icon class="size-6" aria-hidden="true" />
-      </button>
+        <option.Icon aria-hidden="true" />
+      </Button>
     {/each}
   </div>
 
@@ -75,4 +76,4 @@
 
   {#if refused}<p class="error mt-2" data-testid="rating-refused">{refused}</p>{/if}
   {#if failure}<p class="error mt-2" data-testid="rating-failure">{failure}</p>{/if}
-</section>
+</Card.Root>

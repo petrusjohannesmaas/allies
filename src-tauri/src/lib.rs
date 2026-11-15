@@ -36,6 +36,7 @@ fn migrations() -> Vec<Migration> {
 pub fn run() {
     let builder = tauri::Builder::default()
         .plugin(tauri_plugin_fs::init())
+        .plugin(tauri_plugin_store::Builder::new().build())
         .plugin(
             Builder::default()
                 .add_migrations("sqlite:allies.db", migrations())

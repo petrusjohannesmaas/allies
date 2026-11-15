@@ -1,6 +1,6 @@
 import { Then, When } from '@wdio/cucumber-framework';
 
-const SEARCH_BOX = 'header[data-testid="top-bar"] [data-testid="search-box"]';
+const SEARCH_BOX = 'aside[data-testid="sidebar"] [data-testid="search-box"]';
 
 async function searchResults(): Promise<string[]> {
   return browser.execute(() =>

@@ -1,5 +1,8 @@
 <script lang="ts">
-  import { Home } from '@lucide/svelte';
+  import IconButton from './IconButton.svelte';
+  import { Button } from '$lib/components/ui/button';
+  import { Input } from '$lib/components/ui/input';
+  import { House, Plus, Trash2, MapPin } from '@lucide/svelte';
   import EditableCard from './EditableCard.svelte';
   import { db } from '$lib/db';
   import { addAddress, addressIsUsable, deleteAddress, formatAddress, listAddresses, setHomeAddress, type Address } from '$lib/repo/details';
@@ -35,7 +38,7 @@
   }
 </script>
 
-<EditableCard label="address" title="Address" testid="addresses">
+<EditableCard label="address" title="Address" icon={MapPin} testid="addresses">
   {#snippet view()}
     {@render list(false)}
   {/snippet}
@@ -51,11 +54,11 @@
         void run(save);
       }}
     >
-      <input class="input sm:col-span-2" data-testid="address-street" placeholder="Street" autocomplete="off" bind:value={draft.street} />
-      <input class="input" data-testid="address-city" placeholder="City" autocomplete="off" bind:value={draft.city} />
-      <input class="input" data-testid="address-postal-code" placeholder="Postal code" autocomplete="off" bind:value={draft.postalCode} />
-      <input class="input sm:col-span-2" data-testid="address-country" placeholder="Country" autocomplete="off" bind:value={draft.country} />
-      <button type="submit" class="btn btn-primary" data-testid="save-address">Add address</button>
+      <Input class="sm:col-span-2" data-testid="address-street" placeholder="Street" autocomplete="off" bind:value={draft.street} />
+      <Input data-testid="address-city" placeholder="City" autocomplete="off" bind:value={draft.city} />
+      <Input data-testid="address-postal-code" placeholder="Postal code" autocomplete="off" bind:value={draft.postalCode} />
+      <Input class="sm:col-span-2" data-testid="address-country" placeholder="Country" autocomplete="off" bind:value={draft.country} />
+      <Button type="submit" data-testid="save-address"><Plus aria-hidden="true" />Add address</Button>
     </form>
 
     {@render list(true)}
@@ -64,44 +67,46 @@
 
 {#snippet list(editable: boolean)}
   {#if addresses.length === 0}
-    <p class="mt-3 text-sm text-muted" data-testid="addresses-empty">No addresses yet.</p>
+    <p class="mt-3 text-sm text-muted-foreground" data-testid="addresses-empty">No addresses yet.</p>
   {:else}
     <ul class="mt-3 grid gap-2" data-testid="address-list">
       {#each addresses as address (address.id)}
         <li
-          class="border-line flex items-center gap-3 border-t pt-2"
+          class="border-border flex items-center gap-3 border-t pt-2"
           data-testid="address"
           data-home={address.is_home === 1}
           data-street={address.street ?? ''}
         >
           {#if editable}
-            <button
-              type="button"
-              class="shrink-0"
-              class:text-accent={address.is_home === 1}
-              class:text-muted={address.is_home === 0}
+            <IconButton
+              class="shrink-0 {address.is_home === 1 ? 'text-[var(--accent-text)]' : 'text-muted-foreground'}"
               aria-pressed={address.is_home === 1}
-              aria-label={address.is_home === 1 ? `${formatAddress(address)} is the home address` : `Make this the home address`}
+              label={address.is_home === 1 ? `${formatAddress(address)} is the home address` : `Make this the home address`}
               data-testid="home-address"
               onclick={() => run(async () => {
                 await setHomeAddress(await db(), contactId, address.id);
                 await reload(contactId);
               })}
             >
-              <Home class="size-4" fill={address.is_home === 1 ? 'currentColor' : 'none'} aria-hidden="true" />
-            </button>
+              <House fill={address.is_home === 1 ? 'currentColor' : 'none'} aria-hidden="true" />
+            </IconButton>
           {/if}
           <span class="flex-1 text-sm" data-testid="address-text">{formatAddress(address)}</span>
           {#if address.is_home === 1}
-            <span class="text-xs text-muted" data-testid="home-address-label">Home</span>
+            <span class="flex items-center gap-1 text-xs text-muted-foreground" data-testid="home-address-label"><House class="size-3.5" aria-hidden="true" />Home</span>
           {/if}
           {#if editable}
-            <button type="button" class="btn btn-danger shrink-0" data-testid="delete-address" onclick={() => run(async () => {
+            <IconButton
+              class="shrink-0 text-destructive hover:text-destructive"
+              label="Delete this address"
+              data-testid="delete-address"
+              onclick={() => run(async () => {
                 await deleteAddress(await db(), address.id);
                 await reload(contactId);
-              })}>
-              Delete
-            </button>
+              })}
+            >
+              <Trash2 aria-hidden="true" />
+            </IconButton>
           {/if}
         </li>
       {/each}

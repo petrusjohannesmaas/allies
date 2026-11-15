@@ -1,4 +1,12 @@
 <script lang="ts">
+  import { Label } from '$lib/components/ui/label';
+  import { fieldClass } from '$lib/field';
+  import { cn } from '$lib/utils';
+  import { Cake, Mail, Phone, Save, Tag, X } from '@lucide/svelte';
+  import FieldLabel from './FieldLabel.svelte';
+  import * as Card from '$lib/components/ui/card';
+  import { Button } from '$lib/components/ui/button';
+  import { Input } from '$lib/components/ui/input';
   import Avatar from './Avatar.svelte';
   import { CATEGORIES, labelFor } from '$lib/categories';
   import { validateContact, type ContactErrors } from '$lib/contact-validation';
@@ -91,7 +99,8 @@
   }
 </script>
 
-<form class={embedded ? 'grid gap-3' : 'card grid gap-3'} data-testid="contact-form" onsubmit={submit}>
+{#snippet contactForm()}
+<form class="grid gap-3" data-testid="contact-form" onsubmit={submit}>
   {#if !embedded}<h2 class="text-base font-semibold">{heading}</h2>{/if}
 
   <div class="flex items-start gap-3">
@@ -99,58 +108,67 @@
       <Avatar picture={null} {name} size={56} />
       {#if preview}<img src={preview} alt="" class="absolute inset-0 size-14 rounded-full object-cover" data-testid="picture-preview" />{/if}
     </div>
-    <label class="block flex-1">
-      <span class="field-label">Profile picture</span>
-      <input class="input" type="file" accept={ACCEPTED_TYPES.join(',')} data-testid="contact-picture" onchange={pick} />
+    <Label class="block flex-1">
+      <FieldLabel as="span">Profile picture</FieldLabel>
+      <input type="file" class={cn(fieldClass, 'file:text-foreground file:mr-2 file:inline-flex file:h-6 file:border-0 file:bg-transparent file:text-sm file:font-medium')} accept={ACCEPTED_TYPES.join(',')} data-testid="contact-picture" onchange={pick} />
       {#if pictureError}<p class="error" data-testid="error-picture">{pictureError}</p>{/if}
-    </label>
+    </Label>
   </div>
 
-  <label class="block">
-    <span class="field-label">Category</span>
-    <select class="input" data-testid="contact-category" bind:value={input.category}>
+  <Label class="block">
+    <FieldLabel as="span">Category</FieldLabel>
+    <select class={fieldClass} data-testid="contact-category" bind:value={input.category}>
       {#each CATEGORIES as category (category)}
         <option value={category}>{labelFor(category)}</option>
       {/each}
     </select>
-  </label>
+  </Label>
 
-  <label class="block">
-    <span class="field-label">First name</span>
-    <input class="input" data-testid="contact-first-name" autocomplete="off" bind:value={input.firstName} />
+  <Label class="block">
+    <FieldLabel as="span">First name</FieldLabel>
+    <Input data-testid="contact-first-name" autocomplete="off" bind:value={input.firstName} />
     {#if errors.firstName}<p class="error" data-testid="error-first-name">{errors.firstName}</p>{/if}
-  </label>
+  </Label>
 
-  <label class="block">
-    <span class="field-label">Last name</span>
-    <input class="input" data-testid="contact-last-name" autocomplete="off" bind:value={input.lastName} />
-  </label>
+  <Label class="block">
+    <FieldLabel as="span">Last name</FieldLabel>
+    <Input data-testid="contact-last-name" autocomplete="off" bind:value={input.lastName} />
+  </Label>
 
-  <label class="block">
-    <span class="field-label">Email</span>
-    <input class="input" data-testid="contact-email" autocomplete="off" bind:value={input.email} />
+  <Label class="block">
+    <FieldLabel as="span" icon={Mail}>Email</FieldLabel>
+    <Input data-testid="contact-email" autocomplete="off" bind:value={input.email} />
     {#if errors.email}<p class="error" data-testid="error-email">{errors.email}</p>{/if}
-  </label>
+  </Label>
 
-  <label class="block">
-    <span class="field-label">Phone</span>
-    <input class="input" data-testid="contact-phone" autocomplete="off" placeholder="082 123 4567" bind:value={input.phone} />
-  </label>
+  <Label class="block">
+    <FieldLabel as="span" icon={Phone}>Phone</FieldLabel>
+    <Input data-testid="contact-phone" autocomplete="off" placeholder="082 123 4567" bind:value={input.phone} />
+  </Label>
 
-  <label class="block">
-    <span class="field-label">Birthday</span>
-    <input class="input" type="date" data-testid="contact-birthday" bind:value={input.birthday} />
-  </label>
+  <Label class="block">
+    <FieldLabel as="span" icon={Cake}>Birthday</FieldLabel>
+    <Input type="date" data-testid="contact-birthday" bind:value={input.birthday} />
+  </Label>
 
-  <label class="block">
-    <span class="field-label">Tags, separated by commas</span>
-    <input class="input" data-testid="contact-tags" autocomplete="off" placeholder="chess, books" bind:value={tagsText} />
-  </label>
+  <Label class="block">
+    <FieldLabel as="span" icon={Tag}>Tags, separated by commas</FieldLabel>
+    <Input data-testid="contact-tags" autocomplete="off" placeholder="chess, books" bind:value={tagsText} />
+  </Label>
 
   <div class="flex gap-2">
     {#if !contact || changed}
-      <button type="submit" class="btn btn-primary" data-testid="save-contact">Save</button>
+      <Button type="submit" data-testid="save-contact"><Save aria-hidden="true" />Save</Button>
     {/if}
-    <button type="button" class="btn" data-testid="cancel-contact" onclick={oncancel}>Cancel</button>
+    <Button variant="outline" data-testid="cancel-contact" onclick={oncancel}><X aria-hidden="true" />Cancel</Button>
   </div>
 </form>
+{/snippet}
+
+{#if embedded}
+  {@render contactForm()}
+{:else}
+  <Card.Root class="px-4">
+    {@render contactForm()}
+  </Card.Root>
+{/if}

@@ -37,7 +37,7 @@ When(/^I select the contact "([^"]+)"$/, async (name: string) => {
 });
 
 Given(/^I open the contact "([^"]+)"$/, async (name: string) => {
-  await $('[data-testid="top-bar"] nav[aria-label="Screens"] button:nth-child(2)').click();
+  await $('aside[data-testid="sidebar"] nav[aria-label="Screens"] button:nth-child(2)').click();
   await selectContact(name);
 });
 
@@ -166,8 +166,8 @@ const CARD_IDS: Record<string, string> = {
 };
 
 Then(
-  /^the cards are in the order (.+), (two|one) to a row$/,
-  async (order: string, perRow: string) => {
+  /^the cards are in the order (.+), two to a row$/,
+  async (order: string) => {
     const names = order.split(', ');
     const boxes = await browser.execute(
       (ids) =>
@@ -179,17 +179,11 @@ Then(
     );
 
     boxes.forEach((box, index) => {
-      if (perRow === 'two') {
-        // Rows of two: both cards of a row share a top edge, the left one is further left, and each row is lower than the last.
-        const first = index - (index % 2);
-        expect(box.y).toBe(boxes[first].y);
-        if (index % 2 === 1) expect(box.x).toBeGreaterThan(boxes[first].x);
-        if (index >= 2) expect(box.y).toBeGreaterThan(boxes[index - 2].y);
-      } else {
-        // One column: the same left edge, each card lower than the one before.
-        expect(box.x).toBe(boxes[0].x);
-        if (index > 0) expect(box.y).toBeGreaterThan(boxes[index - 1].y);
-      }
+      // Rows of two: both cards of a row share a top edge, the left one is further left, and each row is lower than the last.
+      const first = index - (index % 2);
+      expect(box.y).toBe(boxes[first].y);
+      if (index % 2 === 1) expect(box.x).toBeGreaterThan(boxes[first].x);
+      if (index >= 2) expect(box.y).toBeGreaterThan(boxes[index - 2].y);
     });
   },
 );

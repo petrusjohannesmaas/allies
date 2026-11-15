@@ -88,7 +88,7 @@ export async function launchApp() {
   appendFileSync(RELAUNCHED_PIDS, `${child.pid}\n`);
   await waitFor(serverUp, 'the relaunched app', LAUNCH_TIMEOUT_MS);
   await browser.reloadSession();
-  await $('header[data-testid="top-bar"]').waitForExist({ timeout: 20_000 });
+  await $('aside[data-testid="sidebar"]').waitForExist({ timeout: 20_000 });
 }
 
 export async function restartApp() {

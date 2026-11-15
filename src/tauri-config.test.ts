@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest';
 
 const conf = JSON.parse(
   readFileSync(resolve(process.cwd(), 'src-tauri/tauri.conf.json'), 'utf8'),
-) as { identifier: string; app: { security: { csp: Record<string, string> } } };
+) as { identifier: string; app: { windows: { minWidth: number }[]; security: { csp: Record<string, string> } } };
 
 // Tauri's IPC is the one http origin the app needs. It is a scheme the webview
 // talks to the Rust side over, not a host it reaches out to, so the test holds
@@ -40,5 +40,11 @@ describe('the content security policy', () => {
 describe('the app identifier', () => {
   it('is privatelink.allies, which the data folder follows', () => {
     expect(conf.identifier).toBe('privatelink.allies');
+  });
+});
+
+describe('the window', () => {
+  it('is at least 1024 px wide', () => {
+    expect(conf.app.windows[0].minWidth).toBe(1024);
   });
 });

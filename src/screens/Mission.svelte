@@ -1,6 +1,11 @@
 <script lang="ts">
-  import { ArrowDown, ArrowUp, Trash2 } from '@lucide/svelte';
+  import { Button } from '$lib/components/ui/button';
+  import { Input } from '$lib/components/ui/input';
+  import { AlignLeft, ArrowDown, ArrowLeft, ArrowUp, CalendarDays, ListChecks, Plus, Trash2, X } from '@lucide/svelte';
+  import * as Card from '$lib/components/ui/card';
   import EditableCard from '../components/EditableCard.svelte';
+  import FieldLabel from '../components/FieldLabel.svelte';
+  import IconButton from '../components/IconButton.svelte';
   import MissionForm from '../components/MissionForm.svelte';
   import { db } from '../lib/db';
   import { goBackFromMission, navigation } from '../lib/navigation.svelte';
@@ -60,24 +65,32 @@
 
 <section class="p-6" data-testid="screen-mission">
   {#if missing}
-    <p class="text-sm text-muted" data-testid="mission-missing">That mission is gone.</p>
-    <button type="button" class="btn mt-4" data-testid="back-to-contact" onclick={goBackFromMission}>Back</button>
+    <p class="text-sm text-muted-foreground" data-testid="mission-missing">That mission is gone.</p>
+    <Button variant="outline" class="mt-4" data-testid="back-to-contact" onclick={goBackFromMission}><ArrowLeft aria-hidden="true" />Back</Button>
   {:else if mission && contact}
-    <button type="button" class="btn mb-4" data-testid="back-to-contact" onclick={goBackFromMission}>
-      Back to {fullName(contact)}
-    </button>
+    <Button variant="outline" class="mb-4" data-testid="back-to-contact" onclick={goBackFromMission}>
+      <ArrowLeft aria-hidden="true" />Back to {fullName(contact)}
+    </Button>
 
     {#if failure}<p class="error mb-2" data-testid="mission-failure">{failure}</p>{/if}
 
     <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
       <EditableCard label="mission details" testid="mission-details">
         {#snippet view()}
-          <div class="pr-12">
-            <h1 class="text-xl font-semibold" data-testid="mission-title">{mission?.description}</h1>
-            <p class="text-sm text-muted" data-testid="mission-due">
-              {#if mission?.due_date}Due {mission.due_date}{:else}No due date{/if}
-            </p>
-          </div>
+          <dl class="grid gap-4 pr-12">
+            <div>
+              <FieldLabel icon={AlignLeft}>Description</FieldLabel>
+              <dd><h1 class="text-xl font-semibold" data-testid="mission-title">{mission?.description}</h1></dd>
+            </div>
+            <div>
+              <FieldLabel icon={CalendarDays}>Due date</FieldLabel>
+              <dd>
+                <p class="text-sm {mission?.due_date ? 'text-foreground' : 'italic text-muted-foreground'}" data-testid="mission-due">
+                  {#if mission?.due_date}Due {mission.due_date}{:else}No due date{/if}
+                </p>
+              </dd>
+            </div>
+          </dl>
         {/snippet}
 
         {#snippet edit(close)}
@@ -98,7 +111,7 @@
         {/snippet}
       </EditableCard>
 
-      <EditableCard label="tasks" title="Tasks" testid="mission-tasks">
+      <EditableCard label="tasks" title="Tasks" icon={ListChecks} testid="mission-tasks">
         {#snippet view()}
           {@render list(false)}
         {/snippet}
@@ -118,8 +131,8 @@
               });
             }}
           >
-            <input class="input" data-testid="task-description" placeholder="What needs doing" autocomplete="off" bind:value={newTask} />
-            <button type="submit" class="btn btn-primary" data-testid="add-task">Add task</button>
+            <Input data-testid="task-description" placeholder="What needs doing" autocomplete="off" bind:value={newTask} />
+            <Button type="submit" data-testid="add-task"><Plus aria-hidden="true" />Add task</Button>
           </form>
 
           {@render list(true)}
@@ -129,14 +142,13 @@
 
     <div class="mt-6">
       {#if confirming}
-        <div class="card" data-testid="delete-mission-confirm">
+        <Card.Root class="px-4" data-testid="delete-mission-confirm">
           <p class="text-sm" data-testid="delete-mission-warning">
             Delete this mission? This also deletes {tasks.length} {tasks.length === 1 ? 'task' : 'tasks'}.
           </p>
           <div class="mt-2 flex gap-2">
-            <button
-              type="button"
-              class="btn btn-danger"
+            <Button
+              variant="destructive"
               data-testid="confirm-delete-mission"
               onclick={() =>
                 run(async () => {
@@ -145,13 +157,13 @@
                   goBackFromMission();
                 })}
             >
-              Delete mission
-            </button>
-            <button type="button" class="btn" data-testid="cancel-delete-mission" onclick={() => (confirming = false)}>Keep it</button>
+              <Trash2 aria-hidden="true" />Delete mission
+            </Button>
+            <Button variant="outline" data-testid="cancel-delete-mission" onclick={() => (confirming = false)}><X aria-hidden="true" />Keep it</Button>
           </div>
-        </div>
+        </Card.Root>
       {:else}
-        <button type="button" class="btn btn-danger" data-testid="delete-mission" onclick={() => (confirming = true)}>Delete mission</button>
+        <Button variant="destructive" data-testid="delete-mission" onclick={() => (confirming = true)}><Trash2 aria-hidden="true" />Delete mission</Button>
       {/if}
     </div>
   {/if}
@@ -159,7 +171,7 @@
 
 {#snippet list(editing: boolean)}
   {#if tasks.length === 0}
-    <p class="mt-3 text-sm text-muted" data-testid="tasks-empty">No tasks yet.</p>
+    <p class="mt-3 text-sm text-muted-foreground" data-testid="tasks-empty">No tasks yet.</p>
   {:else}
     <ol class="mt-3 grid gap-2" data-testid="task-list">
       {#each tasks as task, index (task.id)}
@@ -179,51 +191,35 @@
             }}
           />
           {#if editing}
-            <input
-              class="input flex-1"
-              class:line-through={task.is_done === 1}
-              data-testid="task-rename"
-              aria-label="Task description"
-              value={task.description}
-              onchange={(event) =>
-                run(async () => {
-                  const text = event.currentTarget.value;
-                  if (!hasText(text)) return;
-                  await renameTask(await db(), task.id, text);
-                  await reload();
-                })}
-            />
-            <button
-              type="button"
-              class="btn"
-              aria-label="Move up"
+            <Input class={['flex-1', task.is_done === 1 && 'line-through']} data-testid="task-rename" aria-label="Task description" value={task.description} onchange={(event) => run(async () => { const text = event.currentTarget.value; if (!hasText(text)) return; await renameTask(await db(), task.id, text); await reload(); })} />
+            <IconButton
+              variant="outline"
+              label="Move up"
               data-testid="move-task-up"
               disabled={index === 0}
               onclick={() => run(async () => { await moveTask(await db(), task.id, 'up'); await reload(); })}
             >
-              <ArrowUp class="size-4" aria-hidden="true" />
-            </button>
-            <button
-              type="button"
-              class="btn"
-              aria-label="Move down"
+              <ArrowUp aria-hidden="true" />
+            </IconButton>
+            <IconButton
+              variant="outline"
+              label="Move down"
               data-testid="move-task-down"
               disabled={index === tasks.length - 1}
               onclick={() => run(async () => { await moveTask(await db(), task.id, 'down'); await reload(); })}
             >
-              <ArrowDown class="size-4" aria-hidden="true" />
-            </button>
-            <button
-              type="button"
-              class="btn btn-danger"
-              aria-label="Delete task"
+              <ArrowDown aria-hidden="true" />
+            </IconButton>
+            <IconButton
+              class="text-destructive hover:text-destructive"
+              label="Delete task"
               data-testid="delete-task"
               onclick={() => run(async () => { await deleteTask(await db(), task.id); await reload(); })}
             >
-              <Trash2 class="size-4" aria-hidden="true" />
-            </button>
+              <Trash2 aria-hidden="true" />
+            </IconButton>
           {:else}
-            <span class="text-sm" class:line-through={task.is_done === 1} class:text-muted={task.is_done === 1} data-testid="task-text">
+            <span class="text-sm" class:line-through={task.is_done === 1} class:text-muted-foreground={task.is_done === 1} data-testid="task-text">
               {task.description}
             </span>
           {/if}

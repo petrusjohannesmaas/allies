@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { ArrowLeft } from '@lucide/svelte';
+  import { Button } from '$lib/components/ui/button';
   import About from '../components/About.svelte';
   import Activities from '../components/Activities.svelte';
   import Addresses from '../components/Addresses.svelte';
@@ -44,16 +46,16 @@
 
 <section class="p-6" data-testid="screen-contact">
   {#if missing}
-    <p class="text-sm text-muted" data-testid="contact-missing">That contact is gone.</p>
+    <p class="text-sm text-muted-foreground" data-testid="contact-missing">That contact is gone.</p>
   {:else if contact}
-    <button type="button" class="btn mb-4" data-testid="back-to-contacts" onclick={goBackFromContact}>All contacts</button>
+    <Button variant="outline" class="mb-4" data-testid="back-to-contacts" onclick={goBackFromContact}><ArrowLeft aria-hidden="true" />All contacts</Button>
 
     <div class="mb-4">
       <ContactHeader {contact} {tags} onsave={saveHeader} />
     </div>
 
-    <!-- The sketch's order, two cards to a row from 768 px and one column below it. -->
-    <div class="grid grid-cols-1 gap-4 md:grid-cols-2" data-testid="contact-grid">
+    <!-- The sketch's order, two cards to a row. The window is at least 1024 px wide, so there is no one-column layout. -->
+    <div class="grid grid-cols-2 gap-4" data-testid="contact-grid">
       <About contactId={contact.id} />
       <Notes contactId={contact.id} />
       <Calls contactId={contact.id} />
