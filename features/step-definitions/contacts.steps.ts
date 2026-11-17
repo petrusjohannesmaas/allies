@@ -102,18 +102,14 @@ When(/^I add the tag "([^"]+)"$/, async (tag: string) => {
 });
 
 When(/^I delete the contact "([^"]+)"$/, async (name: string) => {
-  await browser.execute((wanted) => {
-    const rows = [...document.querySelectorAll('[data-testid="contact-row"]')];
-    const row = rows.find((candidate) => candidate.getAttribute('data-contact-name') === wanted);
-    if (!row) throw new Error(`No contact named "${wanted}"`);
-    (row.querySelector('[data-testid="delete-contact"]') as HTMLButtonElement).click();
-  }, name);
+  if (!(await $('[data-testid="screen-contact"]').isExisting())) await selectContact(name);
+  await $('[data-testid="delete-contact"]').click();
   await $('[data-testid="confirm-delete"]').waitForExist({ timeout: 5_000 });
 });
 
 When('I confirm the deletion', async () => {
   await $('[data-testid="confirm-delete"]').click();
-  await $('[data-testid="confirm-delete"]').waitForExist({ reverse: true, timeout: 5_000 });
+  await $('[data-testid="screen-home"]').waitForExist({ timeout: 5_000 });
 });
 
 When('I cancel the deletion', async () => {
@@ -123,7 +119,7 @@ When('I cancel the deletion', async () => {
 
 Then('the contacts list has no Edit button', async () => {
   expect(await $('[data-testid="edit-contact"]').isExisting()).toBe(false);
-  expect(await $('[data-testid="screen-contacts"] [data-testid="contact-row"] [data-testid="delete-contact"]').isExisting()).toBe(true);
+  expect(await $('[data-testid="screen-contacts"] [data-testid="contact-row"] [data-testid="delete-contact"]').isExisting()).toBe(false);
 });
 
 Then('the contacts list is empty', async () => {

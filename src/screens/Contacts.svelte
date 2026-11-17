@@ -1,6 +1,5 @@
 <script lang="ts">
-  import { Plus, Trash2, X } from '@lucide/svelte';
-  import IconButton from '../components/IconButton.svelte';
+  import { Plus } from '@lucide/svelte';
   import { Button } from '$lib/components/ui/button';
   import * as Card from '$lib/components/ui/card';
   import Avatar from '../components/Avatar.svelte';
@@ -10,7 +9,6 @@
   import { openContact } from '../lib/navigation.svelte';
   import {
     addContactWithPicture,
-    deleteContact,
     fullName,
     listContacts,
     type Contact,
@@ -19,8 +17,6 @@
 
   let contacts = $state<Contact[]>([]);
   let mode = $state<'list' | 'add'>('list');
-  // The id of the contact whose delete button is showing its confirmation.
-  let confirming = $state<number | null>(null);
   let failure = $state('');
 
   $effect(() => {
@@ -35,14 +31,6 @@
     const connection = await db();
     await addContactWithPicture(connection, input, picture);
     mode = 'list';
-    await reload();
-  }
-
-  async function remove(id: number) {
-    const contact = contacts.find((candidate) => candidate.id === id);
-    if (!contact) return;
-    await deleteContact(await db(), contact);
-    confirming = null;
     await reload();
   }
 
@@ -97,20 +85,6 @@
             </span>
           </button>
 
-          {#if confirming === contact.id}
-            <span class="text-sm">Delete {fullName(contact)}?</span>
-            <Button variant="destructive" data-testid="confirm-delete" onclick={() => run(() => remove(contact.id))}><Trash2 aria-hidden="true" />Delete</Button>
-            <Button variant="outline" data-testid="cancel-delete" onclick={() => (confirming = null)}><X aria-hidden="true" />Cancel</Button>
-          {:else}
-            <IconButton
-              class="text-destructive hover:text-destructive"
-              label="Delete {fullName(contact)}"
-              data-testid="delete-contact"
-              onclick={() => (confirming = contact.id)}
-            >
-              <Trash2 aria-hidden="true" />
-            </IconButton>
-          {/if}
          </Card.Root>
         </li>
       {/each}

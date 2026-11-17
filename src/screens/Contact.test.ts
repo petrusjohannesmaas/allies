@@ -2,8 +2,8 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/svelte';
 import { beforeEach, describe, expect, it } from 'vitest';
 import Contact from './Contact.svelte';
 import { db } from '$lib/db';
-import { openContact } from '$lib/navigation.svelte';
-import { addContact, blankInput } from '$lib/repo/contacts';
+import { navigation, openContact } from '$lib/navigation.svelte';
+import { addContact, blankInput, getContact } from '$lib/repo/contacts';
 import { addCall } from '$lib/repo/calls';
 import { addActivity } from '$lib/repo/activities';
 import { addAddress } from '$lib/repo/details';
@@ -47,5 +47,35 @@ describe('the contact page controls', () => {
         expect(hasTooltip, `no tooltip on ${button.outerHTML}`).toBe(true);
       }
     }
+  });
+});
+
+describe('deleting from the contact page', () => {
+  async function openAda() {
+    const connection = await db();
+    await connection.execute('DELETE FROM contacts');
+    const id = await addContact(connection, { ...blankInput(), firstName: 'Ada', lastName: 'Lovelace' });
+    openContact(id);
+    render(Contact);
+    await screen.findByTestId('contact-grid');
+    return { connection, id };
+  }
+
+  it('Delete asks first, and Cancel keeps the contact', async () => {
+    const { connection, id } = await openAda();
+    await fireEvent.click(screen.getByTestId('delete-contact'));
+    expect(await screen.findByText('Delete Ada Lovelace?')).toBeTruthy();
+    await fireEvent.click(screen.getByTestId('cancel-delete'));
+    expect(await getContact(connection, id)).not.toBeNull();
+    expect(screen.queryByText('Delete Ada Lovelace?')).toBeNull();
+    expect(screen.getAllByText('Ada Lovelace').length).toBeGreaterThan(0);
+  });
+
+  it('Confirming Delete removes the contact and opens Home', async () => {
+    const { connection, id } = await openAda();
+    await fireEvent.click(screen.getByTestId('delete-contact'));
+    await fireEvent.click(await screen.findByTestId('confirm-delete'));
+    await waitFor(async () => expect(await getContact(connection, id)).toBeNull());
+    expect(navigation.screen).toBe('home');
   });
 });

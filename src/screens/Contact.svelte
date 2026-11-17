@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { ArrowLeft } from '@lucide/svelte';
+  import { ArrowLeft, Trash2, X } from '@lucide/svelte';
   import { Button } from '$lib/components/ui/button';
   import About from '../components/About.svelte';
   import Activities from '../components/Activities.svelte';
@@ -10,12 +10,14 @@
   import Reminders from '../components/Reminders.svelte';
   import { db, type Db } from '../lib/db';
   import { goBackFromContact, navigation } from '../lib/navigation.svelte';
-  import { getContact, markViewed, updateContactWithPicture, type Contact, type ContactFormResult } from '../lib/repo/contacts';
+  import { deleteContact, fullName, getContact, markViewed, updateContactWithPicture, type Contact, type ContactFormResult } from '../lib/repo/contacts';
   import { listTags } from '../lib/repo/details';
 
   let contact = $state<Contact | null>(null);
   let tags = $state<string[]>([]);
   let missing = $state(false);
+  let confirming = $state(false);
+  let failure = $state('');
 
   // Opening a page is what counts as viewing a contact, which orders Home's
   // recent contacts. The effect reads only the id, so
@@ -42,13 +44,40 @@
     await updateContactWithPicture(connection, contact, input, picture);
     await load(connection, contact.id);
   }
+
+  /** A failure in the database must say so rather than silently do nothing. */
+  async function remove() {
+    if (!contact) return;
+    failure = '';
+    try {
+      await deleteContact(await db(), contact);
+      confirming = false;
+      goBackFromContact();
+    } catch (error) {
+      failure = error instanceof Error ? error.message : String(error);
+    }
+  }
 </script>
 
 <section class="p-6" data-testid="screen-contact">
   {#if missing}
     <p class="text-sm text-muted-foreground" data-testid="contact-missing">That contact is gone.</p>
   {:else if contact}
-    <Button variant="outline" class="mb-4" data-testid="back-to-contacts" onclick={goBackFromContact}><ArrowLeft aria-hidden="true" />All contacts</Button>
+    <div class="mb-4 flex items-center justify-between gap-2">
+      <Button variant="outline" data-testid="back-to-contacts" onclick={goBackFromContact}><ArrowLeft aria-hidden="true" />All contacts</Button>
+      {#if confirming}
+        <div class="flex items-center gap-2">
+          <span class="text-sm">Delete {fullName(contact)}?</span>
+          <Button variant="destructive" data-testid="confirm-delete" onclick={remove}><Trash2 aria-hidden="true" />Delete</Button>
+          <Button variant="outline" data-testid="cancel-delete" onclick={() => (confirming = false)}><X aria-hidden="true" />Cancel</Button>
+        </div>
+      {:else}
+        <Button variant="destructive" data-testid="delete-contact" onclick={() => (confirming = true)}><Trash2 aria-hidden="true" />Delete</Button>
+      {/if}
+    </div>
+    {#if failure}
+      <p class="mb-4 text-sm text-destructive" role="alert" data-testid="delete-failure">{failure}</p>
+    {/if}
 
     <div class="mb-4">
       <ContactHeader {contact} {tags} onsave={saveHeader} />
