@@ -1,6 +1,6 @@
 import { Given, Then, When } from '@wdio/cucumber-framework';
 import { CATEGORIES, labelFor } from '../../src/lib/categories';
-import { chooseOption, contactRows, openCardEditor, selectContact, setFieldValue, textOf, typeInto } from './helpers';
+import { chooseOption, contactRows, dayFromNow, openCardEditor, selectContact, setFieldValue, textOf, typeInto } from './helpers';
 import { contactValue, countRows, insertContact } from './data';
 
 const FORM = '[data-testid="contact-form"]';
@@ -23,6 +23,13 @@ Given(
     insertContact({ category, birthday, firstName, lastName: lastName || undefined });
   },
 );
+
+// The birthday is a phrase such as "in 5 days", so the scenario never depends
+// on the day it runs.
+Given(/^a contact named "([^"]+)" has the birthday "([^"]+)"$/, async (name: string, when: string) => {
+  const [firstName, lastName = ''] = name.split(' ');
+  insertContact({ firstName, lastName: lastName || undefined, birthday: dayFromNow(when) });
+});
 
 Given(/^a contact named "([^"]+)" exists with the category "([^"]+)"$/, async (name: string, category: string) => {
   const [firstName, lastName = ''] = name.split(' ');

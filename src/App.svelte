@@ -1,43 +1,68 @@
 <script lang="ts">
-  import Sidebar from './components/Sidebar.svelte';
-  import { navigation } from './lib/navigation.svelte';
+  import { CalendarDays, House, MessagesSquare, Target } from '@lucide/svelte';
+  import { appInfo } from './lib/app-info';
+  import { AppShell, Placeholder, type NavItem } from './lib/components/shell';
+  import { navigation, open, type Screen } from './lib/navigation.svelte';
   import { settings } from './lib/settings.svelte';
-  import Appearance from './screens/Appearance.svelte';
   import Contact from './screens/Contact.svelte';
-  import Contacts from './screens/Contacts.svelte';
-  import Dashboard from './screens/Dashboard.svelte';
+  import Home from './screens/Home.svelte';
   import Journal from './screens/Journal.svelte';
   import Mission from './screens/Mission.svelte';
+  import Settings from './screens/Settings.svelte';
+
+  const home: NavItem = { id: 'home', label: 'Home', icon: House };
+  const features: [NavItem, NavItem, NavItem] = [
+    { id: 'missions', label: 'Missions', icon: Target },
+    { id: 'interactions', label: 'Interactions', icon: MessagesSquare },
+    { id: 'calendar', label: 'Calendar', icon: CalendarDays },
+  ];
+
+  // A contact and a mission belong to Home and Missions in the sidebar.
+  const current = $derived(
+    navigation.screen === 'contact' ? 'home' : navigation.screen === 'mission' ? 'missions' : navigation.screen,
+  );
 </script>
 
-<!-- The search box stays on every screen, at the top of the sidebar, so a
-     contact is always one keystroke away from wherever the user is. -->
-<div class="flex h-screen w-screen overflow-hidden bg-[var(--accent-bg)]" data-testid="app-shell">
-  <Sidebar />
+<AppShell
+  logo={appInfo.logo}
+  appName={appInfo.name}
+  {home}
+  {features}
+  {current}
+  onnavigate={(id) => open(id as Screen)}
+>
+  {#if settings.loadError}
+    <p class="m-4 text-sm text-destructive" role="alert" data-testid="settings-load-error">
+      {settings.loadError}
+    </p>
+  {/if}
 
-  <main class="relative z-10 -ml-6 flex min-w-0 flex-1">
-    <div class="@container h-full w-full overflow-y-auto rounded-l-[28px] bg-background shadow-xl" data-testid="content-panel">
-      {#if settings.loadError}
-        <p class="m-4 text-sm text-destructive" role="alert" data-testid="settings-load-error">
-          {settings.loadError}
-        </p>
+  <div data-testid="open-screen">
+    {#key navigation.visit}
+      {#if navigation.screen === 'home'}
+        <Home />
+      {:else if navigation.screen === 'contact'}
+        <Contact />
+      {:else if navigation.screen === 'mission'}
+        <Mission />
+      {:else if navigation.screen === 'missions'}
+        <section class="p-6" data-testid="screen-missions">
+          <h1 class="text-xl font-semibold">Missions</h1>
+          <div class="mt-6"><Placeholder title="Missions" note="Every mission with its ally's avatar. Not built yet." /></div>
+        </section>
+      {:else if navigation.screen === 'interactions'}
+        <!-- The journal stands in until the interactions log is built. -->
+        <Journal />
+      {:else if navigation.screen === 'calendar'}
+        <section class="p-6" data-testid="screen-calendar">
+          <h1 class="text-xl font-semibold">Calendar</h1>
+          <div class="mt-6">
+            <Placeholder title="Calendar" note="Birthdays, reminders and mission due dates. Not built yet." />
+          </div>
+        </section>
+      {:else}
+        <Settings />
       {/if}
-
-      <div data-testid="open-screen">
-        {#if navigation.screen === 'dashboard'}
-          <Dashboard />
-        {:else if navigation.screen === 'contacts'}
-          <Contacts />
-        {:else if navigation.screen === 'contact'}
-          <Contact />
-        {:else if navigation.screen === 'mission'}
-          <Mission />
-        {:else if navigation.screen === 'appearance'}
-          <Appearance />
-        {:else}
-          <Journal />
-        {/if}
-      </div>
-    </div>
-  </main>
-</div>
+    {/key}
+  </div>
+</AppShell>

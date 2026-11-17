@@ -6,10 +6,8 @@
   import { themes } from '../themes';
 </script>
 
-<section class="max-w-xl p-6" data-testid="screen-appearance">
-  <h1 class="text-xl font-semibold">Appearance</h1>
-
-  <fieldset class="mt-6">
+<section class="max-w-xl" data-testid="screen-appearance">
+  <fieldset>
     <legend class="text-sm font-medium">Theme</legend>
     <div class="mt-2 flex flex-col gap-2">
       {#each themes as theme (theme.id)}

@@ -2,13 +2,13 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/svelte';
 import { beforeEach, describe, expect, it } from 'vitest';
 import App from './App.svelte';
 import { db } from './lib/db';
-import { navigation, open, openContact } from './lib/navigation.svelte';
+import { navigation, openContact } from './lib/navigation.svelte';
 import { addContact, blankInput } from './lib/repo/contacts';
 import { settings } from './lib/settings.svelte';
 import { fakeStore } from './test/fake-store';
 
 beforeEach(() => {
-  navigation.screen = 'dashboard';
+  navigation.screen = 'home';
   navigation.contactId = null;
 });
 
@@ -28,71 +28,70 @@ describe('the sidebar', () => {
     expect(alert.compareDocumentPosition(content) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 
-  it('shows the logo, named Allies, and the name Allies', () => {
+  it('shows the logo, named Allies, without the name as text', () => {
     render(App);
     const sidebar = screen.getByTestId('sidebar');
     const logo = screen.getByRole('img', { name: 'Allies' });
     expect(sidebar.contains(logo)).toBe(true);
-    expect(sidebar.textContent).toContain('Allies');
+    expect(sidebar.textContent).not.toContain('Allies');
   });
 
-  it('holds search, the screens, Appearance and the theme button', () => {
+  it('holds Home, Missions, Interactions, Calendar, Settings and a disabled Log out', () => {
     render(App);
     const sidebar = screen.getByTestId('sidebar');
-    expect(sidebar.contains(screen.getByTestId('search-box'))).toBe(true);
-    for (const name of ['Dashboard', 'Contacts', 'Journal', 'Appearance', 'Switch to dark theme']) {
-      expect(sidebar.contains(screen.getByRole('button', { name }))).toBe(true);
-    }
+    const labels = Array.from(sidebar.querySelectorAll('button'), (button) => button.getAttribute('aria-label'));
+    expect(labels).toEqual(['Home', 'Missions', 'Interactions', 'Calendar', 'Settings', 'Log out']);
+    expect(screen.getByRole('button', { name: 'Log out' }).getAttribute('aria-disabled')).toBe('true');
   });
 
-  it('switches Light to Dark with the theme button', async () => {
+  it('switches Light to Dark with the theme button in the Home header', async () => {
     fakeStore();
     await settings.setTheme('light');
     render(App);
 
+    const header = screen.getByTestId('home-header');
     await fireEvent.click(screen.getByRole('button', { name: 'Switch to dark theme' }));
 
     expect(document.documentElement.dataset.theme).toBe('dark');
-    expect(screen.getByRole('button', { name: 'Switch to light theme' })).toBeTruthy();
+    expect(header.contains(screen.getByRole('button', { name: 'Switch to light theme' }))).toBe(true);
   });
 
-  it('opens the Appearance screen from the footer', async () => {
+  it('opens Settings on Appearance, with Email as its own section', async () => {
     render(App);
-    await fireEvent.click(screen.getByRole('button', { name: 'Appearance' }));
+    await fireEvent.click(screen.getByRole('button', { name: 'Settings' }));
     expect(screen.getByTestId('screen-appearance')).toBeTruthy();
+    expect(screen.getByTestId('settings-tab-unique').textContent?.trim()).toBe('Email');
+  });
+
+  it('shows the logo credit under Info', async () => {
+    render(App);
+    await fireEvent.click(screen.getByRole('button', { name: 'Settings' }));
+    await fireEvent.click(screen.getByTestId('settings-tab-info'));
+    expect(screen.getByTestId('logo-attribution').textContent).toContain('Flaticon');
   });
 });
 
 describe('the shell', () => {
-  it('shows the search box on the dashboard', () => {
+  it('opens on Home, the contacts list, with the search box in the header', () => {
     render(App);
-    expect(screen.getByTestId('search-box')).toBeTruthy();
-    expect(screen.getByTestId('screen-dashboard')).toBeTruthy();
+    expect(screen.getByTestId('screen-home')).toBeTruthy();
+    expect(screen.getByTestId('screen-contacts')).toBeTruthy();
+    expect(screen.getByTestId('home-header').contains(screen.getByTestId('search-box'))).toBe(true);
+    expect(screen.getByTestId('notifications')).toBeTruthy();
   });
 
   it.each([
-    ['dashboard', 'screen-dashboard'],
-    ['contacts', 'screen-contacts'],
-    ['contact', 'screen-contact'],
-    ['journal', 'screen-journal'],
-  ] as const)('shows the search box on the %s screen', (screenName, testId) => {
-    open(screenName);
+    ['missions', 'screen-missions'],
+    ['interactions', 'screen-journal'],
+    ['calendar', 'screen-calendar'],
+  ] as const)('opens %s from the sidebar', async (id, testId) => {
     render(App);
-    expect(screen.getByTestId('search-box')).toBeTruthy();
+    await fireEvent.click(screen.getByTestId(`sidebar-${id}`));
     expect(screen.getByTestId(testId)).toBeTruthy();
+    expect(screen.getByTestId(`sidebar-${id}`).getAttribute('aria-current')).toBe('page');
   });
 
-  it('keeps the search box when the user moves between the screens the sidebar offers', async () => {
-    render(App);
-
-    for (const label of ['Contacts', 'Journal', 'Dashboard']) {
-      await fireEvent.click(screen.getByRole('button', { name: label }));
-      expect(screen.getByTestId('search-box')).toBeTruthy();
-    }
-    expect(screen.getByTestId('screen-dashboard')).toBeTruthy();
-  });
-
-  it('shows the contact screen when a contact is opened, and still has the search box', async () => {
+  it('shows the contact screen when a contact is opened, with Home marked in the sidebar', async () => {
     const connection = await db();
     const id = await addContact(connection, { ...blankInput(), firstName: 'Ada' });
 
@@ -100,7 +99,17 @@ describe('the shell', () => {
     render(App);
 
     await waitFor(() => expect(screen.getByTestId('contact-name').textContent).toBe('Ada'));
-    expect(screen.getByTestId('search-box')).toBeTruthy();
+    expect(screen.getByTestId('sidebar-home').getAttribute('aria-current')).toBe('page');
+  });
+
+  it('reloads Home when its sidebar button is pressed again', async () => {
+    render(App);
+    await waitFor(() => expect(screen.getByTestId('contacts-empty')).toBeTruthy());
+
+    await addContact(await db(), { ...blankInput(), firstName: 'Ada' });
+    await fireEvent.click(screen.getByTestId('sidebar-home'));
+
+    await waitFor(() => expect(screen.getByTestId('contacts-list').textContent).toContain('Ada'));
   });
 
   it('says so when the contact is gone', async () => {

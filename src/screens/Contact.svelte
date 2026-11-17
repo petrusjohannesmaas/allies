@@ -17,8 +17,8 @@
   let tags = $state<string[]>([]);
   let missing = $state(false);
 
-  // Opening a page is what counts as viewing a contact, so the dashboard's
-  // recently viewed list picks this one up. The effect reads only the id, so
+  // Opening a page is what counts as viewing a contact, which orders Home's
+  // recent contacts. The effect reads only the id, so
   // it runs once per contact rather than on every reload.
   $effect(() => {
     const id = navigation.contactId;

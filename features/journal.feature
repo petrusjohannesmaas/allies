@@ -5,17 +5,17 @@ Feature: The journal
 
   Scenario: Add a journal entry
     Given the app has just started
-    When I open the "Journal" screen
+    When I open the "Interactions" screen
     And I add a journal entry dated "today" with the text "A quiet day at home"
     Then the journal entry "A quiet day at home" is listed
     And the journal shows the month for "today"
     When I close and reopen the app
-    And I open the "Journal" screen
+    And I open the "Interactions" screen
     Then the journal entry "A quiet day at home" is listed
 
   Scenario: Delete a journal entry
     Given the app has just started
-    When I open the "Journal" screen
+    When I open the "Interactions" screen
     And I add a journal entry dated "today" with the text "A quiet day at home"
     And I add a journal entry dated "1 day ago" with the text "Walked in the park"
     Then both journal entries are listed
@@ -25,19 +25,19 @@ Feature: The journal
 
   Scenario: Rate the day
     Given the app has just started
-    When I open the "Journal" screen
+    When I open the "Interactions" screen
     Then today is not rated
     When I rate the day "happy"
     Then today's rating reads "happy"
     And the face "happy" is marked as chosen
     And the journal lists a rating row for "today" reading "happy"
     When I close and reopen the app
-    And I open the "Journal" screen
+    And I open the "Interactions" screen
     Then today's rating reads "happy"
 
   Scenario: A second rating is refused
     Given the app has just started
-    When I open the "Journal" screen
+    When I open the "Interactions" screen
     And I rate the day "sad"
     And I rate the day "happy"
     Then the day is already rated as "sad"
@@ -48,7 +48,7 @@ Feature: The journal
     And a contact named "Ada Lovelace" exists
     When I open the contact "Ada Lovelace"
     And I log an activity dated "2 days ago" in the category "did sport together" with the description "We went skiing"
-    And I open the "Journal" screen
+    And I open the "Interactions" screen
     Then the automatic entry "We went skiing" for "Ada Lovelace" is listed
     And the automatic entry "We went skiing" is marked "Created automatically"
 
@@ -57,7 +57,7 @@ Feature: The journal
     And a contact named "Ada Lovelace" exists
     When I open the contact "Ada Lovelace"
     And I log a call dated "3 days ago" with the description "Caught up about the conference"
-    And I open the "Journal" screen
+    And I open the "Interactions" screen
     Then the automatic entry "Caught up about the conference" for "Ada Lovelace" is listed
     And the automatic entry "Caught up about the conference" is marked "Created automatically"
 
@@ -66,7 +66,7 @@ Feature: The journal
     And a contact named "Ada Lovelace" exists
     When I open the contact "Ada Lovelace"
     And I log an activity dated "today" in the category "ate at a restaurant" with the description "Lunch at the diner"
-    And I open the "Journal" screen
+    And I open the "Interactions" screen
     Then the automatic entry "Lunch at the diner" has no delete button
     When I add a journal entry dated "today" with the text "A quiet day at home"
     Then the journal entry "A quiet day at home" has a delete button
@@ -78,12 +78,12 @@ Feature: The journal
     When I open the contact "Ada Lovelace"
     And I log an activity dated "today" in the category "ate at a restaurant" with the description "Lunch at the diner"
     And I log a call dated "today" with the description "Called about the book"
-    And I open the "Journal" screen
+    And I open the "Interactions" screen
     Then the automatic entry "Lunch at the diner" is listed
     And the automatic entry "Called about the book" is listed
     When I open the contact "Ada Lovelace"
     And I delete the activity "Lunch at the diner"
-    And I open the "Journal" screen
+    And I open the "Interactions" screen
     Then the automatic entry "Lunch at the diner" is not listed
     And the automatic entry "Called about the book" is listed
 
@@ -93,18 +93,18 @@ Feature: The journal
     When I open the contact "Ada Lovelace"
     And I log a call dated "today" with the description "Called about the book"
     And I log a call dated "today" with the description "Caught up about the conference"
-    And I open the "Journal" screen
+    And I open the "Interactions" screen
     Then the automatic entry "Called about the book" is listed
     And the automatic entry "Caught up about the conference" is listed
     When I open the contact "Ada Lovelace"
     And I delete the call "Called about the book"
-    And I open the "Journal" screen
+    And I open the "Interactions" screen
     Then the automatic entry "Called about the book" is not listed
     And the automatic entry "Caught up about the conference" is listed
 
   Scenario: The journal lists rows newest first
     Given the app has just started
-    When I open the "Journal" screen
+    When I open the "Interactions" screen
     And I add a journal entry dated "1 day ago" with the text "Walked in the park"
     And I add a journal entry dated "40 days ago" with the text "Started a new book"
     And I add a journal entry dated "today" with the text "A quiet day at home"

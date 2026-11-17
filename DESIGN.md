@@ -14,8 +14,8 @@ Allies is a desktop app for one person on one machine. It keeps contacts, what t
 ```
 src/
   main.ts                 loads the settings, then mounts App
-  App.svelte              the sidebar and the content panel with the open screen
-  assets/logo.png         the logo shown in the sidebar, cropped from LOGOS.png
+  App.svelte              the shared shell (sidebar and content panel) with the open screen
+  assets/logo.png         the logo shown in the sidebar and Settings, Info (96 px, a Lanczos resize of ~/Code/app-shell/logos/allies.png, so the edges stay smooth)
   app.css                 Tailwind, the colour variables mapped to Tailwind, the focus ring
   themes/                 light.css, dark.css and index.ts
   lib/platform.ts         the only file that imports @tauri-apps/*
@@ -31,8 +31,10 @@ src/
   lib/activity-categories.ts  the activity categories
   lib/contact-validation.ts  the contact form rules
   lib/repo/               one module per table group: contacts, notes, calls and so on
-  screens/                Dashboard, Contacts, Contact, Mission, Journal, Appearance
-  components/             shared pieces, including Sidebar, IconButton and FieldLabel
+  screens/                Home, Contacts, Contact, Mission, Journal, Settings, Appearance
+  components/             shared pieces, including SearchBox, IconButton and FieldLabel
+  lib/components/shell/   the shared sidebar, Home header and Settings frame, copied from ~/Code/app-shell
+  lib/app-info.ts         the name, description, logo and logo credit (from logo-attribution.txt)
   test/                   Vitest setup, the node:sqlite Db used by data tests, and fake-store.ts, which answers the store plugin's IPC calls
 features/                 Gherkin files, with step definitions in features/step-definitions/
 scripts/install-desktop.sh  npm run desktop:install
@@ -50,7 +52,9 @@ src-tauri/
 
 ## Screens
 
-The window has a sidebar on the left and a content panel with six screens: dashboard, contacts, contact, mission, journal and appearance. The sidebar is about 240 px wide and filled with the accent. From the top it holds the logo and the name Allies, the search box, the Dashboard, Contacts and Journal items, and at the bottom Appearance and the light/dark button. Search results open under the search box, over the content panel. The content panel has rounded left corners where it meets the sidebar. A contact opens from the contacts list, search or the dashboard, and a mission opens from its contact's page. `navigation.svelte.ts` holds the open screen, the open contact id and the open mission id. There is no router. The window is at least 1024 px wide.
+The window is the shared shell from `~/Code/app-shell`: a sidebar on the left and a content panel. The sidebar is always collapsed, about 120 px wide, on the grey `--secondary` colour. From the top it holds the logo, then Home, Missions, Interactions and Calendar as icon buttons with tooltips, and at the bottom Settings and a Log out button that is disabled. The open screen's button has a light accent tint. The content panel has rounded left corners where it meets the sidebar.
+
+The screens are home, contact, mission, missions, interactions, calendar and settings. Home is the shared Home header over the contacts list: the title, the search box, the bell, the light/dark button and the profile menu. Search results open under the search box. Missions and Calendar are placeholders. Interactions shows the journal until its own screen is built. Settings has the tabs Appearance, Email, Info, Profile and Data; Email, Profile and Data are placeholders. A contact opens from the contacts list or search, and a mission opens from its contact's page. `navigation.svelte.ts` holds the open screen, the open contact id, the open mission id and the open Settings section. There is no router. The window is at least 1024 px wide.
 
 The contact page follows the sketch in `preview.webp`. A header holds the picture, name, category, email, phone, birthday and tags, with the Missions box on its right. Below it a grid of cards, always two to a row, holds About, Notes, Phone calls, Activities, Address and Reminders in that order. About holds significant other, children, how they met, work and food preferences.
 
@@ -63,7 +67,7 @@ Contact and activity categories are stored in lower case and shown through `labe
 - `src/themes/light.css` and `dark.css` set shadcn-svelte's colour variables (`--background`, `--foreground`, `--card`, `--primary`, `--muted-foreground`, `--border` and the rest) on `:root[data-theme="<id>"]`. These are the app's only colour variables, and `app.css` maps them to Tailwind colours, so screens use `bg-background`, `text-muted-foreground` and so on. Dark's background is `#1e1e1e`. Light is Zaimu's neutral light palette.
 - `app.css` declares `@custom-variant dark (&:is([data-theme='dark'] *))`, so `dark:` classes follow `data-theme`.
 - The theme setting is `system`, `light` or `dark`, default `system`. For `system`, the app follows `prefers-color-scheme` and switches when the system does. `data-theme` on `<html>` always holds the theme in use, `light` or `dark`.
-- The accent is one of the nine libadwaita colours Zaimu uses (blue, teal, green, yellow, orange, red, pink, purple, slate), default blue. The settings code sets `--accent-bg` on `<html>` to the accent's fill, and `--primary` and `--ring` take it, so the sidebar, primary buttons, focus rings and the Appearance swatches use it. The fill (`accentFillHex` in `lib/accents.ts`) is the accent with its OKLab lightness lowered in steps of 0.005 until white text reaches 4.5:1, or the accent itself when white already does. `--primary-foreground` is always white. `--accent-text` is the accent made darker in Light and lighter in Dark, for accent-coloured text and icons. shadcn's own `--accent` is a hover background, not the user's accent.
+- The accent is one of the nine libadwaita colours Zaimu uses (blue, teal, green, yellow, orange, red, pink, purple, slate), default blue. The settings code sets `--accent-bg` on `<html>` to the accent's fill, and `--primary` and `--ring` take it, so primary buttons, focus rings and the Appearance swatches use it. The sidebar's open item is the accent at 18% over the grey, with its icon in `--accent-text`. The fill (`accentFillHex` in `lib/accents.ts`) is the accent with its OKLab lightness lowered in steps of 0.005 until white text reaches 4.5:1, or the accent itself when white already does. `--primary-foreground` is always white. `--accent-text` is the accent made darker in Light and lighter in Dark, for accent-coloured text and icons. shadcn's own `--accent` is a hover background, not the user's accent.
 - A change applies at once and is then saved. Saves run one after another. A failed save keeps the change for the session and shows a message on the Appearance screen. A failed load at start-up uses the defaults and shows a message above the content.
 - `main.ts` loads the settings before it mounts the app, so the first frame has the right theme and accent.
 
@@ -113,7 +117,7 @@ A date is a local-time string `YYYY-MM-DD`, and `lib/dates.ts` is the only code 
 
 - The upcoming window runs from today to the same day of the month three months later, both days included. When that month is shorter, the last day of that month ends the window.
 - A birthday or yearly reminder shows on its next date on or after today. A 29 February date falls on 28 February in a year with no 29 February.
-- The dashboard groups upcoming dates by month and sorts them by date.
+- Upcoming dates group by month and sort by date. The Calendar will use them.
 
 ## Pictures
 
@@ -148,3 +152,5 @@ Scenario dates are computed from today in the step definitions, so no scenario n
 - 13 November 2026. Allies uses shadcn-svelte and shadcn's colour variable names, as Zaimu and Taskflow do, so the three apps' controls and themes match.
 - 13 November 2026. Text on the accent is always white, and the accent fill is darkened just enough for 4.5:1. No single text colour reaches 4.5:1 on all nine of Zaimu's accents: `#1e1e1e` fails on six of them and black fails on purple. Zaimu's accent hex values stay unchanged.
 - 13 November 2026. The contact page's cards are always two to a row. The 1024 px minimum window width leaves the content panel at about 784 px or more, so the one-column layout from #19 could no longer be reached.
+- 18 November 2026. The sidebar, Home header and Settings frame are shared with Zaimu and Taskflow. They live in `~/Code/app-shell` and `scripts/sync.sh` there copies them into `src/lib/components/shell/`. A change goes into app-shell and is synced, never edited in this copy.
+- 18 November 2026. The dashboard is removed. Upcoming birthdays and reminders move to the Calendar, and recently viewed contacts move to Home.
