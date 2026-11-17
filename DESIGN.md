@@ -15,7 +15,7 @@ Allies is a desktop app for one person on one machine. It keeps contacts, what t
 src/
   main.ts                 loads the settings, then mounts App
   App.svelte              the shared shell (sidebar and content panel) with the open screen
-  assets/logo.png         the logo shown in the sidebar and Settings, Info (256 px, from ~/Code/app-shell/logos/allies.png)
+  assets/logo.png         the logo shown in the sidebar and Settings, Info (96 px, a Lanczos resize of ~/Code/app-shell/logos/allies.png, so the edges stay smooth)
   app.css                 Tailwind, the colour variables mapped to Tailwind, the focus ring
   themes/                 light.css, dark.css and index.ts
   lib/platform.ts         the only file that imports @tauri-apps/*
