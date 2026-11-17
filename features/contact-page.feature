@@ -6,7 +6,7 @@ Feature: The contact page
   Scenario: Open a contact
     Given the app has just started
     And a contact named "Ada Lovelace" exists with the category "colleague" and the birthday 1990-05-01
-    When I open the "Contacts" screen
+    When I open the "Home" screen
     And I select the contact "Ada Lovelace"
     Then the contact page shows "Ada Lovelace"
     And the contact page shows the category "Colleague"
@@ -27,7 +27,7 @@ Feature: The contact page
     When I open the contact "Ada Lovelace"
     And I edit the contact "Ada Lovelace"
     And I fill in "new@example.com" as the email
-    And I open the "Contacts" screen
+    And I open the "Home" screen
     And I select the contact "Ada Lovelace"
     Then the contact page shows the email "ada@example.com"
 

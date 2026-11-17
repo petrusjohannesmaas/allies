@@ -9,20 +9,14 @@ server and has no login.
 
 ## What it does
 
-Six screens sit behind one sidebar, which has a search box that reaches every
-one of them. The sidebar links to Dashboard, Contacts and Journal, and its
-footer has Appearance and a button that switches between the light and dark
-theme.
+A narrow sidebar of icons holds Home, Missions, Interactions and Calendar, with
+Settings and a Log out button (not available yet) at the bottom. Missions and
+Calendar are placeholders for now, and Interactions shows the journal.
 
-**Dashboard.** Every birthday and reminder from today to the same date three
-months on, soonest first and grouped by month. A birthday needs no reminder
-added by hand, and one that has passed this year comes round on its next date.
-The eight contacts you opened most recently are there, and a count of your
-contacts and of every call and activity you logged.
-
-**Contacts.** Add and delete a contact with a picture, a category, names, an
-email, a phone number, a birthday and tags. You edit a contact on their own
-page. Type part of a name in the search box to find one.
+**Home.** Your contacts. Add and delete a contact with a picture, a category,
+names, an email, a phone number, a birthday and tags. You edit a contact on
+their own page. Type part of a name in the search box at the top to find one.
+The top right holds a bell, the light and dark switch and your profile.
 
 **A contact.** Everything about one person on one page. A header holds the
 picture, name, category, email, phone number, birthday and tags, with the
@@ -47,15 +41,17 @@ description, an optional due date and an ordered list of tasks. Tick a task to
 cross it out, and move tasks up and down to reorder them. The Missions box
 lists missions soonest due first, with progress such as "2 of 5".
 
-**Journal.** What you wrote, newest first, with the month and year above each
+**Journal (under Interactions).** What you wrote, newest first, with the month and year above each
 run of rows. Rate a day once with one of three faces. Every call and activity
 you log appears here as well, marked as created automatically and naming the
 contact it was with, and goes away with the call or activity itself. There is
 no way to delete one of those rows from the journal.
 
-**Appearance.** Opens from the sidebar footer. Choose System, Light or Dark, and
-pick one of nine accent colours, which fills the sidebar. The choice is saved
-and kept when the app restarts.
+**Settings.** Appearance, Email, Info, Profile and Data. Under Appearance,
+choose System, Light or Dark and pick one of nine accent colours, which tints
+the sidebar's open item and fills the buttons. The choice is saved and kept when
+the app restarts. Info shows the logo credit. Email, Profile and Data are
+placeholders for now.
 
 ## Install it
 

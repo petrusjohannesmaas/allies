@@ -1,7 +1,7 @@
 Feature: Contact search
 
-  The search box sits at the top of the sidebar, on every screen, so a contact is one
-  keystroke away from wherever the user is.
+  The search box sits in the Home header, so a contact is one keystroke away from
+  the list.
 
   Scenario: Search by part of a first name
     Given the app has just started

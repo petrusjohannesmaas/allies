@@ -69,7 +69,7 @@ describe('adding a contact', () => {
     expect(await listTags(db, id)).toEqual(['chess']);
   });
 
-  it('counts what the dashboard counts', async () => {
+  it('counts the contacts', async () => {
     expect(await countContacts(db)).toBe(0);
     await addContact(db, input({ firstName: 'Ada' }));
     await addContact(db, input({ firstName: 'Grace' }));

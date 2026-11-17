@@ -6,7 +6,7 @@ import { navigation } from '$lib/navigation.svelte';
 import { addContact, blankInput } from '$lib/repo/contacts';
 
 beforeEach(async () => {
-  navigation.screen = 'dashboard';
+  navigation.screen = 'home';
   navigation.contactId = null;
 
   const connection = await db();

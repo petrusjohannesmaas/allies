@@ -19,8 +19,9 @@ async function waitForSave() {
   );
 }
 
+// Settings opens on Appearance.
 async function openAppearance() {
-  await $(`${SIDEBAR} [data-testid="sidebar-appearance"]`).click();
+  await $(`${SIDEBAR} [data-testid="sidebar-settings"]`).click();
   await $('[data-testid="screen-appearance"]').waitForExist({ timeout: 5_000 });
 }
 
@@ -61,7 +62,8 @@ When(/^I pick the (\w+) accent$/, async (name: string) => {
 });
 
 When('I press the theme button', async () => {
-  await $(`${SIDEBAR} [data-testid="sidebar-theme"]`).click();
+  await $(`${SIDEBAR} [data-testid="sidebar-home"]`).click();
+  await $('[data-testid="home-header"] [data-testid="theme-toggle"]').click();
   await waitForSave();
 });
 

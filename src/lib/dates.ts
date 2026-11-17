@@ -31,7 +31,7 @@ export function formatDate(day: string): string {
   return `${date} ${MONTHS[month - 1]} ${year}`;
 }
 
-/** The year and month a date sits in, as the dashboard groups them. */
+/** The year and month a date sits in, for grouping upcoming dates by month. */
 export function monthOf(day: string): string {
   return day.slice(0, 7);
 }
@@ -65,16 +65,16 @@ function pad(part: number): string {
   return `${part}`.padStart(2, '0');
 }
 
-/* The dashboard's window */
+/* The upcoming window, which the Calendar will use */
 
-/** A contact with a birthday, as the dashboard needs to see one. */
+/** A contact with a birthday, as the upcoming dates need to see one. */
 export interface Birthday {
   id: number;
   name: string;
   birthday: string | null;
 }
 
-/** A reminder, as the dashboard needs to see one. */
+/** A reminder, as the upcoming dates need to see one. */
 export interface DatedReminder {
   contactId: number;
   contactName: string;

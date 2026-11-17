@@ -59,7 +59,7 @@
 
 <section class="p-6" data-testid="screen-contacts">
   <div class="mb-4 flex items-center justify-between">
-    <h1 class="text-xl font-semibold">Contacts</h1>
+    <h2 class="text-lg font-semibold">All contacts</h2>
     {#if mode === 'list'}
       <Button data-testid="add-contact" onclick={() => (mode = 'add')}><Plus aria-hidden="true" />New contact</Button>
     {/if}

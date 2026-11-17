@@ -5,12 +5,12 @@ Feature: Contacts
 
   Scenario: First run shows no contacts
     Given the app has just started
-    When I open the "Contacts" screen
+    When I open the "Home" screen
     Then the contacts list is empty
 
   Scenario: Add a contact
     Given the app has just started
-    When I open the "Contacts" screen
+    When I open the "Home" screen
     And I add a contact
     And I fill in the first name "Ada"
     And I fill in the last name "Lovelace"
@@ -31,7 +31,7 @@ Feature: Contacts
 
   Scenario: The first name is required
     Given the app has just started
-    When I open the "Contacts" screen
+    When I open the "Home" screen
     And I add a contact
     And I save the contact
     Then the form says the first name is required
@@ -39,7 +39,7 @@ Feature: Contacts
 
   Scenario: An email has to be an address
     Given the app has just started
-    When I open the "Contacts" screen
+    When I open the "Home" screen
     And I add a contact
     And I fill in the first name "Ada"
     And I fill in "ada at example" as the email
@@ -49,14 +49,14 @@ Feature: Contacts
 
   Scenario: The category picker offers eight categories
     Given the app has just started
-    When I open the "Contacts" screen
+    When I open the "Home" screen
     And I add a contact
     Then the category picker offers family, friend, colleague, acquaintance, mentor, community, stranger and online
 
   Scenario: Edit a contact and reopen the app
     Given the app has just started
     And a contact named "Ada Lovelace" exists
-    When I open the "Contacts" screen
+    When I open the "Home" screen
     And I edit the contact "Ada Lovelace"
     And I fill in the last name "Byron"
     And I choose "mentor" as the category
@@ -65,7 +65,7 @@ Feature: Contacts
     And I save the contact
     Then the contact page shows "Ada Byron"
     When I close and reopen the app
-    And I open the "Contacts" screen
+    And I open the "Home" screen
     Then the contacts list shows "Ada Byron"
     And the contact "Ada Byron" has the category "mentor"
     When I select the contact "Ada Byron"
@@ -77,7 +77,7 @@ Feature: Contacts
     Given the app has just started
     And a contact named "Ada Lovelace" exists
     And a contact named "Grace Hopper" exists
-    When I open the "Contacts" screen
+    When I open the "Home" screen
     Then the contacts list shows "Ada Lovelace"
     And the contacts list shows "Grace Hopper"
     When I delete the contact "Ada Lovelace"
@@ -85,5 +85,5 @@ Feature: Contacts
     Then the contacts list does not show "Ada Lovelace"
     And the contacts list shows "Grace Hopper"
     When I close and reopen the app
-    And I open the "Contacts" screen
+    And I open the "Home" screen
     Then the contacts list does not show "Ada Lovelace"

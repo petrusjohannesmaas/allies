@@ -6,19 +6,19 @@ Feature: Profile pictures
   Scenario: A picture is stored in the app folder
     Given the app has just started
     And a contact named "Ada Lovelace" exists
-    When I open the "Contacts" screen
+    When I open the "Home" screen
     And I edit the contact "Ada Lovelace"
     And I choose the portrait fixture as the picture
     And I save the contact
     Then the pictures folder holds 1 file
-    When I open the "Contacts" screen
+    When I open the "Home" screen
     Then the contact "Ada Lovelace" has a picture
     And the contact "Ada Lovelace" shows the picture
 
   Scenario: A replaced picture is removed
     Given the app has just started
     And a contact named "Ada Lovelace" exists
-    When I open the "Contacts" screen
+    When I open the "Home" screen
     And I edit the contact "Ada Lovelace"
     And I choose the portrait fixture as the picture
     And I save the contact
@@ -32,12 +32,12 @@ Feature: Profile pictures
     Given the app has just started
     And a contact named "Ada Lovelace" exists
     And a contact named "Grace Hopper" exists
-    When I open the "Contacts" screen
+    When I open the "Home" screen
     And I edit the contact "Ada Lovelace"
     And I choose the portrait fixture as the picture
     And I save the contact
     Then the pictures folder holds 1 file
-    When I open the "Contacts" screen
+    When I open the "Home" screen
     And I delete the contact "Ada Lovelace"
     And I confirm the deletion
     Then the pictures folder holds 0 files
@@ -45,6 +45,6 @@ Feature: Profile pictures
   Scenario: A contact with no picture needs no file
     Given the app has just started
     And a contact named "Ada Lovelace" exists
-    When I open the "Contacts" screen
+    When I open the "Home" screen
     Then the pictures folder holds 0 files
     And the contact "Ada Lovelace" has no picture

@@ -178,12 +178,12 @@ function escapeLike(value: string): string {
   return value.replace(/[\\%_]/g, (character) => `\\${character}`);
 }
 
-/** Records that the user opened this contact, which is what the dashboard's recently viewed list reads. */
+/** Records that the user opened this contact, which orders Home's recent contacts. */
 export async function markViewed(db: Db, id: number): Promise<void> {
   await db.execute("UPDATE contacts SET last_viewed_at = strftime('%Y-%m-%dT%H:%M:%fZ', 'now') WHERE id = $1", [id]);
 }
 
-/** The number of contacts the dashboard counts. */
+/** The number of contacts. */
 export async function countContacts(db: Db): Promise<number> {
   const rows = await db.select<{ n: number }>('SELECT COUNT(*) AS n FROM contacts');
   return rows[0].n;

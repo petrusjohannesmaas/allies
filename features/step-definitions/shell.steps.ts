@@ -40,45 +40,40 @@ Given('the app has just started', { timeout: 180_000 }, async () => {
   );
 });
 
+// The sidebar's buttons are icons, named by their aria-label.
+// The sidebar's buttons are icons, named by their aria-label.
 When(/^I open the "([^"]+)" screen$/, async (label: string) => {
-  await browser.execute((sidebar, name) => {
-    const buttons = [...document.querySelectorAll(`${sidebar} nav[aria-label="Screens"] button`)];
-    const match = buttons.find((b) => b.textContent?.trim() === name);
-    if (!match) throw new Error(`No button named "${name}" in the sidebar`);
-    (match as HTMLButtonElement).click();
-  }, SIDEBAR, label);
+  await $(`${SIDEBAR} button[aria-label="${label}"]`).click();
   await browser.waitUntil(
-    async () => (await browser.execute((sidebar) => document.querySelectorAll(`${sidebar} button[aria-current="page"]`).length, SIDEBAR)) === 1,
+    async () => (await $(`${SIDEBAR} button[aria-label="${label}"]`).getAttribute('aria-current')) === 'page',
     { timeout: 5_000, timeoutMsg: `The "${label}" screen did not open` },
   );
 });
 
-Then('the search box is at the top of the sidebar', async () => {
-  const box = await $('input[data-testid="search-box"]');
-  await box.waitForExist({ timeout: 5_000 });
-
-  const placement = await browser.execute((sidebar, selector) => {
-    const field = document.querySelector(selector);
-    const bar = document.querySelector(sidebar);
-    if (!field || !bar) return null;
-    const fieldBox = field.getBoundingClientRect();
-    const barBox = bar.getBoundingClientRect();
-    return {
-      insideSidebar: fieldBox.top >= barBox.top && fieldBox.bottom <= barBox.bottom,
-      atTop: fieldBox.top < window.innerHeight / 2,
-      label: field.getAttribute('aria-label'),
-    };
-  }, SIDEBAR, 'input[data-testid="search-box"]');
-
-  expect(placement).not.toBeNull();
-  expect(placement?.insideSidebar).toBe(true);
-  expect(placement?.atTop).toBe(true);
-  expect(placement?.label).toBe('Search contacts');
-});
+// Interactions shows the journal until its own screen is built.
+const SCREENS: Record<string, string> = {
+  Home: 'screen-home',
+  Missions: 'screen-missions',
+  Interactions: 'screen-journal',
+  Calendar: 'screen-calendar',
+  Settings: 'settings-page',
+};
 
 Then(/^the "([^"]+)" screen is open$/, async (label: string) => {
-  const testId = `screen-${label.toLowerCase()}`;
+  const testId = SCREENS[label];
+  if (!testId) throw new Error(`No screen is known as "${label}"`);
   await $(`[data-testid="${testId}"]`).waitForExist({ timeout: 5_000 });
+});
+
+Then('the search box is in the Home header', async () => {
+  const box = await $('[data-testid="home-header"] input[data-testid="search-box"]');
+  await box.waitForExist({ timeout: 5_000 });
+  expect(await box.getAttribute('aria-label')).toBe('Search contacts');
+});
+
+Then('the Log out button is disabled', async () => {
+  const button = await $(`${SIDEBAR} [data-testid="sidebar-logout"]`);
+  expect(await button.getAttribute('aria-disabled')).toBe('true');
 });
 
 // The runner points XDG_CONFIG_HOME at a folder it made, so a run writes its
