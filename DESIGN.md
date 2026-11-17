@@ -20,8 +20,9 @@ src/
   themes/                 light.css, dark.css and index.ts
   lib/platform.ts         the only file that imports @tauri-apps/*
   lib/db.ts               the Db interface (select, execute) and the plugin-backed Db
-  lib/dates.ts            date strings, adding months, the upcoming-dates function
+  lib/dates.ts            date strings, adding months, the upcoming-dates function, the time since a contact was viewed
   lib/navigation.svelte.ts  the open screen and the open contact
+  lib/home.svelte.ts      Home's selected contact for the session, and `homeView`, which picks the panel's contact and the page
   lib/settings.svelte.ts  the theme and accent, applied to <html> and saved through platform.ts
   lib/accents.ts          the nine accents and the colours worked out from them
   lib/utils.ts            `cn`, used by the shadcn-svelte components
@@ -31,7 +32,7 @@ src/
   lib/activity-categories.ts  the activity categories
   lib/contact-validation.ts  the contact form rules
   lib/repo/               one module per table group: contacts, notes, calls and so on
-  screens/                Home, Contacts, Contact, Mission, Journal, Settings, Appearance
+  screens/                Home, Contact, Mission, Journal, Settings, Appearance
   components/             shared pieces, including SearchBox, IconButton and FieldLabel
   lib/components/shell/   the shared sidebar, Home header and Settings frame, copied from ~/Code/app-shell
   lib/app-info.ts         the name, description, logo and logo credit (from logo-attribution.txt)
@@ -54,9 +55,11 @@ src-tauri/
 
 The window is the shared shell from `~/Code/app-shell`: a sidebar on the left and a content panel. The sidebar is always collapsed, about 120 px wide, on the grey `--secondary` colour. From the top it holds the logo, then Home, Missions, Interactions and Calendar as icon buttons with tooltips, and at the bottom Settings and a Log out button that is disabled. The open screen's button has a light accent tint. The content panel has rounded left corners where it meets the sidebar.
 
-The screens are home, contact, mission, missions, interactions, calendar and settings. Home is the shared Home header over the contacts list: the title, the search box, the bell, the light/dark button and the profile menu. Search results open under the search box. Missions and Calendar are placeholders. Interactions shows the journal until its own screen is built. Settings has the tabs Appearance, Email, Info, Profile and Data; Email, Profile and Data are placeholders. A contact opens from the contacts list or search, and a mission opens from its contact's page. `navigation.svelte.ts` holds the open screen, the open contact id, the open mission id and the open Settings section. There is no router. The window is at least 1024 px wide.
+The screens are home, contact, mission, missions, interactions, calendar and settings. Home is the shared Home header (the title, the search box with its Ctrl+K hint, the bell, the light/dark button and the profile menu) over two columns that follow `allies-home.webp`. Search results open under the search box, and Ctrl+K focuses it. Missions and Calendar are placeholders. Interactions shows the journal until its own screen is built. Settings has the tabs Appearance, Email, Info, Profile and Data; Email, Profile and Data are placeholders. A contact opens from Home's View full profile or search, and a mission opens from its contact's page. `navigation.svelte.ts` holds the open screen, the open contact id, the open mission id and the open Settings section. There is no router. The window is at least 1024 px wide.
 
-The contact page follows the sketch in `preview.webp`. A header holds the picture, name, category, email, phone, birthday and tags, with the Missions box on its right. Below it a grid of cards, always two to a row, holds About, Notes, Phone calls, Activities, Address and Reminders in that order. About holds significant other, children, how they met, work and food preferences.
+Home's middle column holds the filter chips, the list/grid toggle, "All contacts (N)" with Sort, the contact rows and a bottom bar with the count, Add contact, Import, Export and the pager. Its right column is a fixed-width panel that always shows one contact: avatar, name, email, a category pill, four square buttons, an About card, a Notes card (the favourite note, else the latest) and View full profile. Only selecting a row, Add contact, the pager and View full profile do anything; the chips, toggle, Sort, Import, Export, the "⋯", the pencils and the square buttons are inert. Rows are sorted by `last_viewed_at`, newest first, then never-viewed contacts by name, and show the time since the last view, worked out when Home loads. Only opening the contact page sets `last_viewed_at`, so selecting a row does not move it. The panel picks a random contact once per app start, and `lib/home.svelte.ts` remembers the selection until the app closes, falling back to another random contact if that one is deleted. Rows are 56 px high, and a page holds as many as fit the column's height, so the list never scrolls. Home always shows the page that holds the panel's contact. In a window shorter than the panel, the panel scrolls inside itself. Add contact shows the contact form in the middle column, and a saved contact becomes the selected one.
+
+The contact page follows the sketch in `preview.webp`. Its top line has "All contacts" on the left and Delete on the right, which asks "Delete NAME?" and then returns to Home. A header holds the picture, name, category, email, phone, birthday and tags, with the Missions box on its right. Below it a grid of cards, always two to a row, holds About, Notes, Phone calls, Activities, Address and Reminders in that order. About holds significant other, children, how they met, work and food preferences.
 
 Every block on the contact and mission screens uses `EditableCard.svelte`. It is read-only until its pencil is clicked. A field block (the header, About, the mission details) shows Save only once a value differs, and the pencil again, Cancel, Escape or leaving the page discards the draft without asking. A list card in edit mode shows its add form and row controls, and each of those saves at once. The tick box on a task works without edit mode.
 
@@ -118,6 +121,7 @@ A date is a local-time string `YYYY-MM-DD`, and `lib/dates.ts` is the only code 
 - The upcoming window runs from today to the same day of the month three months later, both days included. When that month is shorter, the last day of that month ends the window.
 - A birthday or yearly reminder shows on its next date on or after today. A 29 February date falls on 28 February in a year with no 29 February.
 - Upcoming dates group by month and sort by date. The Calendar will use them.
+- The time since a contact was viewed reads "Just now" under a minute, then "Nm ago", "Nh ago" and "Nd ago" up to 7 days, then the local date such as "8 November 2026".
 
 ## Pictures
 
@@ -130,7 +134,7 @@ The contact form reads the chosen file from an `<input type="file">` and writes 
 | Rust | `cargo test --manifest-path src-tauri/Cargo.toml` |
 | Frontend and data | `npm test` (Vitest, jsdom, `mockIPC`). Data tests run the real migration files on an in-memory `node:sqlite` database behind the same `Db` interface. |
 | Types | `npm run check` |
-| End to end | `npm run test:e2e`. WebdriverIO with `@wdio/tauri-service` and Cucumber against a debug build, headless under `xvfb-run -a`. Restart scenarios relaunch the app themselves through `launchApp()` and wait up to 60 s for it. |
+| End to end | `npm run test:e2e`. WebdriverIO with `@wdio/tauri-service` and Cucumber against a debug build, headless under `xvfb-run -a` on a 1920 × 1080 screen. Steps resize the window through Tauri's window API, which only the end-to-end capability allows. Restart scenarios relaunch the app themselves through `launchApp()` and wait up to 60 s for it. |
 
 Scenario dates are computed from today in the step definitions, so no scenario needs a fake clock. `data-settings-saving` on `<html>` is `true` while a settings save is pending; the Appearance steps wait for it before they restart the app, so the restart never races the write. WebdriverIO packages stay on 9.x.
 
