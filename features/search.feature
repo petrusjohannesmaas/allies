@@ -42,3 +42,10 @@ Feature: Contact search
     When I type "grace" in the search box
     Then the search shows "Grace Hopper"
     And the search does not show "Ada Lovelace"
+
+  Scenario: Ctrl+K focuses the search box
+    Given the app has just started
+    And the "Home" screen is open
+    Then the search box shows "Ctrl+K"
+    When I press Ctrl+K
+    Then the search box has the focus

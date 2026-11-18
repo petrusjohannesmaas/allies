@@ -20,6 +20,16 @@ OUT OF SCOPE
 - 13 November 2026 | #26 | Terracotta, or accents beyond Zaimu's nine. | The issue lists it as out of scope.
 - 13 November 2026 | #26 | Themes other than Light and Dark. | The issue lists it as out of scope.
 - 13 November 2026 | #26 | Changes to screens or features beyond the sidebar, colours, hover, icons, button sizes and spacing. | The issue lists it as out of scope.
+- 18 November 2026 | #32 | Working Recent, Favourites and Groups chips, list/grid toggle, Sort, Import, Export, the "⋯" menu, the panel's edit pencils and the Message, Call, Video and Email buttons. | They render and do nothing. Favourites needs a favourite flag (a migration), and Groups needs a definition.
+- 18 November 2026 | #32 | Search filtering the Home list or selecting a contact in the panel. | Search keeps opening the full contact page.
+- 18 November 2026 | #32 | Online status dots on avatars. | Allies has no online status.
+- 18 November 2026 | #32 | The bell notification. | Needs its own issue. Its wording is still to be decided.
+- 18 November 2026 | #32 | The Missions screen (FT1). | Needs its own issue.
+- 18 November 2026 | #32 | The Interactions screen (FT2) and migration 0005 for emails and messages. | Needs its own issue. Where journal entries and day ratings go is still to be decided.
+- 18 November 2026 | #32 | The Calendar screen (FT3). | Needs its own issue.
+- 18 November 2026 | #32 | Email settings (S1). | Needs its own issue.
+- 18 November 2026 | #32 | Profile settings and the header's profile menu. | Needs its own issue.
+- 18 November 2026 | #32 | Data settings. | Stays a placeholder until its contents (backup, export, or both) are decided.
 DECISIONS
 - 17 October 2026 | #1 | Contact search stays at 8 results. | Outcome 18 says matching contacts are listed. The user chose to keep the cap, since more letters narrow the list.
 - 17 October 2026 | #1 | Only LOGOS.png stays tracked. The Monica screenshots and MONICA-FEATURES.md are untracked and stay on the user's disk. | The user decided this before the pull request. The files remain in the branch's earlier commits.
@@ -27,6 +37,7 @@ DECISIONS
 - 18 November 2026 | shell pass | Settings is a page with tabs (Appearance, Email, Info, Profile, Data). | This supersedes the 13 November 2026 out-of-scope entry "A Taskflow-style Settings screen". The three apps now share one shell.
 - 18 November 2026 | shell pass | The dashboard is removed. | The user scrapped it in the UI pass. Its upcoming dates move to the Calendar and its recently viewed contacts to Home.
 NOTES
+- 18 November 2026 | #32 | The shell copy's SOURCE reads "uncommitted+changes": the app-shell work it was synced from is not committed. | Commit it in ~/Code/app-shell so the copy has provenance.
 - 16 October 2026 | #1 | Monica 1.6.0 is the reference. | The three screenshots the user keeps outside git are Monica 1.6.0, taken from contact.webp's version marker. Where a detail was not visible there, the rule the user set on 16 October 2026 applies: match Monica.
 - 16 October 2026 | #1 | The admin password in create_ally.html stays in the git history of a public repository after the file is deleted. | Rotate the PocketBase admin password.
 - 16 October 2026 | #1 | tauri-plugin-sql resolves SQLite paths against the config folder, and its reference page wrongly says the app folder. | Checked in the plugin source, wrapper.rs on the v2 branch.

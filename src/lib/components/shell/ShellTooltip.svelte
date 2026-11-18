@@ -22,7 +22,9 @@
     {/snippet}
   </Tooltip.Trigger>
   <Tooltip.Portal>
+    <!-- bits-ui gives the content no role of its own. -->
     <Tooltip.Content
+      role="tooltip"
       {side}
       sideOffset={8}
       class="z-50 rounded-md bg-foreground px-2.5 py-1 text-xs font-medium text-background shadow-md"

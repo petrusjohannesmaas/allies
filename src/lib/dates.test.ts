@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { addMonths, formatDate, formatMonth, monthOf, today, upcoming, type Birthday, type DatedReminder } from './dates';
+import { addMonths, dayOf, formatDate, formatTimeSince, formatMonth, monthOf, today, upcoming, type Birthday, type DatedReminder } from './dates';
 
 describe('today', () => {
   it('is the local date, written the way the app stores it', () => {
@@ -161,5 +161,29 @@ describe('the upcoming window', () => {
     const months = upcoming([ada], [reminder({ remindOn: '2026-12-10' })], '2026-10-16');
 
     expect(months[0].dates.map((date) => date.kind)).toEqual(['birthday', 'reminder']);
+  });
+});
+
+
+describe('formatTimeSince', () => {
+  const now = new Date('2026-11-18T12:00:00.000Z');
+
+  it('reads the time since a view', () => {
+    expect(formatTimeSince('2026-11-18T11:59:30.000Z', now)).toBe('Just now');
+    expect(formatTimeSince('2026-11-18T11:55:00.000Z', now)).toBe('5m ago');
+    expect(formatTimeSince('2026-11-18T11:00:01.000Z', now)).toBe('59m ago');
+    expect(formatTimeSince('2026-11-18T09:00:00.000Z', now)).toBe('3h ago');
+    expect(formatTimeSince('2026-11-16T12:00:00.000Z', now)).toBe('2d ago');
+    expect(formatTimeSince('2026-11-11T13:00:00.000Z', now)).toBe('6d ago');
+    expect(formatTimeSince('2026-11-08T12:00:00.000Z', now)).toBe('8 November 2026');
+    expect(formatTimeSince('2026-11-18T12:05:00.000Z', now)).toBe('Just now');
+    expect(formatTimeSince(null, now)).toBe('');
+  });
+});
+
+describe('dayOf', () => {
+  it('gives the local day of a timestamp', () => {
+    expect(dayOf('2026-01-12T12:00:00.000Z')).toBe('2026-01-12');
+    expect(formatDate(dayOf('2026-01-12T12:00:00.000Z'))).toBe('12 January 2026');
   });
 });

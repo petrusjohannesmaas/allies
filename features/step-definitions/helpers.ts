@@ -1,5 +1,3 @@
-export const CONTACTS_SCREEN = '[data-testid="screen-contacts"]';
-
 // Native date inputs take a value the driver cannot type into, so the field is
 // set from the page and sent the change event the screen listens for.
 export async function setFieldValue(selector: string, value: string) {
@@ -74,11 +72,18 @@ export function dayFromNow(phrase: string): string {
   return when.toLocaleDateString('en-CA');
 }
 
-/** Opens a contact from the Contacts list and waits for its page. */
-export async function selectContact(name: string) {
-  const row = $(`[data-testid="contact-row"][data-contact-name="${name}"] [data-testid="open-contact"]`);
+/** Clicks a row on Home, which shows that contact in the panel. */
+export async function clickRow(name: string) {
+  const row = $(`[data-testid="contact-row"][data-contact-name="${name}"]`);
   await row.waitForExist({ timeout: 5_000 });
   await row.click();
+  await $(`[data-testid="contact-row"][data-contact-name="${name}"][aria-current="true"]`).waitForExist({ timeout: 5_000 });
+}
+
+/** Opens a contact from Home: the row, then View full profile, and waits for its page. */
+export async function selectContact(name: string) {
+  await clickRow(name);
+  await $('[data-testid="contact-panel"] [data-testid="view-full-profile"]').click();
   await $('[data-testid="screen-contact"] [data-testid="contact-header"]').waitForExist({ timeout: 5_000 });
 }
 
@@ -96,4 +101,36 @@ export async function openCardEditor(testid: string) {
     timeout: 5_000,
     timeoutMsg: `The ${testid} card never opened its editor`,
   });
+}
+
+/** Sets the window's inner size and waits until the page reports it. */
+export async function resizeWindow(width: number, height: number) {
+  // withGlobalTauri puts the window API on the page, and the wdio build grants
+  // the permission to resize.
+  await browser.executeAsync(
+    (w: number, h: number, done: (result: string) => void) => {
+      const { window: tauriWindow } = (
+        globalThis as unknown as {
+          __TAURI__: {
+            window: { getCurrentWindow(): { setSize(size: unknown): Promise<void> }; LogicalSize: new (w: number, h: number) => unknown };
+          };
+        }
+      ).__TAURI__;
+      tauriWindow
+        .getCurrentWindow()
+        .setSize(new tauriWindow.LogicalSize(w, h))
+        .then(() => done('ok'), (error: unknown) => done(String(error)));
+    },
+    width,
+    height,
+  );
+  let seen = '';
+  await browser.waitUntil(
+    async () => {
+      const size = await browser.execute(() => ({ width: window.innerWidth, height: window.innerHeight }));
+      seen = `${size.width} by ${size.height}`;
+      return size.width === width && size.height === height;
+    },
+    { timeout: 10_000, timeoutMsg: `The window never became ${width} by ${height}, it was ${seen}` },
+  );
 }

@@ -37,7 +37,7 @@
     </p>
   {/if}
 
-  <div data-testid="open-screen">
+  <div class="h-full" data-testid="open-screen">
     {#key navigation.visit}
       {#if navigation.screen === 'home'}
         <Home />

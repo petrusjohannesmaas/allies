@@ -2,6 +2,7 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/svelte';
 import { beforeEach, describe, expect, it } from 'vitest';
 import App from './App.svelte';
 import { db } from './lib/db';
+import { home } from './lib/home.svelte';
 import { navigation, openContact } from './lib/navigation.svelte';
 import { addContact, blankInput } from './lib/repo/contacts';
 import { settings } from './lib/settings.svelte';
@@ -10,6 +11,7 @@ import { fakeStore } from './test/fake-store';
 beforeEach(() => {
   navigation.screen = 'home';
   navigation.contactId = null;
+  home.selectedId = null;
 });
 
 describe('the sidebar', () => {
@@ -72,10 +74,10 @@ describe('the sidebar', () => {
 });
 
 describe('the shell', () => {
-  it('opens on Home, the contacts list, with the search box in the header', () => {
+  it('opens on Home, the contacts list, with the search box in the header', async () => {
     render(App);
     expect(screen.getByTestId('screen-home')).toBeTruthy();
-    expect(screen.getByTestId('screen-contacts')).toBeTruthy();
+    expect(await screen.findByTestId('contact-panel-empty')).toBeTruthy();
     expect(screen.getByTestId('home-header').contains(screen.getByTestId('search-box'))).toBe(true);
     expect(screen.getByTestId('notifications')).toBeTruthy();
   });
@@ -103,6 +105,7 @@ describe('the shell', () => {
   });
 
   it('reloads Home when its sidebar button is pressed again', async () => {
+    await (await db()).execute('DELETE FROM contacts');
     render(App);
     await waitFor(() => expect(screen.getByTestId('contacts-empty')).toBeTruthy());
 
@@ -110,6 +113,24 @@ describe('the shell', () => {
     await fireEvent.click(screen.getByTestId('sidebar-home'));
 
     await waitFor(() => expect(screen.getByTestId('contacts-list').textContent).toContain('Ada'));
+  });
+
+  it('Home keeps the selected contact when its sidebar button is pressed again', async () => {
+    const connection = await db();
+    await connection.execute('DELETE FROM contacts');
+    await addContact(connection, { ...blankInput(), firstName: 'Ada', lastName: 'Lovelace' });
+    await addContact(connection, { ...blankInput(), firstName: 'Grace', lastName: 'Hopper' });
+
+    render(App);
+    await waitFor(() => expect(screen.getAllByTestId('contact-row')).toHaveLength(2));
+    const grace = screen.getAllByTestId('contact-row').find((row) => row.getAttribute('data-contact-name') === 'Grace Hopper')!;
+    await fireEvent.click(grace);
+    await waitFor(() => expect(screen.getByTestId('panel-name').textContent).toBe('Grace Hopper'));
+
+    await fireEvent.click(screen.getByTestId('sidebar-home'));
+
+    await waitFor(() => expect(screen.getAllByTestId('contact-row')).toHaveLength(2));
+    await waitFor(() => expect(screen.getByTestId('panel-name').textContent).toBe('Grace Hopper'));
   });
 
   it('says so when the contact is gone', async () => {

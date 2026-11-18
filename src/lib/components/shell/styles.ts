@@ -3,11 +3,19 @@
 // never as a solid fill. `--accent-text` is the accent made darker in Light
 // and lighter in Dark, so it reads on the grey sidebar and on the page.
 
-/** A 48 px square icon button in the sidebar. */
+/** A 48 px square icon button in the sidebar. Add exactly one of the two below. */
 export const sidebarButton =
-  'relative flex size-12 cursor-pointer items-center justify-center rounded-2xl text-muted-foreground transition-colors hover:bg-(color:--accent-bg)/12 hover:text-(color:--accent-text)';
+  'relative flex size-12 cursor-pointer items-center justify-center rounded-2xl transition-colors';
 
-/** Added to a sidebar button for the page that is open. */
+/** A sidebar button for a page that is not open. */
+export const sidebarButtonIdle =
+  'text-muted-foreground hover:bg-(color:--accent-bg)/12 hover:text-(color:--accent-text)';
+
+/**
+ * A sidebar button for the page that is open. It never sits beside the idle
+ * classes: two text colours on one element resolve by Tailwind's CSS order,
+ * not by the order in the class list, and the grey would win.
+ */
 export const sidebarButtonCurrent = 'bg-(color:--accent-bg)/18 text-(color:--accent-text)';
 
 /** A round 40 px icon button in the home header. It grows sideways when it holds text. */

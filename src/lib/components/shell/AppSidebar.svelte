@@ -2,7 +2,7 @@
   import { LogOut, Settings } from '@lucide/svelte';
   import { Tooltip } from 'bits-ui';
   import ShellTooltip from './ShellTooltip.svelte';
-  import { sidebarButton, sidebarButtonCurrent } from './styles';
+  import { sidebarButton, sidebarButtonCurrent, sidebarButtonIdle } from './styles';
   import type { NavItem } from './types';
 
   // Always collapsed: icons only, each labelled by a tooltip. From the top:
@@ -50,7 +50,7 @@
               aria-current={current === item.id ? 'page' : undefined}
               data-testid="sidebar-{item.id}"
               onclick={() => onnavigate(item.id)}
-              class="{sidebarButton} {current === item.id ? sidebarButtonCurrent : ''}"
+              class="{sidebarButton} {current === item.id ? sidebarButtonCurrent : sidebarButtonIdle}"
             >
               <item.icon size={22} strokeWidth={1.8} aria-hidden="true" />
               {#if item.dot}
@@ -76,7 +76,7 @@
             aria-current={current === 'settings' ? 'page' : undefined}
             data-testid="sidebar-settings"
             onclick={() => onnavigate('settings')}
-            class="{sidebarButton} {current === 'settings' ? sidebarButtonCurrent : ''}"
+            class="{sidebarButton} {current === 'settings' ? sidebarButtonCurrent : sidebarButtonIdle}"
           >
             <Settings size={22} strokeWidth={1.8} aria-hidden="true" />
           </button>

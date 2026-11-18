@@ -6,6 +6,7 @@
   import { openContact } from '$lib/navigation.svelte';
   import { fullName, searchContacts, type Contact } from '$lib/repo/contacts';
 
+  let input = $state<HTMLInputElement | null>(null);
   let text = $state('');
   let results = $state<Contact[]>([]);
   let searched = $state(false);
@@ -41,7 +42,8 @@
 
 <div class="relative w-full">
   <Search class="pointer-events-none absolute top-1/2 left-2 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
-  <Input type="search" class="w-full pl-8" placeholder="Search contacts" aria-label="Search contacts" aria-controls="search-results" data-testid="search-box" bind:value={text} oninput={search} />
+  <Input type="search" class="w-full pr-16 pl-8" placeholder="Search contacts" aria-label="Search contacts" aria-controls="search-results" data-testid="search-box" bind:value={text} bind:ref={input} oninput={search} />
+  <kbd class="pointer-events-none absolute top-1/2 right-2 -translate-y-1/2 rounded border border-border px-1.5 py-0.5 text-xs text-muted-foreground" data-testid="search-hint">Ctrl+K</kbd>
 
   {#if searched}
     <div
@@ -75,4 +77,12 @@
 
 <!-- The box keeps focus after a result opens, so the user can type the next
      name straight away. -->
-<svelte:window onkeydown={(event) => event.key === 'Escape' && clear()} />
+<svelte:window
+  onkeydown={(event) => {
+    if (event.key === 'Escape') clear();
+    if (event.ctrlKey && event.key.toLowerCase() === 'k') {
+      event.preventDefault();
+      input?.focus();
+    }
+  }}
+/>

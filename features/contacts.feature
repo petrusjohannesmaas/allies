@@ -7,6 +7,8 @@ Feature: Contacts
     Given the app has just started
     When I open the "Home" screen
     Then the contacts list is empty
+    And the empty state offers Add contact
+    And the panel shows its empty card
 
   Scenario: Add a contact
     Given the app has just started
@@ -21,6 +23,7 @@ Feature: Contacts
     And I fill in the tags "chess"
     And I save the contact
     Then the contacts list shows "Ada Lovelace"
+    And the panel shows the name "Ada Lovelace"
     And the contacts list has no Edit button
     And the contact "Ada Lovelace" has the category "colleague"
     And the contact "Ada Lovelace" has the email "ada@example.com"
@@ -35,7 +38,7 @@ Feature: Contacts
     And I add a contact
     And I save the contact
     Then the form says the first name is required
-    And the contacts list is empty
+    And the database holds 0 contacts
 
   Scenario: An email has to be an address
     Given the app has just started
@@ -45,7 +48,7 @@ Feature: Contacts
     And I fill in "ada at example" as the email
     And I save the contact
     Then the form says the email is not valid
-    And the contacts list is empty
+    And the database holds 0 contacts
 
   Scenario: The category picker offers eight categories
     Given the app has just started
@@ -84,6 +87,7 @@ Feature: Contacts
     And I confirm the deletion
     Then the contacts list does not show "Ada Lovelace"
     And the contacts list shows "Grace Hopper"
+    And the panel shows the name "Grace Hopper"
     When I close and reopen the app
     And I open the "Home" screen
     Then the contacts list does not show "Ada Lovelace"

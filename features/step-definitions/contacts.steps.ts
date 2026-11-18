@@ -4,7 +4,7 @@ import { chooseOption, contactRows, dayFromNow, openCardEditor, selectContact, s
 import { contactValue, countRows, insertContact } from './data';
 
 const FORM = '[data-testid="contact-form"]';
-const LIST = `${'[data-testid="screen-contacts"]'} [data-testid="contacts-list"]`;
+const LIST = '[data-testid="contacts-list"]';
 
 async function openTheForm() {
   await $('[data-testid="add-contact"]').click();
@@ -14,6 +14,12 @@ async function openTheForm() {
 Given('a contact named {string} exists', async (name: string) => {
   const [firstName, lastName = ''] = name.split(' ');
   insertContact({ firstName, lastName: lastName || undefined });
+});
+
+Given(/^(\d+) contacts exist$/, async (count: string) => {
+  for (let number = 1; number <= Number(count); number++) {
+    insertContact({ firstName: 'Contact', lastName: String(number).padStart(2, '0') });
+  }
 });
 
 Given(
@@ -102,18 +108,14 @@ When(/^I add the tag "([^"]+)"$/, async (tag: string) => {
 });
 
 When(/^I delete the contact "([^"]+)"$/, async (name: string) => {
-  await browser.execute((wanted) => {
-    const rows = [...document.querySelectorAll('[data-testid="contact-row"]')];
-    const row = rows.find((candidate) => candidate.getAttribute('data-contact-name') === wanted);
-    if (!row) throw new Error(`No contact named "${wanted}"`);
-    (row.querySelector('[data-testid="delete-contact"]') as HTMLButtonElement).click();
-  }, name);
+  if (!(await $('[data-testid="screen-contact"]').isExisting())) await selectContact(name);
+  await $('[data-testid="delete-contact"]').click();
   await $('[data-testid="confirm-delete"]').waitForExist({ timeout: 5_000 });
 });
 
 When('I confirm the deletion', async () => {
   await $('[data-testid="confirm-delete"]').click();
-  await $('[data-testid="confirm-delete"]').waitForExist({ reverse: true, timeout: 5_000 });
+  await $('[data-testid="screen-home"]').waitForExist({ timeout: 5_000 });
 });
 
 When('I cancel the deletion', async () => {
@@ -123,7 +125,15 @@ When('I cancel the deletion', async () => {
 
 Then('the contacts list has no Edit button', async () => {
   expect(await $('[data-testid="edit-contact"]').isExisting()).toBe(false);
-  expect(await $('[data-testid="screen-contacts"] [data-testid="contact-row"] [data-testid="delete-contact"]').isExisting()).toBe(true);
+  expect(await $('[data-testid="contacts-list"] [data-testid="contact-row"] [data-testid="delete-contact"]').isExisting()).toBe(false);
+});
+
+Then('the empty state offers Add contact', async () => {
+  await $('[data-testid="contacts-empty"] [data-testid="add-contact"]').waitForExist({ timeout: 5_000 });
+});
+
+Then('the panel shows its empty card', async () => {
+  await $('[data-testid="contact-panel-empty"]').waitForExist({ timeout: 5_000 });
 });
 
 Then('the contacts list is empty', async () => {
@@ -143,10 +153,13 @@ Then(/^the contacts list does not show "([^"]+)"$/, async (name: string) => {
 });
 
 Then(/^the contact "([^"]+)" has the category "([^"]+)"$/, async (name: string, category: string) => {
-  const row = `[data-testid="contact-row"][data-contact-name="${name}"]`;
-  await $(row).waitForExist({ timeout: 5_000 });
-
-  expect(await textOf(row)).toContain(labelFor(category));
+  // The row no longer shows the category. The panel's pill does, and the
+  // contact is the selected one in the scenarios that ask.
+  await browser.waitUntil(async () => (await textOf('[data-testid="panel-name"]')) === name, {
+    timeout: 5_000,
+    timeoutMsg: `The panel never showed ${name}`,
+  });
+  expect(await textOf('[data-testid="panel-category"]')).toBe(labelFor(category));
   expect(contactValue(name, 'category')).toBe(category);
 });
 

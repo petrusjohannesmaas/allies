@@ -19,6 +19,16 @@ Object.defineProperty(window, 'crypto', {
   configurable: true,
 });
 
+// jsdom has no ResizeObserver, which Svelte's bind:clientHeight reads. It does
+// no layout either, so a measured height stays 0 and Home shows every row.
+if (!('ResizeObserver' in globalThis)) {
+  globalThis.ResizeObserver = class {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  };
+}
+
 // jsdom has no matchMedia, which the theme code reads.
 if (!window.matchMedia) {
   window.matchMedia = ((query: string) => ({

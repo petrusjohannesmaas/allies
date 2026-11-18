@@ -13,10 +13,11 @@ A narrow sidebar of icons holds Home, Missions, Interactions and Calendar, with
 Settings and a Log out button (not available yet) at the bottom. Missions and
 Calendar are placeholders for now, and Interactions shows the journal.
 
-**Home.** Your contacts. Add and delete a contact with a picture, a category,
-names, an email, a phone number, a birthday and tags. You edit a contact on
-their own page. Type part of a name in the search box at the top to find one.
-The top right holds a bell, the light and dark switch and your profile.
+**Home.** Your contacts. Add a contact with a picture, a category,
+names, an email, a phone number, a birthday and tags. You edit or delete a
+contact on their own page. Type part of a name in the search box at the top to
+find one. The top right holds a bell, the light and dark switch and your
+profile.
 
 **A contact.** Everything about one person on one page. A header holds the
 picture, name, category, email, phone number, birthday and tags, with the
