@@ -58,16 +58,18 @@ const COLUMNS = 'id, category, first_name, last_name, email, phone, birthday, pi
 
 // A contact known by one name sorts under that name, so the list reads the way
 // the user wrote it down.
-const ORDER = `ORDER BY COALESCE(NULLIF(last_name, ''), first_name) COLLATE NOCASE, first_name COLLATE NOCASE, id`;
+const ORDER_TERMS = `COALESCE(NULLIF(last_name, ''), first_name) COLLATE NOCASE, first_name COLLATE NOCASE, id`;
 
 /** Every contact, by last name and then first name. */
 export async function listContacts(db: Db): Promise<Contact[]> {
-  return db.select<Contact>(`SELECT ${COLUMNS} FROM contacts ${ORDER}`);
+  return db.select<Contact>(`SELECT ${COLUMNS} FROM contacts ORDER BY ${ORDER_TERMS}`);
 }
 
 /** Every contact, the most recently viewed first, then the never-viewed ones by name. */
 export async function listContactsByLastViewed(db: Db): Promise<Contact[]> {
-  return db.select<Contact>(`SELECT ${COLUMNS} FROM contacts ORDER BY last_viewed_at IS NULL, last_viewed_at DESC, ${ORDER.replace('ORDER BY ', '')}`);
+  return db.select<Contact>(
+    `SELECT ${COLUMNS} FROM contacts ORDER BY last_viewed_at IS NULL, last_viewed_at DESC, ${ORDER_TERMS}`,
+  );
 }
 
 /** A contact with what Home's panel shows beside it. */
@@ -196,7 +198,7 @@ export async function searchContacts(db: Db, text: string): Promise<Contact[]> {
      WHERE first_name LIKE $1 ESCAPE '\\'
         OR last_name LIKE $1 ESCAPE '\\'
         OR (first_name || ' ' || COALESCE(last_name, '')) LIKE $1 ESCAPE '\\'
-     ${ORDER}
+     ORDER BY ${ORDER_TERMS}
      LIMIT 8`,
     [pattern],
   );

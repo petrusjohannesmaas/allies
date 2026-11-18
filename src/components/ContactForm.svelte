@@ -38,9 +38,8 @@
     title?: string;
   } = $props();
 
-  // The form takes the contact once, when it mounts. Contacts.svelte keys the
-  // form on the contact it edits, so a different contact is a new form rather
-  // than a reset of this one's edits.
+  // The form reads the contact once, when it mounts: Home's Add contact mounts
+  // it blank, and ContactHeader mounts it with the contact being edited.
   // svelte-ignore state_referenced_locally
   let input = $state<ContactInput>(contact ? toInput(contact, tags) : blankInput());
   // svelte-ignore state_referenced_locally

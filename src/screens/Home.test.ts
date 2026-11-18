@@ -1,9 +1,9 @@
-import { fireEvent, render, screen, waitFor, within } from '@testing-library/svelte';
+import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/svelte';
 import { beforeEach, describe, expect, it } from 'vitest';
 import Home from './Home.svelte';
 import { db } from '$lib/db';
 import { home } from '$lib/home.svelte';
-import { addContact, blankInput, getContact } from '$lib/repo/contacts';
+import { addContact, blankInput } from '$lib/repo/contacts';
 
 async function reset() {
   const connection = await db();
@@ -24,8 +24,9 @@ describe('the contact list and the panel', () => {
   it('Clicking a row shows that contact and leaves its last view alone', async () => {
     const connection = await reset();
     const ada = await addContact(connection, { ...blankInput(), firstName: 'Ada', lastName: 'Lovelace' });
-    const grace = await addContact(connection, { ...blankInput(), firstName: 'Grace', lastName: 'Hopper' });
-    await connection.execute('UPDATE contacts SET last_viewed_at = $1 WHERE id = $2', ['2026-11-18T10:00:00.000Z', ada]);
+    await addContact(connection, { ...blankInput(), firstName: 'Grace', lastName: 'Hopper' });
+    const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
+    await connection.execute('UPDATE contacts SET last_viewed_at = $1 WHERE id = $2', [fiveMinutesAgo, ada]);
     home.selectedId = ada;
 
     render(Home);
@@ -37,8 +38,15 @@ describe('the contact list and the panel', () => {
     expect(within(rowOf('Grace Hopper')).getByTestId('contact-row-menu')).toBeTruthy();
     expect(within(rowOf('Ada Lovelace')).getByTestId('contact-row-chevron')).toBeTruthy();
     expect(rowOf('Ada Lovelace').getAttribute('aria-current')).toBeNull();
-    expect((await getContact(connection, ada))!.last_viewed_at).toBe('2026-11-18T10:00:00.000Z');
-    expect((await getContact(connection, grace))!.last_viewed_at).toBeNull();
+
+    // Reading Home again shows the rows as the click left them: Ada still at
+    // the time she was viewed before the click, and Grace still never viewed,
+    // so the click recorded no view for either.
+    await new Promise((done) => setTimeout(done, 0));
+    cleanup();
+    render(Home);
+    await waitFor(() => expect(within(rowOf('Ada Lovelace')).getByTestId('contact-row-time').textContent).toBe('5m ago'));
+    expect(within(rowOf('Grace Hopper')).getByTestId('contact-row-time').textContent).toBe('');
   });
 
   it('The panel shows placeholders for missing values', async () => {
