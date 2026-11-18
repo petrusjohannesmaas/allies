@@ -99,7 +99,7 @@
           aria-current={selected ? 'true' : undefined}
           onclick={() => onselect(contact.id)}
         >
-          <button type="button" class="flex min-w-0 flex-1 cursor-pointer items-center gap-3 text-left" onclick={() => onselect(contact.id)}>
+          <button type="button" class="flex min-w-0 flex-1 cursor-pointer items-center gap-3 text-left">
             <Avatar picture={contact.picture} name={fullName(contact)} size={40} />
             <span class="min-w-0 flex-1">
               <span class="block truncate text-sm font-medium">{fullName(contact)}</span>
