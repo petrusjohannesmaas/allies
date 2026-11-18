@@ -262,11 +262,10 @@ Then('the page has no horizontal scroll', async () => {
   expect(sizes.scroll).toBeLessThanOrEqual(sizes.client);
 });
 
-// The panel's box is the aside that scrolls it. The contact-panel block inside it is taller than the aside when the window is short.
 async function panelBox() {
   return browser.execute(() => {
     const panel = document.querySelector('[data-testid="contact-panel"]') as HTMLElement | null;
-    const area = panel?.parentElement ?? null;
+    const area = panel;
     return {
       found: panel !== null,
       bottom: area?.getBoundingClientRect().bottom ?? 0,
@@ -285,12 +284,11 @@ Then('the panel fits inside the window', async () => {
   }, { timeout: 5_000, timeoutMsg: `The bottom of the panel is outside the window: ${JSON.stringify(await panelBox())}` });
 });
 
-// The panel's scrolling area is the aside that holds the contact-panel block.
 Then('the panel scrolls inside itself', async () => {
   await browser.waitUntil(
     async () =>
       browser.execute(() => {
-        const area = document.querySelector('[data-testid="contact-panel"]')?.parentElement as HTMLElement | null;
+        const area = document.querySelector('[data-testid="contact-panel"]') as HTMLElement | null;
         return area !== null && area.scrollHeight > area.clientHeight;
       }),
     { timeout: 5_000, timeoutMsg: 'The panel does not scroll inside itself' },
@@ -309,7 +307,7 @@ Then('the whole panel shows', async () => {
   await browser.waitUntil(
     async () =>
       browser.execute(() => {
-        const area = document.querySelector('[data-testid="contact-panel"]')?.parentElement as HTMLElement | null;
+        const area = document.querySelector('[data-testid="contact-panel"]') as HTMLElement | null;
         return area !== null && area.scrollHeight <= area.clientHeight;
       }),
     { timeout: 5_000, timeoutMsg: `The panel scrolls inside itself: ${JSON.stringify(await panelBox())}` },

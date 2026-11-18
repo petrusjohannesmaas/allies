@@ -18,7 +18,7 @@
   ];
 </script>
 
-<aside class="flex h-full w-80 shrink-0 flex-col gap-3 overflow-y-auto" aria-label="Selected contact">
+<aside class="flex h-full min-h-0 w-80 shrink-0 flex-col gap-3" aria-label="Selected contact">
   {#if card === null}
     <Card.Root class="items-center p-6 text-center" data-testid="contact-panel-empty">
       <User class="size-8 text-muted-foreground" aria-hidden="true" />
@@ -26,7 +26,7 @@
     </Card.Root>
   {:else}
     {@const contact = card.contact}
-    <div class="flex flex-col gap-3" data-testid="contact-panel">
+    <div class="flex min-h-0 flex-col gap-3 overflow-y-auto [&>*]:shrink-0" data-testid="contact-panel">
       <Card.Root class="relative items-center gap-2 p-4">
         <div class="absolute top-2 right-2"><IconButton label="Edit contact"><Pencil aria-hidden="true" /></IconButton></div>
         <Avatar picture={contact.picture} name={fullName(contact)} size={96} />
