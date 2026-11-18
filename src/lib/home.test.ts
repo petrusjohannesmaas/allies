@@ -1,25 +1,27 @@
 import { describe, expect, it } from 'vitest';
-import { homeView } from './home.svelte';
+import { homeView, pickContact } from './home.svelte';
 
 const contacts = (...ids: number[]) => ids.map((id) => ({ id }));
 
-describe('homeView', () => {
+describe('pickContact', () => {
   it('picks a random contact when none is remembered', () => {
-    expect(homeView(contacts(1, 2, 3, 4), null, { random: () => 0.5 }).selected?.id).toBe(3);
+    expect(pickContact(contacts(1, 2, 3, 4), null, () => 0.5)?.id).toBe(3);
   });
 
   it('keeps the remembered contact', () => {
-    expect(homeView(contacts(1, 2, 3, 4), 2, { random: () => 0.99 }).selected?.id).toBe(2);
+    expect(pickContact(contacts(1, 2, 3, 4), 2, () => 0.99)?.id).toBe(2);
   });
 
   it('picks again when the remembered contact is gone', () => {
-    expect(homeView(contacts(1, 3, 4), 2, { random: () => 0 }).selected?.id).toBe(1);
+    expect(pickContact(contacts(1, 3, 4), 2, () => 0)?.id).toBe(1);
   });
 
   it('has nothing selected with no contacts', () => {
-    expect(homeView([], null, { random: () => 0.5 }).selected).toBeNull();
+    expect(pickContact([], null, () => 0.5)).toBeNull();
   });
+});
 
+describe('homeView', () => {
   const many = (n: number) => contacts(...Array.from({ length: n }, (_, index) => index + 1));
   const ids = (rows: { id: number }[]) => rows.map((row) => row.id);
   const range = (from: number, to: number) => Array.from({ length: to - from + 1 }, (_, index) => from + index);

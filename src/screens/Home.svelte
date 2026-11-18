@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { untrack } from 'svelte';
   import { Bell } from '@lucide/svelte';
   import { HeaderButton, HomeHeader } from '$lib/components/shell';
   import { openSettings } from '$lib/navigation.svelte';
@@ -8,7 +9,7 @@
   import ContactPanel from '../components/ContactPanel.svelte';
   import SearchBox from '../components/SearchBox.svelte';
   import { db } from '../lib/db';
-  import { home } from '../lib/home.svelte';
+  import { home, pickContact } from '../lib/home.svelte';
   import {
     addContactWithPicture,
     getContactCard,
@@ -27,6 +28,9 @@
   let card = $state<ContactCard | null>(null);
   let mode = $state<'list' | 'add'>('list');
   let failure = $state('');
+  // The page the arrows asked for. It lives here so it survives the Add contact
+  // form replacing the list, and null means the page that holds the panel's contact.
+  let requestedPage = $state<number | null>(null);
 
   const selectedId = $derived(home.selectedId);
 
@@ -34,8 +38,17 @@
     void reload();
   });
 
-  // The panel's card follows the remembered contact. The list reports the
-  // contact it shows, including a fresh random pick.
+  // The panel's contact is picked once per app start, and again when the
+  // remembered one is gone. Only a change to the contacts triggers it, so a
+  // saved contact is selected before the reload that lists it.
+  $effect(() => {
+    if (!loaded) return;
+    const picked = pickContact(contacts, untrack(() => home.selectedId));
+    const id = picked?.id ?? null;
+    if (id !== untrack(() => home.selectedId)) home.selectedId = id;
+  });
+
+  // The panel's card follows the remembered contact.
   $effect(() => {
     const id = selectedId;
     if (id === null) {
@@ -60,6 +73,7 @@
     try {
       home.selectedId = await addContactWithPicture(await db(), input, picture);
       await reload();
+      requestedPage = null;
       mode = 'list';
     } catch (error) {
       failure = error instanceof Error ? error.message : String(error);
@@ -104,8 +118,10 @@
           {contacts}
           {selectedId}
           {now}
+          page={requestedPage}
           onselect={(id) => (home.selectedId = id)}
           onadd={() => (mode = 'add')}
+          onpage={(page) => (requestedPage = page)}
         />
       {/if}
       <ContactPanel {card} />

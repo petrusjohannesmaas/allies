@@ -13,21 +13,29 @@ export interface HomeView<T> {
 }
 
 interface HomeOptions {
-  random?: () => number;
   /** The height in pixels of the space the rows fill. Infinity keeps one page. */
   listHeight?: number;
   /** The page asked for, or null for the page that holds the selected contact. */
   page?: number | null;
 }
 
+/** The contact the panel shows: the remembered one, else a random one, else none. */
+export function pickContact<T extends { id: number }>(
+  contacts: T[],
+  selectedId: number | null,
+  random: () => number = Math.random,
+): T | null {
+  const remembered = contacts.find((contact) => contact.id === selectedId);
+  if (remembered) return remembered;
+  return contacts.length === 0 ? null : contacts[Math.floor(random() * contacts.length)];
+}
+
 export function homeView<T extends { id: number }>(
   contacts: T[],
   selectedId: number | null,
-  { random = Math.random, listHeight = Infinity, page = null }: HomeOptions = {},
+  { listHeight = Infinity, page = null }: HomeOptions = {},
 ): HomeView<T> {
-  const remembered = contacts.find((contact) => contact.id === selectedId);
-  const picked = contacts.length === 0 ? null : contacts[Math.floor(random() * contacts.length)];
-  const selected = remembered ?? picked;
+  const selected = contacts.find((contact) => contact.id === selectedId) ?? null;
 
   const perPage = Math.max(1, Math.floor(listHeight / ROW_HEIGHT));
   const pages = Math.max(1, Math.ceil(contacts.length / perPage));

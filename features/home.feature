@@ -76,6 +76,7 @@ Feature: Home
     When I open the "Home" screen
     And I go to the first page
     And I click the row "Contact 01"
+    And I click Next page
     Then the list does not scroll
     When I remember the page size
     And the window grows to 1366 by 1000
@@ -83,6 +84,17 @@ Feature: Home
     And the page count is the same or lower
     And the row "Contact 01" is on screen
     And the list does not scroll
+
+  Scenario: The page survives Add contact and Cancel
+    Given the app has just started
+    And 30 contacts exist
+    And the window is 1366 by 700
+    When I open the "Home" screen
+    And I go to the first page
+    And I click Next page
+    And I click Add contact
+    And I cancel the contact form
+    Then the pager reads page 2
 
   Scenario: Home comes back on the selected contact's page
     Given the app has just started

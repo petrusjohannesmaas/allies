@@ -140,6 +140,7 @@ const LIST = '[data-testid="contacts-list"]';
 const PAGER = '[data-testid="pager"]';
 let remembered: string[] = [];
 let rememberedSize = 0;
+let rememberedPages = 0;
 
 async function pager(): Promise<{ page: number; pages: number }> {
   const text = await browser.execute((selector) => document.querySelector(selector)?.textContent?.trim() ?? '', PAGER);
@@ -159,6 +160,16 @@ async function waitForPage(wanted: (page: number, pages: number) => boolean, mes
 
 When(/^the window (?:is|grows to) (\d+) by (\d+)$/, async (width: string, height: string) => {
   await resizeWindow(Number(width), Number(height));
+});
+
+When('I click Add contact', async () => {
+  await $('[data-testid="add-contact"]').click();
+  await $('[data-testid="contact-form"]').waitForExist({ timeout: 5_000 });
+});
+
+When('I cancel the contact form', async () => {
+  await $('[data-testid="cancel-contact"]').click();
+  await $(PAGER).waitForExist({ timeout: 5_000 });
 });
 
 When('I click Next page', async () => {
@@ -187,6 +198,7 @@ When('I remember the rows', async () => {
 
 When('I remember the page size', async () => {
   rememberedSize = (await contactRows()).length;
+  rememberedPages = (await pager()).pages;
 });
 
 When('I click the first row on the page', async () => {
@@ -241,7 +253,8 @@ Then('the page holds more rows', async () => {
 
 Then('the page count is the same or lower', async () => {
   const { pages } = await pager();
-  expect(pages).toBeLessThanOrEqual(Math.ceil(30 / Math.max(1, rememberedSize)));
+  expect(rememberedPages).toBeGreaterThan(1);
+  expect(pages).toBeLessThanOrEqual(rememberedPages);
 });
 
 Then(/^the row "([^"]+)" is on screen$/, async (name: string) => {

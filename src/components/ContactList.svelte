@@ -25,36 +25,32 @@
     contacts,
     selectedId,
     now,
+    page,
     onselect,
     onadd,
+    onpage,
   }: {
     contacts: Contact[];
     selectedId: number | null;
     now: Date;
+    page: number | null;
     onselect: (id: number) => void;
     onadd: () => void;
+    onpage: (page: number | null) => void;
   } = $props();
 
   // The list measures itself, so a page holds as many rows as fit. A height of
-  // 0 means the list is not laid out yet, so every row shows until it is. The
-  // page the arrows asked for is kept until the height changes, and null means
-  // the page that holds the panel's contact.
+  // 0 means the list is not laid out yet, so every row shows until it is. Home
+  // owns the page the arrows asked for, and null means the page that holds the
+  // panel's contact. A new height asks for that page again.
   let measuredHeight = $state(0);
-  let requestedPage = $state<number | null>(null);
 
-  const view = $derived(homeView(contacts, selectedId, { listHeight: measuredHeight || Infinity, page: requestedPage }));
+  const view = $derived(homeView(contacts, selectedId, { listHeight: measuredHeight || Infinity, page }));
 
-  $effect(() => {
-    void measuredHeight;
-    requestedPage = null;
-  });
-
-  // The contact the panel shows may be a fresh random pick, so the screen that
-  // owns the panel hears about it through the same path a row click takes.
-  $effect(() => {
-    const id = view.selected?.id ?? null;
-    if (id !== null && id !== selectedId) onselect(id);
-  });
+  function measured(height: number) {
+    if (measuredHeight !== 0 && height !== measuredHeight) onpage(null);
+    measuredHeight = height;
+  }
 
   const chips = [
     { label: 'All', icon: Users },
@@ -88,7 +84,7 @@
       <Button variant="outline" size="sm">Sort: Recent<ChevronDown aria-hidden="true" /></Button>
     </div>
 
-    <ul class="min-h-0 flex-1 overflow-hidden" data-testid="contacts-list" bind:clientHeight={measuredHeight}>
+    <ul class="min-h-0 flex-1 overflow-hidden" data-testid="contacts-list" bind:clientHeight={null, measured}>
       {#each view.rows as contact (contact.id)}
         {@const selected = contact.id === selectedId}
         <!-- The row's own button gives the keyboard a way in. The row also takes the click, so the whole width selects. -->
@@ -126,9 +122,9 @@
       <Button variant="outline"><Download aria-hidden="true" />Import</Button>
       <Button variant="outline"><Upload aria-hidden="true" />Export</Button>
       <div class="ml-auto flex items-center gap-1">
-        <IconButton label="Previous page" disabled={view.page <= 1} onclick={() => (requestedPage = view.page - 1)}><ChevronLeft aria-hidden="true" /></IconButton>
+        <IconButton label="Previous page" disabled={view.page <= 1} onclick={() => onpage(view.page - 1)}><ChevronLeft aria-hidden="true" /></IconButton>
         <span class="px-2 text-sm" data-testid="pager">{view.page} / {view.pages}</span>
-        <IconButton label="Next page" disabled={view.page >= view.pages} onclick={() => (requestedPage = view.page + 1)}><ChevronRight aria-hidden="true" /></IconButton>
+        <IconButton label="Next page" disabled={view.page >= view.pages} onclick={() => onpage(view.page + 1)}><ChevronRight aria-hidden="true" /></IconButton>
       </div>
     </div>
   {/if}

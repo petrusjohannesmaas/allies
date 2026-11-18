@@ -22,7 +22,7 @@ src/
   lib/db.ts               the Db interface (select, execute) and the plugin-backed Db
   lib/dates.ts            date strings, adding months, the upcoming-dates function, the time since a contact was viewed
   lib/navigation.svelte.ts  the open screen and the open contact
-  lib/home.svelte.ts      Home's selected contact for the session, and `homeView`, which picks the panel's contact and the page
+  lib/home.svelte.ts      Home's selected contact for the session, `pickContact`, which picks the panel's contact, and `homeView`, which pages the list
   lib/settings.svelte.ts  the theme and accent, applied to <html> and saved through platform.ts
   lib/accents.ts          the nine accents and the colours worked out from them
   lib/utils.ts            `cn`, used by the shadcn-svelte components
