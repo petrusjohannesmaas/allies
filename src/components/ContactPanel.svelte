@@ -4,11 +4,12 @@
   import * as Card from '$lib/components/ui/card';
   import { labelFor } from '../lib/categories';
   import { dayOf, formatDate } from '../lib/dates';
+  import { openContact } from '../lib/navigation.svelte';
   import { fullName, type ContactCard } from '../lib/repo/contacts';
   import Avatar from './Avatar.svelte';
   import IconButton from './IconButton.svelte';
 
-  let { card, onopen }: { card: ContactCard | null; onopen: () => void } = $props();
+  let { card }: { card: ContactCard | null } = $props();
 
   const actions = [
     { label: 'Message', icon: MessageSquare },
@@ -62,7 +63,7 @@
         <p class="line-clamp-4 text-sm {card.note ? '' : 'text-muted-foreground italic'}" data-testid="panel-note">{card.note ?? 'No notes yet'}</p>
       </Card.Root>
 
-      <Button data-testid="view-full-profile" onclick={onopen}>View full profile</Button>
+      <Button data-testid="view-full-profile" onclick={() => card && openContact(card.contact.id)}>View full profile</Button>
     </div>
   {/if}
 </aside>

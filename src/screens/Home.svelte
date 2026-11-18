@@ -9,7 +9,6 @@
   import SearchBox from '../components/SearchBox.svelte';
   import { db } from '../lib/db';
   import { home } from '../lib/home.svelte';
-  import { openContact } from '../lib/navigation.svelte';
   import {
     addContactWithPicture,
     getContactCard,
@@ -109,7 +108,7 @@
           onadd={() => (mode = 'add')}
         />
       {/if}
-      <ContactPanel {card} onopen={() => selectedId !== null && openContact(selectedId)} />
+      <ContactPanel {card} />
     </div>
   {/if}
 </div>

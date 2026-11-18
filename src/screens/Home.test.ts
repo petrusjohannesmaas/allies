@@ -1,4 +1,5 @@
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/svelte';
+import { tick } from 'svelte';
 import { beforeEach, describe, expect, it } from 'vitest';
 import Home from './Home.svelte';
 import { db } from '$lib/db';
@@ -42,7 +43,7 @@ describe('the contact list and the panel', () => {
     // Reading Home again shows the rows as the click left them: Ada still at
     // the time she was viewed before the click, and Grace still never viewed,
     // so the click recorded no view for either.
-    await new Promise((done) => setTimeout(done, 0));
+    await tick();
     cleanup();
     render(Home);
     await waitFor(() => expect(within(rowOf('Ada Lovelace')).getByTestId('contact-row-time').textContent).toBe('5m ago'));
