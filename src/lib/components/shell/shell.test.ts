@@ -55,6 +55,21 @@ describe('AppShell', () => {
     expect(onnavigate.mock.calls).toEqual([['three'], ['settings']]);
   });
 
+  it('gives the open page the accent text colour and no grey', () => {
+    renderShell('two');
+    expect(screen.getByTestId('sidebar-two').className).toContain('text-(color:--accent-text)');
+    expect(screen.getByTestId('sidebar-two').className).not.toContain('text-muted-foreground');
+    expect(screen.getByTestId('sidebar-one').className).toContain('text-muted-foreground');
+  });
+
+  it('names a button in a tooltip when the pointer moves over it', async () => {
+    renderShell();
+    const button = screen.getByTestId('sidebar-three');
+    await fireEvent(button, new PointerEvent('pointerenter', { bubbles: false, pointerType: 'mouse' }));
+    await fireEvent(button, new PointerEvent('pointermove', { bubbles: true, pointerType: 'mouse' }));
+    expect((await screen.findByRole('tooltip', {}, { timeout: 2000 })).textContent).toContain('Three');
+  });
+
   it('shows a dot on a feature that asks for one', () => {
     renderShell();
     expect(screen.getByTestId('sidebar-two-dot')).toBeTruthy();
