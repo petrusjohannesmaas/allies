@@ -60,3 +60,20 @@ Then(/^the search says "([^"]+)"$/, async (message: string) => {
   await element.waitForExist({ timeout: 5_000 });
   expect((await element.getText()).trim()).toBe(message);
 });
+
+Then(/^the search box shows "([^"]+)"$/, async (hint: string) => {
+  const element = await $('[data-testid="home-header"] [data-testid="search-hint"]');
+  await element.waitForExist({ timeout: 5_000 });
+  expect((await element.getText()).trim()).toBe(hint);
+});
+
+When('I press Ctrl+K', async () => {
+  await browser.keys(['Control', 'k']);
+});
+
+Then('the search box has the focus', async () => {
+  await browser.waitUntil(
+    async () => browser.execute(() => document.activeElement?.getAttribute('data-testid') === 'search-box'),
+    { timeout: 5_000, timeoutMsg: 'The search box never took the focus' },
+  );
+});

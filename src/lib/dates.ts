@@ -31,6 +31,26 @@ export function formatDate(day: string): string {
   return `${date} ${MONTHS[month - 1]} ${year}`;
 }
 
+/** How long ago a timestamp was, for the list on Home. A week or more reads as the date. */
+export function formatTimeSince(timestamp: string | null, now: Date): string {
+  if (timestamp === null) return '';
+  const seconds = (now.getTime() - new Date(timestamp).getTime()) / 1000;
+  if (seconds < 60) return 'Just now';
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `${minutes}m ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.floor(hours / 24);
+  if (days < 7) return `${days}d ago`;
+  return formatDate(dayOf(timestamp));
+}
+
+/** The local day of a timestamp. */
+export function dayOf(timestamp: string): string {
+  const when = new Date(timestamp);
+  return `${when.getFullYear()}-${pad(when.getMonth() + 1)}-${pad(when.getDate())}`;
+}
+
 /** The year and month a date sits in, for grouping upcoming dates by month. */
 export function monthOf(day: string): string {
   return day.slice(0, 7);

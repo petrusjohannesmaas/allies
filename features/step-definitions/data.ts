@@ -59,6 +59,7 @@ export function insertContact(fields: {
   firstName: string;
   lastName?: string;
   email?: string;
+  phone?: string;
   birthday?: string;
   picture?: string;
   lastViewedAt?: string;
@@ -66,14 +67,15 @@ export function insertContact(fields: {
   return withDatabase((db) => {
     const result = db
       .prepare(
-        `INSERT INTO contacts (category, first_name, last_name, email, birthday, picture, last_viewed_at)
-         VALUES ($category, $first, $last, $email, $birthday, $picture, $viewed)`,
+        `INSERT INTO contacts (category, first_name, last_name, email, phone, birthday, picture, last_viewed_at)
+         VALUES ($category, $first, $last, $email, $phone, $birthday, $picture, $viewed)`,
       )
       .run({
         $category: fields.category ?? 'friend',
         $first: fields.firstName,
         $last: fields.lastName ?? null,
         $email: fields.email ?? null,
+        $phone: fields.phone ?? null,
         $birthday: fields.birthday ?? null,
         $picture: fields.picture ?? null,
         $viewed: fields.lastViewedAt ?? null,
@@ -105,5 +107,34 @@ export function contactValue(
   if (id === undefined) return undefined;
   return withDatabase(
     (db) => (db.prepare(`SELECT ${column} FROM contacts WHERE id = $id`).get({ $id: id }) as Record<string, unknown>)[column],
+  );
+}
+
+/** Sets one column of an existing contact, found by the name the list shows. */
+export function setContactValue(name: string, column: 'email' | 'phone' | 'category', value: string): void {
+  const id = findContactId(name);
+  if (id === undefined) throw new Error(`No contact named ${name}`);
+  withDatabase((db) => db.prepare(`UPDATE contacts SET ${column} = $value WHERE id = $id`).run({ $value: value, $id: id }));
+}
+
+/** Gives a contact a home address. */
+export function insertHomeAddress(name: string, city: string, country: string): void {
+  const id = findContactId(name);
+  if (id === undefined) throw new Error(`No contact named ${name}`);
+  withDatabase((db) =>
+    db
+      .prepare('INSERT INTO addresses (contact_id, city, country, is_home) VALUES ($id, $city, $country, 1)')
+      .run({ $id: id, $city: city, $country: country }),
+  );
+}
+
+/** Gives a contact a note. */
+export function insertNote(name: string, body: string, favourite: boolean): void {
+  const id = findContactId(name);
+  if (id === undefined) throw new Error(`No contact named ${name}`);
+  withDatabase((db) =>
+    db
+      .prepare('INSERT INTO notes (contact_id, body, is_favourite) VALUES ($id, $body, $favourite)')
+      .run({ $id: id, $body: body, $favourite: favourite ? 1 : 0 }),
   );
 }

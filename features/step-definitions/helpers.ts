@@ -1,5 +1,3 @@
-export const CONTACTS_SCREEN = '[data-testid="screen-contacts"]';
-
 // Native date inputs take a value the driver cannot type into, so the field is
 // set from the page and sent the change event the screen listens for.
 export async function setFieldValue(selector: string, value: string) {
@@ -74,11 +72,18 @@ export function dayFromNow(phrase: string): string {
   return when.toLocaleDateString('en-CA');
 }
 
-/** Opens a contact from the Contacts list and waits for its page. */
-export async function selectContact(name: string) {
-  const row = $(`[data-testid="contact-row"][data-contact-name="${name}"] [data-testid="open-contact"]`);
+/** Clicks a row on Home, which shows that contact in the panel. */
+export async function clickRow(name: string) {
+  const row = $(`[data-testid="contact-row"][data-contact-name="${name}"]`);
   await row.waitForExist({ timeout: 5_000 });
   await row.click();
+  await $(`[data-testid="contact-row"][data-contact-name="${name}"][aria-current="true"]`).waitForExist({ timeout: 5_000 });
+}
+
+/** Opens a contact from Home: the row, then View full profile, and waits for its page. */
+export async function selectContact(name: string) {
+  await clickRow(name);
+  await $('[data-testid="contact-panel"] [data-testid="view-full-profile"]').click();
   await $('[data-testid="screen-contact"] [data-testid="contact-header"]').waitForExist({ timeout: 5_000 });
 }
 

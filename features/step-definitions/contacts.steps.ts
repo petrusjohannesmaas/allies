@@ -4,7 +4,7 @@ import { chooseOption, contactRows, dayFromNow, openCardEditor, selectContact, s
 import { contactValue, countRows, insertContact } from './data';
 
 const FORM = '[data-testid="contact-form"]';
-const LIST = `${'[data-testid="screen-contacts"]'} [data-testid="contacts-list"]`;
+const LIST = '[data-testid="contacts-list"]';
 
 async function openTheForm() {
   await $('[data-testid="add-contact"]').click();
@@ -119,7 +119,15 @@ When('I cancel the deletion', async () => {
 
 Then('the contacts list has no Edit button', async () => {
   expect(await $('[data-testid="edit-contact"]').isExisting()).toBe(false);
-  expect(await $('[data-testid="screen-contacts"] [data-testid="contact-row"] [data-testid="delete-contact"]').isExisting()).toBe(false);
+  expect(await $('[data-testid="contacts-list"] [data-testid="contact-row"] [data-testid="delete-contact"]').isExisting()).toBe(false);
+});
+
+Then('the empty state offers Add contact', async () => {
+  await $('[data-testid="contacts-empty"] [data-testid="add-contact"]').waitForExist({ timeout: 5_000 });
+});
+
+Then('the panel shows its empty card', async () => {
+  await $('[data-testid="contact-panel-empty"]').waitForExist({ timeout: 5_000 });
 });
 
 Then('the contacts list is empty', async () => {
@@ -139,10 +147,13 @@ Then(/^the contacts list does not show "([^"]+)"$/, async (name: string) => {
 });
 
 Then(/^the contact "([^"]+)" has the category "([^"]+)"$/, async (name: string, category: string) => {
-  const row = `[data-testid="contact-row"][data-contact-name="${name}"]`;
-  await $(row).waitForExist({ timeout: 5_000 });
-
-  expect(await textOf(row)).toContain(labelFor(category));
+  // The row no longer shows the category. The panel's pill does, and the
+  // contact is the selected one in the scenarios that ask.
+  await browser.waitUntil(async () => (await textOf('[data-testid="panel-name"]')) === name, {
+    timeout: 5_000,
+    timeoutMsg: `The panel never showed ${name}`,
+  });
+  expect(await textOf('[data-testid="panel-category"]')).toBe(labelFor(category));
   expect(contactValue(name, 'category')).toBe(category);
 });
 

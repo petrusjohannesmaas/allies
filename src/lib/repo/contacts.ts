@@ -65,6 +65,35 @@ export async function listContacts(db: Db): Promise<Contact[]> {
   return db.select<Contact>(`SELECT ${COLUMNS} FROM contacts ${ORDER}`);
 }
 
+/** Every contact, the most recently viewed first, then the never-viewed ones by name. */
+export async function listContactsByLastViewed(db: Db): Promise<Contact[]> {
+  return db.select<Contact>(`SELECT ${COLUMNS} FROM contacts ORDER BY last_viewed_at IS NULL, last_viewed_at DESC, ${ORDER.replace('ORDER BY ', '')}`);
+}
+
+/** A contact with what Home's panel shows beside it. */
+export interface ContactCard {
+  contact: Contact;
+  location: string | null;
+  note: string | null;
+}
+
+export async function getContactCard(db: Db, id: number): Promise<ContactCard | null> {
+  const rows = await db.select<Contact & { city: string | null; country: string | null; note: string | null }>(
+    `SELECT ${COLUMNS.split(', ').map((column) => `c.${column}`).join(', ')},
+            a.city AS city, a.country AS country,
+            (SELECT body FROM notes WHERE contact_id = c.id ORDER BY is_favourite DESC, created_at DESC, id DESC LIMIT 1) AS note
+       FROM contacts c
+       LEFT JOIN addresses a ON a.contact_id = c.id AND a.is_home = 1
+      WHERE c.id = $1`,
+    [id],
+  );
+  if (rows.length === 0) return null;
+
+  const { city, country, note, ...contact } = rows[0];
+  const location = [city, country].filter((part) => part && part.trim() !== '').join(', ');
+  return { contact, location: location === '' ? null : location, note };
+}
+
 export async function getContact(db: Db, id: number): Promise<Contact | null> {
   const rows = await db.select<Contact>(`SELECT ${COLUMNS} FROM contacts WHERE id = $1`, [id]);
   return rows[0] ?? null;

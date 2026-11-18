@@ -9,7 +9,9 @@ import {
   deleteContact,
   fullName,
   getContact,
+  getContactCard,
   listContacts,
+  listContactsByLastViewed,
   markViewed,
   searchContacts,
   toInput,
@@ -273,5 +275,56 @@ describe('deleting a contact', () => {
 
   it('is quiet when the contact is already gone', async () => {
     await expect(deleteContact(db, { id: 99, picture: null } as never)).resolves.toBeUndefined();
+  });
+});
+
+describe('listContactsByLastViewed', () => {
+  it('sorts by the last view, then by name', async () => {
+    const ada = await addContact(db, input({ firstName: 'Ada', lastName: 'Lovelace' }));
+    const grace = await addContact(db, input({ firstName: 'Grace', lastName: 'Hopper' }));
+    await addContact(db, input({ firstName: 'Alan', lastName: 'Turing' }));
+    await addContact(db, input({ firstName: 'Bea', lastName: 'Abbott' }));
+    await db.execute('UPDATE contacts SET last_viewed_at = $1 WHERE id = $2', ['2026-11-18T10:00:00.000Z', ada]);
+    await db.execute('UPDATE contacts SET last_viewed_at = $1 WHERE id = $2', ['2026-11-18T12:00:00.000Z', grace]);
+
+    expect((await listContactsByLastViewed(db)).map((contact) => contact.first_name)).toEqual(['Grace', 'Ada', 'Bea', 'Alan']);
+  });
+});
+
+describe('getContactCard', () => {
+  it('picks the favourite note and the home city', async () => {
+    const id = await addContact(db, input());
+    await db.execute('INSERT INTO notes (contact_id, body, is_favourite, created_at) VALUES ($1, $2, 1, $3)', [id, 'Older favourite', '2026-11-01T10:00:00.000Z']);
+    await db.execute('INSERT INTO notes (contact_id, body, is_favourite, created_at) VALUES ($1, $2, 0, $3)', [id, 'Newer note', '2026-11-10T10:00:00.000Z']);
+    await db.execute('INSERT INTO addresses (contact_id, city, country, is_home) VALUES ($1, $2, $3, 0)', [id, 'London', 'United Kingdom']);
+    await db.execute('INSERT INTO addresses (contact_id, city, country, is_home) VALUES ($1, $2, $3, 1)', [id, 'Cape Town', 'South Africa']);
+
+    const card = await getContactCard(db, id);
+
+    expect(card?.note).toBe('Older favourite');
+    expect(card?.location).toBe('Cape Town, South Africa');
+    expect(card?.contact.first_name).toBe('Ada');
+  });
+
+  it('falls back to the latest note', async () => {
+    const id = await addContact(db, input());
+    await db.execute('INSERT INTO notes (contact_id, body, created_at) VALUES ($1, $2, $3)', [id, 'First', '2026-11-01T10:00:00.000Z']);
+    await db.execute('INSERT INTO notes (contact_id, body, created_at) VALUES ($1, $2, $3)', [id, 'Second', '2026-11-10T10:00:00.000Z']);
+
+    expect((await getContactCard(db, id))?.note).toBe('Second');
+  });
+
+  it('has nothing to show without notes or a home address', async () => {
+    const id = await addContact(db, input());
+
+    const bare = await getContactCard(db, id);
+    expect(bare?.note).toBeNull();
+    expect(bare?.location).toBeNull();
+
+    await db.execute('INSERT INTO addresses (contact_id, city, is_home) VALUES ($1, $2, 1)', [id, 'Cape Town']);
+    expect((await getContactCard(db, id))?.location).toBe('Cape Town');
+
+    await db.execute('UPDATE addresses SET city = NULL, country = $1 WHERE contact_id = $2', ['South Africa', id]);
+    expect((await getContactCard(db, id))?.location).toBe('South Africa');
   });
 });
