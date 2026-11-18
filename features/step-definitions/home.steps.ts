@@ -219,12 +219,17 @@ Then('the first row on the page is highlighted', async () => {
   });
 });
 
+// After a resize the list measures again and re-pages, so the check waits for that.
 Then('the list does not scroll', async () => {
-  const sizes = await browser.execute((selector) => {
-    const list = document.querySelector(selector) as HTMLElement;
-    return { scroll: list.scrollHeight, client: list.clientHeight };
-  }, LIST);
-  expect(sizes.scroll).toBeLessThanOrEqual(sizes.client);
+  const measure = () =>
+    browser.execute((selector) => {
+      const list = document.querySelector(selector) as HTMLElement;
+      return { scroll: list.scrollHeight, client: list.clientHeight };
+    }, LIST);
+  await browser.waitUntil(async () => {
+    const sizes = await measure();
+    return sizes.scroll <= sizes.client;
+  }, { timeout: 5_000, timeoutMsg: `The list scrolls: ${JSON.stringify(await measure())}` });
 });
 
 Then('the page holds more rows', async () => {
@@ -257,13 +262,14 @@ Then('the page has no horizontal scroll', async () => {
   expect(sizes.scroll).toBeLessThanOrEqual(sizes.client);
 });
 
+// The panel's box is the aside that scrolls it. The contact-panel block inside it is taller than the aside when the window is short.
 async function panelBox() {
   return browser.execute(() => {
     const panel = document.querySelector('[data-testid="contact-panel"]') as HTMLElement | null;
     const area = panel?.parentElement ?? null;
     return {
       found: panel !== null,
-      bottom: panel?.getBoundingClientRect().bottom ?? 0,
+      bottom: area?.getBoundingClientRect().bottom ?? 0,
       height: window.innerHeight,
       width: window.innerWidth,
       areaScroll: area?.scrollHeight ?? 0,
@@ -289,4 +295,32 @@ Then('the panel scrolls inside itself', async () => {
       }),
     { timeout: 5_000, timeoutMsg: 'The panel does not scroll inside itself' },
   );
+});
+
+Then('the page does not scroll', async () => {
+  const sizes = await browser.execute(() => {
+    const panel = document.querySelector('[data-testid="content-panel"]') as HTMLElement;
+    return { scroll: panel.scrollHeight, client: panel.clientHeight };
+  });
+  expect(sizes.scroll).toBeLessThanOrEqual(sizes.client);
+});
+
+Then('the whole panel shows', async () => {
+  await browser.waitUntil(
+    async () =>
+      browser.execute(() => {
+        const area = document.querySelector('[data-testid="contact-panel"]')?.parentElement as HTMLElement | null;
+        return area !== null && area.scrollHeight <= area.clientHeight;
+      }),
+    { timeout: 5_000, timeoutMsg: `The panel scrolls inside itself: ${JSON.stringify(await panelBox())}` },
+  );
+});
+
+Then('the panel shows the name of the highlighted row', async () => {
+  const name = await browser.execute(
+    (selector) => document.querySelector(`${selector} [data-testid="contact-row"][aria-current="true"]`)?.getAttribute('data-contact-name') ?? '',
+    LIST,
+  );
+  expect(name).not.toBe('');
+  expect(await panelName()).toBe(name);
 });

@@ -89,12 +89,14 @@ Feature: Home
     And 30 contacts exist
     And the window is 1366 by 700
     When I open the "Home" screen
+    And I go to the first page
     And I click Next page
     And I click the first row on the page
     And I click View full profile
     And I click "All contacts"
-    Then the pager reads page 2
+    Then the pager reads page 1
     And the first row on the page is highlighted
+    And the panel shows the name of the highlighted row
 
   Scenario: Home fits the window
     Given the app has just started
@@ -102,10 +104,16 @@ Feature: Home
     When I open the "Home" screen
     And the window is 1366 by 700
     Then the page has no horizontal scroll
+    And the page does not scroll
     And the panel fits inside the window
+    And the list does not scroll
     When the window is 1024 by 700
     Then the page has no horizontal scroll
+    And the page does not scroll
     And the panel fits inside the window
+    And the list does not scroll
+    When the window is 1366 by 900
+    Then the whole panel shows
     When the window is 1024 by 480
     Then the panel scrolls inside itself
     And the list does not scroll
