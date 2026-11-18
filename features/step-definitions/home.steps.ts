@@ -213,6 +213,17 @@ Then(/^the pager reads page (\d+)$/, async (wanted: string) => {
   await waitForPage((page) => page === Number(wanted), `The pager never read page ${wanted}`);
 });
 
+Then('the pager reads the last page', async () => {
+  await waitForPage((page, pages) => pages > 1 && page === pages, 'The pager never reached the last page');
+});
+
+Then(/^the row "([^"]+)" is highlighted$/, async (name: string) => {
+  await $(`[data-testid="contact-row"][data-contact-name="${name}"][aria-current="true"]`).waitForExist({
+    timeout: 5_000,
+    timeoutMsg: `The row "${name}" is not highlighted`,
+  });
+});
+
 Then(/^the (Previous|Next) page button is disabled$/, async (which: string) => {
   const button = $(`button[aria-label="${which} page"]`);
   await browser.waitUntil(async () => !(await button.isEnabled()), { timeout: 5_000, timeoutMsg: `${which} page is enabled` });

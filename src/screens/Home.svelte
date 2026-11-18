@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { untrack } from 'svelte';
   import { Bell } from '@lucide/svelte';
   import { HeaderButton, HomeHeader } from '$lib/components/shell';
   import { openSettings } from '$lib/navigation.svelte';
@@ -32,32 +31,20 @@
   // form replacing the list, and null means the page that holds the panel's contact.
   let requestedPage = $state<number | null>(null);
 
-  const selectedId = $derived(home.selectedId);
-
   $effect(() => {
     void reload();
   });
 
-  // The panel's contact is picked once per app start, and again when the
-  // remembered one is gone. Only a change to the contacts triggers it, so a
-  // saved contact is selected before the reload that lists it.
-  $effect(() => {
-    if (!loaded) return;
-    const picked = pickContact(contacts, untrack(() => home.selectedId));
-    const id = picked?.id ?? null;
-    if (id !== untrack(() => home.selectedId)) home.selectedId = id;
-  });
-
   // The panel's card follows the remembered contact.
   $effect(() => {
-    const id = selectedId;
+    const id = home.selectedId;
     if (id === null) {
       card = null;
       return;
     }
     void (async () => {
       const found = await getContactCard(await db(), id);
-      if (id === selectedId) card = found;
+      if (id === home.selectedId) card = found;
     })();
   });
 
@@ -65,6 +52,9 @@
     const found = await listContactsByLastViewed(await db());
     now = new Date();
     contacts = found;
+    // The panel's contact is picked once per app start, and again when the
+    // remembered one is gone. The contacts change only here.
+    home.selectedId = pickContact(found, home.selectedId)?.id ?? null;
     loaded = true;
   }
 
@@ -116,7 +106,7 @@
       {:else}
         <ContactList
           {contacts}
-          {selectedId}
+          selectedId={home.selectedId}
           {now}
           page={requestedPage}
           onselect={(id) => (home.selectedId = id)}

@@ -96,6 +96,20 @@ Feature: Home
     And I cancel the contact form
     Then the pager reads page 2
 
+  Scenario: Saving shows the new contact's page
+    Given the app has just started
+    And 30 contacts exist
+    And the window is 1366 by 700
+    When I open the "Home" screen
+    And I go to the first page
+    And I click Add contact
+    And I fill in the first name "Zara"
+    And I fill in the last name "Zulu"
+    And I save the contact
+    Then the pager reads the last page
+    And the row "Zara Zulu" is highlighted
+    And the panel shows the name "Zara Zulu"
+
   Scenario: Home comes back on the selected contact's page
     Given the app has just started
     And 30 contacts exist
