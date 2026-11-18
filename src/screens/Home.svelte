@@ -29,11 +29,23 @@
   let mode = $state<'list' | 'add'>('list');
   let failure = $state('');
 
-  const view = $derived(homeView(contacts, home.selectedId));
+  // A height of 0 means the list is not laid out yet, so every row shows until it is.
+  // The list's measured height sets how many rows a page holds. The page the
+  // arrows asked for is kept until the height changes or the contact is added,
+  // and null means the page that holds the panel's contact.
+  let listHeight = $state(0);
+  let requestedPage = $state<number | null>(null);
+
+  const view = $derived(homeView(contacts, home.selectedId, { listHeight: listHeight || Infinity, page: requestedPage }));
   const selectedId = $derived(view.selected?.id ?? null);
 
   $effect(() => {
     void reload();
+  });
+
+  $effect(() => {
+    void listHeight;
+    requestedPage = null;
   });
 
   // The panel's contact is remembered, so another screen and a sidebar click
@@ -67,6 +79,7 @@
     try {
       home.selectedId = await addContactWithPicture(await db(), input, picture);
       mode = 'list';
+      requestedPage = null;
       await reload();
     } catch (error) {
       failure = error instanceof Error ? error.message : String(error);
@@ -114,6 +127,8 @@
           {now}
           page={view.page}
           pages={view.pages}
+          bind:listHeight
+          onpage={(next) => (requestedPage = next)}
           onselect={(id) => (home.selectedId = id)}
           onadd={() => (mode = 'add')}
         />

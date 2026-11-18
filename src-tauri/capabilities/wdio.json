@@ -7,6 +7,7 @@
   ],
   "permissions": [
     "core:app:allow-exit",
+    "core:window:allow-set-size",
     "wdio:default",
     "wdio-webdriver:default"
   ]

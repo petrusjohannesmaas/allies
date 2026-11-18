@@ -10,7 +10,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "check": "svelte-check --tsconfig ./tsconfig.json",
-    "test:e2e": "npm run build:e2e && GDK_BACKEND=x11 xvfb-run -a wdio run wdio.conf.ts",
+    "test:e2e": "npm run build:e2e && GDK_BACKEND=x11 xvfb-run -a -s '-screen 0 1920x1080x24' wdio run wdio.conf.ts",
     "build:e2e": "VITE_E2E=1 tauri build --debug --no-bundle --features wdio --config src-tauri/tauri.wdio.json",
     "tauri": "tauri",
     "desktop:install": "scripts/install-desktop.sh",

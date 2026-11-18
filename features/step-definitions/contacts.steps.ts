@@ -16,6 +16,12 @@ Given('a contact named {string} exists', async (name: string) => {
   insertContact({ firstName, lastName: lastName || undefined });
 });
 
+Given(/^(\d+) contacts exist$/, async (count: string) => {
+  for (let number = 1; number <= Number(count); number++) {
+    insertContact({ firstName: 'Contact', lastName: String(number).padStart(2, '0') });
+  }
+});
+
 Given(
   /^a contact named "([^"]+)" exists with the category "([^"]+)" and the birthday (\d{4}-\d{2}-\d{2})$/,
   async (name: string, category: string, birthday: string) => {

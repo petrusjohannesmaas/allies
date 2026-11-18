@@ -27,8 +27,10 @@
     now,
     page,
     pages,
+    listHeight = $bindable(0),
     onselect,
     onadd,
+    onpage,
   }: {
     rows: Contact[];
     total: number;
@@ -36,8 +38,10 @@
     now: Date;
     page: number;
     pages: number;
+    listHeight?: number;
     onselect: (id: number) => void;
     onadd: () => void;
+    onpage: (page: number) => void;
   } = $props();
 
   const chips = [
@@ -72,7 +76,7 @@
       <Button variant="outline" size="sm">Sort: Recent<ChevronDown aria-hidden="true" /></Button>
     </div>
 
-    <ul class="min-h-0 flex-1" data-testid="contacts-list">
+    <ul class="min-h-0 flex-1 overflow-hidden" data-testid="contacts-list" bind:clientHeight={listHeight}>
       {#each rows as contact (contact.id)}
         {@const selected = contact.id === selectedId}
         <!-- The row's own button gives the keyboard a way in. The row also takes the click, so the whole width selects. -->
@@ -109,9 +113,9 @@
       <Button variant="outline"><Download aria-hidden="true" />Import</Button>
       <Button variant="outline"><Upload aria-hidden="true" />Export</Button>
       <div class="ml-auto flex items-center gap-1">
-        <IconButton label="Previous page" disabled={page <= 1}><ChevronLeft aria-hidden="true" /></IconButton>
+        <IconButton label="Previous page" disabled={page <= 1} onclick={() => onpage(page - 1)}><ChevronLeft aria-hidden="true" /></IconButton>
         <span class="px-2 text-sm" data-testid="pager">{page} / {pages}</span>
-        <IconButton label="Next page" disabled={page >= pages}><ChevronRight aria-hidden="true" /></IconButton>
+        <IconButton label="Next page" disabled={page >= pages} onclick={() => onpage(page + 1)}><ChevronRight aria-hidden="true" /></IconButton>
       </div>
     </div>
   {/if}

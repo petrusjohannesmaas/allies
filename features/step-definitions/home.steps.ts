@@ -1,6 +1,6 @@
 import { Given, Then, When } from '@wdio/cucumber-framework';
 import { formatDate, today } from '../../src/lib/dates';
-import { clickRow, textOf } from './helpers';
+import { clickRow, contactRows, resizeWindow, textOf } from './helpers';
 import { insertContact, insertHomeAddress, insertNote, setContactValue } from './data';
 
 const PANEL = '[data-testid="contact-panel"]';
@@ -133,4 +133,160 @@ Then(/^the row "([^"]+)" reads "([^"]+)"$/, async (name: string, time: string) =
 Then(/^the row "([^"]+)" shows no time$/, async (name: string) => {
   await $(`[data-testid="contact-row"][data-contact-name="${name}"]`).waitForExist({ timeout: 5_000 });
   expect(await rowPart(name, 'time')).toBe('');
+});
+
+
+const LIST = '[data-testid="contacts-list"]';
+const PAGER = '[data-testid="pager"]';
+let remembered: string[] = [];
+let rememberedSize = 0;
+
+async function pager(): Promise<{ page: number; pages: number }> {
+  const text = await browser.execute((selector) => document.querySelector(selector)?.textContent?.trim() ?? '', PAGER);
+  const [page, pages] = text.split('/').map((part) => Number(part.trim()));
+  return { page, pages };
+}
+
+async function waitForPage(wanted: (page: number, pages: number) => boolean, message: string) {
+  await browser.waitUntil(
+    async () => {
+      const { page, pages } = await pager();
+      return wanted(page, pages);
+    },
+    { timeout: 5_000, timeoutMsg: `${message}, the pager reads ${JSON.stringify(await pager())}` },
+  );
+}
+
+When(/^the window (?:is|grows to) (\d+) by (\d+)$/, async (width: string, height: string) => {
+  await resizeWindow(Number(width), Number(height));
+});
+
+When('I click Next page', async () => {
+  await $('button[aria-label="Next page"]').click();
+});
+
+// Home opens on the page of a random contact, so a scenario that needs the first one goes there.
+When('I go to the first page', async () => {
+  for (let { page } = await pager(); page > 1; page--) {
+    await $('button[aria-label="Previous page"]').click();
+    await waitForPage((now) => now === page - 1, `The pager never reached page ${page - 1}`);
+  }
+});
+
+When('I go to the last page', async () => {
+  const { page: first, pages } = await pager();
+  for (let step = first; step < pages; step++) {
+    await $('button[aria-label="Next page"]').click();
+    await waitForPage((page) => page === step + 1, `The pager never reached page ${step + 1}`);
+  }
+});
+
+When('I remember the rows', async () => {
+  remembered = await contactRows();
+});
+
+When('I remember the page size', async () => {
+  rememberedSize = (await contactRows()).length;
+});
+
+When('I click the first row on the page', async () => {
+  await clickRow((await contactRows())[0]);
+});
+
+Then(/^the pager reads page (\d+) of more than one$/, async (wanted: string) => {
+  await waitForPage((page, pages) => page === Number(wanted) && pages > 1, `The pager never read page ${wanted} of more than one`);
+});
+
+Then(/^the pager reads page (\d+)$/, async (wanted: string) => {
+  await waitForPage((page) => page === Number(wanted), `The pager never read page ${wanted}`);
+});
+
+Then(/^the (Previous|Next) page button is disabled$/, async (which: string) => {
+  const button = $(`button[aria-label="${which} page"]`);
+  await browser.waitUntil(async () => !(await button.isEnabled()), { timeout: 5_000, timeoutMsg: `${which} page is enabled` });
+});
+
+Then('the rows are different', async () => {
+  const rows = await contactRows();
+  expect(rows.length).toBeGreaterThan(0);
+  expect(rows.some((name) => remembered.includes(name))).toBe(false);
+});
+
+Then('the first row on the page is highlighted', async () => {
+  await browser.waitUntil(async () => (await $(`${LIST} [data-testid="contact-row"]`).getAttribute('aria-current')) === 'true', {
+    timeout: 5_000,
+    timeoutMsg: 'The first row on the page is not highlighted',
+  });
+});
+
+Then('the list does not scroll', async () => {
+  const sizes = await browser.execute((selector) => {
+    const list = document.querySelector(selector) as HTMLElement;
+    return { scroll: list.scrollHeight, client: list.clientHeight };
+  }, LIST);
+  expect(sizes.scroll).toBeLessThanOrEqual(sizes.client);
+});
+
+Then('the page holds more rows', async () => {
+  await browser.waitUntil(async () => (await contactRows()).length > rememberedSize, {
+    timeout: 5_000,
+    timeoutMsg: `The page holds ${(await contactRows()).length} rows, it held ${rememberedSize}`,
+  });
+});
+
+Then('the page count is the same or lower', async () => {
+  const { pages } = await pager();
+  expect(pages).toBeLessThanOrEqual(Math.ceil(30 / Math.max(1, rememberedSize)));
+});
+
+Then(/^the row "([^"]+)" is on screen$/, async (name: string) => {
+  const row = await $(`[data-testid="contact-row"][data-contact-name="${name}"]`);
+  await row.waitForExist({ timeout: 5_000 });
+  const inside = await browser.execute((element) => {
+    const box = (element as unknown as HTMLElement).getBoundingClientRect();
+    return box.top >= 0 && box.bottom <= window.innerHeight;
+  }, row);
+  expect(inside).toBe(true);
+});
+
+Then('the page has no horizontal scroll', async () => {
+  const sizes = await browser.execute(() => {
+    const panel = document.querySelector('[data-testid="content-panel"]') as HTMLElement;
+    return { scroll: panel.scrollWidth, client: panel.clientWidth };
+  });
+  expect(sizes.scroll).toBeLessThanOrEqual(sizes.client);
+});
+
+async function panelBox() {
+  return browser.execute(() => {
+    const panel = document.querySelector('[data-testid="contact-panel"]') as HTMLElement | null;
+    const area = panel?.parentElement ?? null;
+    return {
+      found: panel !== null,
+      bottom: panel?.getBoundingClientRect().bottom ?? 0,
+      height: window.innerHeight,
+      width: window.innerWidth,
+      areaScroll: area?.scrollHeight ?? 0,
+      areaClient: area?.clientHeight ?? 0,
+    };
+  });
+}
+
+Then('the panel fits inside the window', async () => {
+  await browser.waitUntil(async () => {
+    const box = await panelBox();
+    return box.found && box.bottom <= box.height;
+  }, { timeout: 5_000, timeoutMsg: `The bottom of the panel is outside the window: ${JSON.stringify(await panelBox())}` });
+});
+
+// The panel's scrolling area is the aside that holds the contact-panel block.
+Then('the panel scrolls inside itself', async () => {
+  await browser.waitUntil(
+    async () =>
+      browser.execute(() => {
+        const area = document.querySelector('[data-testid="contact-panel"]')?.parentElement as HTMLElement | null;
+        return area !== null && area.scrollHeight > area.clientHeight;
+      }),
+    { timeout: 5_000, timeoutMsg: 'The panel does not scroll inside itself' },
+  );
 });

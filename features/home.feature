@@ -51,3 +51,61 @@ Feature: Home
     When I click "All contacts"
     Then the panel shows the name "Grace Hopper"
     And the row "Grace Hopper" reads "Just now"
+
+  Scenario: Move between pages
+    Given the app has just started
+    And 30 contacts exist
+    And the window is 1366 by 700
+    When I open the "Home" screen
+    And I go to the first page
+    And I click the row "Contact 01"
+    Then the pager reads page 1 of more than one
+    And the Previous page button is disabled
+    When I remember the rows
+    And I click Next page
+    Then the pager reads page 2
+    And the rows are different
+    And the panel shows the name "Contact 01"
+    When I go to the last page
+    Then the Next page button is disabled
+
+  Scenario: A taller window holds more rows
+    Given the app has just started
+    And 30 contacts exist
+    And the window is 1366 by 700
+    When I open the "Home" screen
+    And I go to the first page
+    And I click the row "Contact 01"
+    Then the list does not scroll
+    When I remember the page size
+    And the window grows to 1366 by 1000
+    Then the page holds more rows
+    And the page count is the same or lower
+    And the row "Contact 01" is on screen
+    And the list does not scroll
+
+  Scenario: Home comes back on the selected contact's page
+    Given the app has just started
+    And 30 contacts exist
+    And the window is 1366 by 700
+    When I open the "Home" screen
+    And I click Next page
+    And I click the first row on the page
+    And I click View full profile
+    And I click "All contacts"
+    Then the pager reads page 2
+    And the first row on the page is highlighted
+
+  Scenario: Home fits the window
+    Given the app has just started
+    And 30 contacts exist
+    When I open the "Home" screen
+    And the window is 1366 by 700
+    Then the page has no horizontal scroll
+    And the panel fits inside the window
+    When the window is 1024 by 700
+    Then the page has no horizontal scroll
+    And the panel fits inside the window
+    When the window is 1024 by 480
+    Then the panel scrolls inside itself
+    And the list does not scroll

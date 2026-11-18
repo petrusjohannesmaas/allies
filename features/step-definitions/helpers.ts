@@ -102,3 +102,35 @@ export async function openCardEditor(testid: string) {
     timeoutMsg: `The ${testid} card never opened its editor`,
   });
 }
+
+/** Sets the window's inner size and waits until the page reports it. */
+export async function resizeWindow(width: number, height: number) {
+  // withGlobalTauri puts the window API on the page, and the wdio build grants
+  // the permission to resize.
+  await browser.executeAsync(
+    (w: number, h: number, done: (result: string) => void) => {
+      const { window: tauriWindow } = (
+        globalThis as unknown as {
+          __TAURI__: {
+            window: { getCurrentWindow(): { setSize(size: unknown): Promise<void> }; LogicalSize: new (w: number, h: number) => unknown };
+          };
+        }
+      ).__TAURI__;
+      tauriWindow
+        .getCurrentWindow()
+        .setSize(new tauriWindow.LogicalSize(w, h))
+        .then(() => done('ok'), (error: unknown) => done(String(error)));
+    },
+    width,
+    height,
+  );
+  let seen = '';
+  await browser.waitUntil(
+    async () => {
+      const size = await browser.execute(() => ({ width: window.innerWidth, height: window.innerHeight }));
+      seen = `${size.width} by ${size.height}`;
+      return size.width === width && size.height === height;
+    },
+    { timeout: 10_000, timeoutMsg: `The window never became ${width} by ${height}, it was ${seen}` },
+  );
+}
