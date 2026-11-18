@@ -38,8 +38,9 @@
 
   // The panel's contact is remembered, so another screen and a sidebar click
   // bring Home back to it.
+  // Before the list loads nothing is selected, and that must not wipe the memory.
   $effect(() => {
-    home.selectedId = selectedId;
+    if (loaded && selectedId !== null) home.selectedId = selectedId;
   });
 
   $effect(() => {
