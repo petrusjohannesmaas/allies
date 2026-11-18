@@ -1,5 +1,6 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/svelte';
 import { beforeEach, describe, expect, it } from 'vitest';
+import App from '../App.svelte';
 import Contact from './Contact.svelte';
 import { db } from '$lib/db';
 import { navigation, openContact } from '$lib/navigation.svelte';
@@ -77,5 +78,18 @@ describe('deleting from the contact page', () => {
     await fireEvent.click(await screen.findByTestId('confirm-delete'));
     await waitFor(async () => expect(await getContact(connection, id)).toBeNull());
     expect(navigation.screen).toBe('home');
+  });
+
+  it('Deleting the last contact leaves Home empty', async () => {
+    const connection = await db();
+    await connection.execute('DELETE FROM contacts');
+    const id = await addContact(connection, { ...blankInput(), firstName: 'Ada', lastName: 'Lovelace' });
+    openContact(id);
+    render(App);
+    await fireEvent.click(await screen.findByTestId('delete-contact'));
+    await fireEvent.click(await screen.findByTestId('confirm-delete'));
+    await waitFor(() => expect(navigation.screen).toBe('home'));
+    expect(await screen.findByTestId('contacts-empty')).toBeTruthy();
+    expect(await screen.findByTestId('contact-panel-empty')).toBeTruthy();
   });
 });
