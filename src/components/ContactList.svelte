@@ -16,33 +16,45 @@
   } from '@lucide/svelte';
   import { Button } from '$lib/components/ui/button';
   import { formatTimeSince } from '../lib/dates';
+  import { homeView, ROW_HEIGHT } from '../lib/home.svelte';
   import { fullName, type Contact } from '../lib/repo/contacts';
   import Avatar from './Avatar.svelte';
   import IconButton from './IconButton.svelte';
 
   let {
-    rows,
-    total,
+    contacts,
     selectedId,
     now,
-    page,
-    pages,
-    listHeight = $bindable(0),
     onselect,
     onadd,
-    onpage,
   }: {
-    rows: Contact[];
-    total: number;
+    contacts: Contact[];
     selectedId: number | null;
     now: Date;
-    page: number;
-    pages: number;
-    listHeight?: number;
     onselect: (id: number) => void;
     onadd: () => void;
-    onpage: (page: number) => void;
   } = $props();
+
+  // The list measures itself, so a page holds as many rows as fit. A height of
+  // 0 means the list is not laid out yet, so every row shows until it is. The
+  // page the arrows asked for is kept until the height changes, and null means
+  // the page that holds the panel's contact.
+  let measuredHeight = $state(0);
+  let requestedPage = $state<number | null>(null);
+
+  const view = $derived(homeView(contacts, selectedId, { listHeight: measuredHeight || Infinity, page: requestedPage }));
+
+  $effect(() => {
+    void measuredHeight;
+    requestedPage = null;
+  });
+
+  // The contact the panel shows may be a fresh random pick, so the screen that
+  // owns the panel hears about it through the same path a row click takes.
+  $effect(() => {
+    const id = view.selected?.id ?? null;
+    if (id !== null && id !== selectedId) onselect(id);
+  });
 
   const chips = [
     { label: 'All', icon: Users },
@@ -53,7 +65,7 @@
 </script>
 
 <section class="flex min-h-0 min-w-0 flex-1 flex-col" data-testid="contacts-column">
-  {#if total === 0}
+  {#if contacts.length === 0}
     <div class="flex flex-1 flex-col items-start gap-3" data-testid="contacts-empty">
       <p class="text-sm text-muted-foreground">No contacts yet. Add the first one.</p>
       <Button data-testid="add-contact" onclick={onadd}><Plus aria-hidden="true" />Add contact</Button>
@@ -72,19 +84,20 @@
     </div>
 
     <div class="mb-2 flex items-center justify-between">
-      <h2 class="text-base font-semibold">All contacts ({total})</h2>
+      <h2 class="text-base font-semibold">All contacts ({contacts.length})</h2>
       <Button variant="outline" size="sm">Sort: Recent<ChevronDown aria-hidden="true" /></Button>
     </div>
 
-    <ul class="min-h-0 flex-1 overflow-hidden" data-testid="contacts-list" bind:clientHeight={listHeight}>
-      {#each rows as contact (contact.id)}
+    <ul class="min-h-0 flex-1 overflow-hidden" data-testid="contacts-list" bind:clientHeight={measuredHeight}>
+      {#each view.rows as contact (contact.id)}
         {@const selected = contact.id === selectedId}
         <!-- The row's own button gives the keyboard a way in. The row also takes the click, so the whole width selects. -->
         <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_noninteractive_element_interactions -->
         <li
-          class="border-border flex h-14 cursor-pointer items-center gap-3 rounded-lg border px-3 transition-colors hover:bg-accent {selected
+          class="border-border flex cursor-pointer items-center gap-3 rounded-lg border px-3 transition-colors hover:bg-accent {selected
             ? 'bg-accent border-primary'
             : 'border-transparent'}"
+          style:height="{ROW_HEIGHT}px"
           data-testid="contact-row"
           data-contact-name={fullName(contact)}
           aria-current={selected ? 'true' : undefined}
@@ -108,14 +121,14 @@
     </ul>
 
     <div class="mt-3 flex items-center gap-2">
-      <span class="text-sm text-muted-foreground" data-testid="contact-count">{total} {total === 1 ? 'contact' : 'contacts'}</span>
+      <span class="text-sm text-muted-foreground" data-testid="contact-count">{contacts.length} {contacts.length === 1 ? 'contact' : 'contacts'}</span>
       <Button variant="outline" data-testid="add-contact" onclick={onadd}><UserPlus aria-hidden="true" />Add contact</Button>
       <Button variant="outline"><Download aria-hidden="true" />Import</Button>
       <Button variant="outline"><Upload aria-hidden="true" />Export</Button>
       <div class="ml-auto flex items-center gap-1">
-        <IconButton label="Previous page" disabled={page <= 1} onclick={() => onpage(page - 1)}><ChevronLeft aria-hidden="true" /></IconButton>
-        <span class="px-2 text-sm" data-testid="pager">{page} / {pages}</span>
-        <IconButton label="Next page" disabled={page >= pages} onclick={() => onpage(page + 1)}><ChevronRight aria-hidden="true" /></IconButton>
+        <IconButton label="Previous page" disabled={view.page <= 1} onclick={() => (requestedPage = view.page - 1)}><ChevronLeft aria-hidden="true" /></IconButton>
+        <span class="px-2 text-sm" data-testid="pager">{view.page} / {view.pages}</span>
+        <IconButton label="Next page" disabled={view.page >= view.pages} onclick={() => (requestedPage = view.page + 1)}><ChevronRight aria-hidden="true" /></IconButton>
       </div>
     </div>
   {/if}
